@@ -1,8 +1,6 @@
-# Seanna Hartbauer
+Pre-med biology student at Los Medanos College | UC Transfer candidate, Molecular and Cell Biology, 2028
 
-Pre-med biology student at Los Medanos College | Transfer candidate, UC Berkeley MCB 2028
 
-I'm building toward a career in pathology. This site houses my academic portfolio, clinical research work, and tools built along the way.
 
-## Contact
-ss.hartbauer@gmail.com
+Portfolio of academic work, clinical research, data visualizations, and study tools built along the path to medicine.
+
