@@ -7,8 +7,14 @@ header {
 }
 
 #banner {
-  background: #C96460;
-  border: 4px solid #F08667;
+  background: #FEF086;
+  border: 2px solid #F08667;
+}
+
+#banner a.button {
+  background: #F08667;
+  border-color: #F08667;
+  color: #fff;
 }
 
 header h1 {
