@@ -10,7 +10,7 @@ My goal is pathology, with an openness to whatever catches my attention along th
 
 
 
-\## Contact
+\##Contact
 
-\[ss.hartbauer@gmail.com](mailto:ss.hartbauer@gmail.com)
+ss.hartbauer@gmail.com
 
