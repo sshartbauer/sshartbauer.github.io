@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hospital Spanish Phrase Guide</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --slate:#395C6B;--pink:#C96460;--peach:#F08667;--teal:#00AFB9;--yellow:#FDFCDC;
+  --purple:#9b59b6;--red:#e74c3c;
+  --bg:#080e14;--surf:#0d1b26;--surf2:#132233;--border:#2a4858;--text:#FDFCDC;--muted:#6fa0af;
+  --known:#2ecc71;--unknown:#e74c3c;
+}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;display:flex;flex-direction:column}
+
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid var(--border);background:linear-gradient(90deg,#060c12,#0a1520);flex-shrink:0}
+.topbar h1{font-size:1.15rem;font-weight:800;letter-spacing:-.02em;color:var(--teal)}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.mode-toggle{display:flex;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.mode-btn{padding:5px 14px;font-size:.75rem;font-weight:600;cursor:pointer;border:none;background:var(--surf2);color:var(--muted);transition:all .15s}
+.mode-btn.active{background:var(--teal);color:#080e14}
+.reset-btn{padding:5px 12px;border-radius:7px;border:1px solid var(--border);background:var(--surf2);color:var(--muted);font-size:.73rem;cursor:pointer;transition:all .15s}
+.reset-btn:hover{border-color:var(--pink);color:var(--pink)}
+
+.main{display:flex;flex:1;overflow:hidden}
+
+.sidebar{width:240px;flex-shrink:0;background:linear-gradient(180deg,#0a1720 0%,#08131e 100%);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.sidebar-hdr{padding:14px 16px 10px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+.sidebar-hdr span{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+.sidebar-acts{display:flex;gap:5px}
+.btn-xs{padding:2px 9px;border-radius:5px;border:1px solid var(--border);background:var(--surf2);color:var(--text);font-size:.68rem;cursor:pointer;transition:all .15s}
+.btn-xs:hover{border-color:var(--teal);color:var(--teal)}
+
+.sidebar-body{flex:1;overflow-y:auto;padding:10px 12px 16px}
+.sidebar-body::-webkit-scrollbar{width:4px}
+.sidebar-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+.sec-col{display:flex;flex-direction:column;gap:4px}
+.sec-btn{display:flex;align-items:center;justify-content:space-between;padding:5px 10px;border-radius:8px;border:1.5px solid transparent;background:var(--surf2);color:var(--muted);font-size:.75rem;font-weight:500;cursor:pointer;transition:all .15s;user-select:none;width:100%;text-align:left}
+.sec-btn:hover{color:var(--text);border-color:var(--c)}
+.sec-btn.on{background:color-mix(in srgb,var(--c) 16%,transparent);border-color:var(--c);color:var(--c)}
+.sec-btn-left{display:flex;align-items:center;gap:6px}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--c);flex-shrink:0}
+.sec-count{font-size:.65rem;opacity:.7}
+
+.type-filter{padding:10px 12px 8px;border-top:1px solid var(--border);flex-shrink:0}
+.type-filter-label{font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:6px}
+.type-toggle{display:flex;border:1px solid var(--border);border-radius:8px;overflow:hidden;width:100%}
+.type-btn{flex:1;padding:4px 0;font-size:.7rem;font-weight:600;cursor:pointer;border:none;background:var(--surf2);color:var(--muted);transition:all .15s;text-align:center}
+.type-btn.active{background:var(--teal);color:#080e14}
+
+.prog-panel{flex-shrink:0;border-top:1px solid var(--border);padding:12px 14px;background:#06101a}
+.prog-panel-title{font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:8px}
+.prog-stats{display:flex;gap:8px;margin-bottom:8px}
+.prog-stat{flex:1;background:var(--surf2);border-radius:7px;padding:6px 8px;text-align:center;border:1px solid var(--border)}
+.prog-stat-val{font-size:1.1rem;font-weight:800;line-height:1}
+.prog-stat-lbl{font-size:.58rem;color:var(--muted);margin-top:2px}
+.prog-stat.known .prog-stat-val{color:var(--known)}
+.prog-stat.unknown .prog-stat-val{color:var(--unknown)}
+.prog-stat.total .prog-stat-val{color:var(--teal)}
+.prog-bar-wrap{display:flex;align-items:center;gap:7px;font-size:.7rem;color:var(--muted);margin-bottom:8px}
+.prog-bar{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--known),var(--teal));border-radius:3px;transition:width .4s}
+.device-notice{font-size:.59rem;color:var(--muted);text-align:center;padding:5px 14px;border-radius:6px;background:var(--surf2);border:1px solid var(--border);white-space:nowrap;flex-shrink:0}
+
+.content{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:20px 24px 16px;overflow-y:auto;gap:14px}
+.content::-webkit-scrollbar{width:5px}
+.content::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;width:100%;max-width:540px;min-height:360px;background:linear-gradient(160deg,#0d1b26,#0a1620);border:2px dashed var(--border);border-radius:18px;color:var(--muted);margin:auto}
+.empty .ico{font-size:3rem}
+.empty p{font-size:.88rem;text-align:center;max-width:240px;line-height:1.5}
+
+.stats-row{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:540px;font-size:.78rem;color:var(--muted);flex-shrink:0}
+.nav-prog{display:flex;align-items:center;gap:8px;flex:1;margin-left:12px}
+.nav-bar{flex:1;height:3px;background:var(--border);border-radius:2px;overflow:hidden}
+.nav-fill{height:100%;background:linear-gradient(90deg,var(--teal),var(--peach));border-radius:2px;transition:width .3s}
+
+.scene{width:100%;max-width:540px;height:360px;perspective:1400px;flex-shrink:0}
+.card{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.4,0,.2,1);cursor:pointer}
+.card.flipped{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;border-radius:18px;backface-visibility:hidden;-webkit-backface-visibility:hidden;display:flex;overflow:hidden}
+
+.front{background:var(--yellow);color:#1a2c3a;flex-direction:column;align-items:center;justify-content:center;padding:32px 28px;gap:12px;border:1px solid #e8e6c0;box-shadow:0 10px 40px rgba(0,0,0,.5)}
+.type-badge{padding:3px 12px;border-radius:12px;font-size:.63rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.type-badge.word{background:rgba(0,175,185,.15);color:#007a84;border:1px solid rgba(0,175,185,.4)}
+.type-badge.phrase{background:rgba(240,134,103,.15);color:#b05030;border:1px solid rgba(240,134,103,.4)}
+.sec-badge{padding:2px 10px;border-radius:10px;font-size:.63rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.phrase-en{font-size:clamp(1.3rem,3.5vw,1.9rem);font-weight:800;color:#1a2c3a;text-align:center;line-height:1.25}
+.flip-hint{font-size:.68rem;color:#a0b8c0;position:absolute;bottom:14px;display:flex;align-items:center;gap:4px}
+
+.back{background:linear-gradient(160deg,#0b1c2c 0%,#0d2035 100%);color:var(--text);transform:rotateY(180deg);flex-direction:row;align-items:stretch;padding:18px;border:1px solid var(--border);box-shadow:0 10px 40px rgba(0,0,0,.55)}
+.back-l{flex:0 0 195px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding-right:14px}
+.back-r{flex:1;display:flex;flex-direction:column;gap:10px;overflow-y:auto;padding-left:14px;border-left:1px solid var(--border)}
+.back-r::-webkit-scrollbar{width:3px}
+.back-r::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.es-label{font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+.es-text{font-size:clamp(1rem,2.4vw,1.4rem);font-weight:800;color:var(--yellow);text-align:center;line-height:1.35}
+.dl{display:flex;flex-direction:column;gap:3px}
+.dl-label{font-size:.58rem;font-weight:800;text-transform:uppercase;letter-spacing:.09em;color:var(--teal)}
+.phonetic{font-family:'SF Mono','Fira Code','Courier New',monospace;font-size:.85rem;color:var(--peach);background:#06101a;padding:5px 8px;border-radius:6px;border:1px solid var(--border);line-height:1.5}
+.notes{font-size:.75rem;color:#c9dae0;line-height:1.5;font-style:italic}
+
+.ctrls{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.btn{display:flex;align-items:center;gap:5px;padding:9px 18px;border-radius:9px;border:1px solid var(--border);background:var(--surf);color:var(--text);font-size:.84rem;font-weight:500;cursor:pointer;transition:all .15s}
+.btn:hover:not(:disabled){background:var(--surf2);border-color:var(--teal);box-shadow:0 0 10px rgba(0,175,185,.18)}
+.btn:disabled{opacity:.3;cursor:default}
+.btn-flip{background:linear-gradient(135deg,rgba(0,175,185,.14),rgba(240,134,103,.14));border-color:var(--teal);padding:9px 24px;font-weight:700}
+
+.quiz-btns{display:flex;align-items:center;gap:10px;flex-shrink:0;animation:fadeUp .25s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.btn-known{flex:1;max-width:180px;padding:10px 0;border-radius:10px;background:rgba(46,204,113,.15);border:1.5px solid var(--known);color:var(--known);font-size:.88rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .15s}
+.btn-known:hover{background:rgba(46,204,113,.28)}
+.btn-unknown{flex:1;max-width:180px;padding:10px 0;border-radius:10px;background:rgba(231,76,60,.12);border:1.5px solid var(--unknown);color:var(--unknown);font-size:.88rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .15s}
+.btn-unknown:hover{background:rgba(231,76,60,.26)}
+.quiz-card-badge{position:absolute;top:12px;right:12px;padding:3px 10px;border-radius:20px;font-size:.65rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;pointer-events:none;z-index:2}
+.badge-known{background:rgba(46,204,113,.2);color:var(--known);border:1px solid var(--known)}
+.badge-unknown{background:rgba(231,76,60,.15);color:var(--unknown);border:1px solid var(--unknown)}
+
+.kbd-hint{font-size:.67rem;color:var(--muted);text-align:center;flex-shrink:0}
+kbd{display:inline-block;padding:1px 5px;border:1px solid var(--border);border-radius:4px;background:var(--surf2);font-size:.64rem;font-family:monospace}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>🏥 Hospital Spanish Phrase Guide</h1>
+  <div class="topbar-right">
+    <div class="mode-toggle">
+      <button class="mode-btn active" id="modeBrowse" onclick="setMode('browse')">Browse</button>
+      <button class="mode-btn" id="modeQuiz" onclick="setMode('quiz')">Quiz</button>
+    </div>
+    <button class="reset-btn" onclick="resetProgress()">↺ Reset progress</button>
+  </div>
+</div>
+
+<div class="main">
+
+  <div class="sidebar">
+    <div class="sidebar-hdr">
+      <span>Sections</span>
+      <div class="sidebar-acts">
+        <button class="btn-xs" onclick="selectAll()">All</button>
+        <button class="btn-xs" onclick="clearAll()">Clear</button>
+      </div>
+    </div>
+    <div class="sidebar-body">
+      <div class="sec-col" id="sec-list"></div>
+    </div>
+
+    <div class="type-filter">
+      <div class="type-filter-label">Card Type</div>
+      <div class="type-toggle">
+        <button class="type-btn" id="typeWords" onclick="setType('word')">Words</button>
+        <button class="type-btn" id="typePhrases" onclick="setType('phrase')">Phrases</button>
+        <button class="type-btn active" id="typeBoth" onclick="setType('both')">Both</button>
+      </div>
+    </div>
+
+    <div class="prog-panel">
+      <div class="prog-panel-title">Quiz Progress</div>
+      <div class="prog-stats">
+        <div class="prog-stat known"><div class="prog-stat-val" id="pKnown">0</div><div class="prog-stat-lbl">Known</div></div>
+        <div class="prog-stat unknown"><div class="prog-stat-val" id="pUnknown">0</div><div class="prog-stat-lbl">Review</div></div>
+        <div class="prog-stat total"><div class="prog-stat-val" id="pTotal">0</div><div class="prog-stat-lbl">In Deck</div></div>
+      </div>
+      <div class="prog-bar-wrap">
+        <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+        <span id="progPct">0%</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="device-notice">💾 Progress saves to this browser only — not shared across devices</div>
+
+    <div class="empty" id="empty">
+      <div class="ico">🏥</div>
+      <p>Select a section from the left panel to load your deck</p>
+    </div>
+
+    <div class="stats-row" id="statsBar" style="display:none">
+      <span id="statsText" style="flex-shrink:0"></span>
+      <div class="nav-prog">
+        <div class="nav-bar"><div class="nav-fill" id="navFill" style="width:0%"></div></div>
+        <span id="navText" style="white-space:nowrap">0/0</span>
+      </div>
+    </div>
+
+    <div class="scene" id="scene" style="display:none">
+      <div class="card" id="card" onclick="flip()">
+        <div class="face front">
+          <div id="quizBadge" class="quiz-card-badge" style="display:none"></div>
+          <div id="fTypeBadge" class="type-badge"></div>
+          <div id="fSecBadge" class="sec-badge"></div>
+          <div class="phrase-en" id="fEnglish"></div>
+          <div class="flip-hint">↩ click or press Space to reveal</div>
+        </div>
+        <div class="face back">
+          <div class="back-l">
+            <div class="es-label">Español</div>
+            <div class="es-text" id="bSpanish"></div>
+          </div>
+          <div class="back-r" id="bDetails"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ctrls" id="ctrls" style="display:none">
+      <button class="btn" id="btnPrev" onclick="prev()">← Prev</button>
+      <button class="btn btn-flip" onclick="flip()">↩ Flip</button>
+      <button class="btn" id="btnNext" onclick="next()">Next →</button>
+      <button class="btn" onclick="shuffle()">🔀</button>
+    </div>
+
+    <div class="quiz-btns" id="quizBtns" style="display:none">
+      <button class="btn" id="qPrev" onclick="prev()">← Prev</button>
+      <button class="btn-unknown" onclick="markCard(false)">✗ Still learning</button>
+      <button class="btn-known" onclick="markCard(true)">✓ Got it</button>
+      <button class="btn" id="qNext" onclick="next()">Next →</button>
+    </div>
+
+    <div class="kbd-hint" id="kbdHint" style="display:none">
+      <kbd>←</kbd> <kbd>→</kbd> navigate &nbsp;
+      <kbd>Space</kbd> flip &nbsp;
+      <kbd>S</kbd> shuffle &nbsp;
+      <span id="quizHint" style="display:none">&nbsp; <kbd>K</kbd> known &nbsp; <kbd>U</kbd> review</span>
+    </div>
+  </div>
+</div>
+
+<script>
+const SECTIONS = {
+  assessment: {label:'Assessment', color:'#00AFB9', emoji:'🩺'},
+  vitals:     {label:'Vitals',     color:'#F08667', emoji:'📊'},
+  movement:   {label:'Movement',   color:'#C96460', emoji:'🚶'},
+  consent:    {label:'Consent',    color:'#9b59b6', emoji:'📋'},
+  discharge:  {label:'Discharge',  color:'#5a8fa0', emoji:'🏠'},
+  emergency:  {label:'Emergency',  color:'#e74c3c', emoji:'🚨'},
+};
+
+const CARDS = [
+  // ASSESSMENT — phrases
+  {id:'ass_p1',section:'assessment',type:'phrase',english:'Where does it hurt?',spanish:'¿Dónde te duele?',phonetic:'DOHN-day tay DWEH-lay',notes:'Point to body areas while asking to help the patient indicate location.'},
+  {id:'ass_p2',section:'assessment',type:'phrase',english:'How bad is the pain? One to ten.',spanish:'¿Qué tan fuerte es el dolor? Del uno al diez.',phonetic:'keh tan FWEHR-teh ehs el do-LOR? del OO-no al DYEHS',notes:'Hold up fingers to reinforce the number scale visually.'},
+  {id:'ass_p3',section:'assessment',type:'phrase',english:'How long have you had this?',spanish:'¿Cuánto tiempo llevas con esto?',phonetic:'KWAN-to TYEM-po YEH-bahs kon EHS-to',notes:'Useful for establishing onset and timeline of symptoms.'},
+  {id:'ass_p4',section:'assessment',type:'phrase',english:'Do you have any allergies?',spanish:'¿Tienes alguna alergia?',phonetic:'TYEH-nehs al-GOO-nah ah-LEHR-hyah',notes:"Follow up with '¿A qué?' (ah KEH) = 'To what?'"},
+  {id:'ass_p5',section:'assessment',type:'phrase',english:'Are you taking any medications?',spanish:'¿Estás tomando algún medicamento?',phonetic:'ehs-TAHS to-MAN-do al-GOON meh-dee-kah-MEN-to',notes:"Also accept 'pastillas' (pills) — a very common patient response."},
+  {id:'ass_p6',section:'assessment',type:'phrase',english:'Have you had surgery before?',spanish:'¿Has tenido alguna cirugía antes?',phonetic:'ahs teh-NEE-do al-GOO-nah see-roo-HEE-ah AN-tehs',notes:'Important for anesthesia history and surgical planning.'},
+  {id:'ass_p7',section:'assessment',type:'phrase',english:'Are you pregnant?',spanish:'¿Estás embarazada?',phonetic:'ehs-TAHS em-bah-rah-SAH-dah',notes:'Necessary before imaging, certain medications, or procedures.'},
+  // ASSESSMENT — words
+  {id:'ass_w1',section:'assessment',type:'word',english:'pain',spanish:'dolor',phonetic:'do-LOR',notes:''},
+  {id:'ass_w2',section:'assessment',type:'word',english:'allergy',spanish:'alergia',phonetic:'ah-LEHR-hyah',notes:''},
+  {id:'ass_w3',section:'assessment',type:'word',english:'medication',spanish:'medicamento',phonetic:'meh-dee-kah-MEN-to',notes:"Also heard as 'medicina' or 'pastilla' (pill)."},
+  {id:'ass_w4',section:'assessment',type:'word',english:'surgery',spanish:'cirugía',phonetic:'see-roo-HEE-ah',notes:''},
+  // VITALS — phrases
+  {id:'vit_p1',section:'vitals',type:'phrase',english:"I'm going to take your blood pressure.",spanish:'Te voy a tomar la presión.',phonetic:'tay BOY ah to-MAR lah preh-SYON',notes:'Show the cuff before placing it to reduce patient anxiety.'},
+  {id:'vit_p2',section:'vitals',type:'phrase',english:'I need to take your temperature.',spanish:'Necesito tomarte la temperatura.',phonetic:'neh-seh-SEE-to to-MAR-teh lah tem-peh-rah-TOO-rah',notes:'Show the thermometer first so the patient understands.'},
+  {id:'vit_p3',section:'vitals',type:'phrase',english:'Take a deep breath.',spanish:'Respira profundo.',phonetic:'rehs-PEE-rah pro-FOON-do',notes:"Use while auscultating. Add 'y suéltalo' (ee SWEL-tah-lo) = 'and let it out.'"},
+  {id:'vit_p4',section:'vitals',type:'phrase',english:'I need a urine sample.',spanish:'Necesito una muestra de orina.',phonetic:'neh-seh-SEE-to OO-nah MWEHS-trah deh oh-REE-nah',notes:'Hand the specimen cup while saying this.'},
+  {id:'vit_p5',section:'vitals',type:'phrase',english:"I'm going to draw blood.",spanish:'Te voy a sacar sangre.',phonetic:'tay BOY ah sah-KAR SAN-greh',notes:'Always warn before needle insertion to avoid startling the patient.'},
+  // VITALS — words
+  {id:'vit_w1',section:'vitals',type:'word',english:'blood pressure',spanish:'presión arterial',phonetic:'preh-SYON ar-teh-RYAL',notes:"Often shortened to just 'presión' in conversation."},
+  {id:'vit_w2',section:'vitals',type:'word',english:'temperature',spanish:'temperatura',phonetic:'tem-peh-rah-TOO-rah',notes:''},
+  {id:'vit_w3',section:'vitals',type:'word',english:'pulse',spanish:'pulso',phonetic:'POOL-so',notes:''},
+  {id:'vit_w4',section:'vitals',type:'word',english:'oxygen',spanish:'oxígeno',phonetic:'ok-SEE-heh-no',notes:''},
+  // MOVEMENT — phrases
+  {id:'mov_p1',section:'movement',type:'phrase',english:'Can you walk?',spanish:'¿Puedes caminar?',phonetic:'PWEH-dehs kah-mee-NAR',notes:''},
+  {id:'mov_p2',section:'movement',type:'phrase',english:'I need you to lie down.',spanish:'Necesito que te acuestes.',phonetic:'neh-seh-SEE-to keh tay ah-KWEHS-tehs',notes:'Pat the bed or gurney to show where you want them.'},
+  {id:'mov_p3',section:'movement',type:'phrase',english:"Don't move.",spanish:'No te muevas.',phonetic:'no tay MWEH-bahs',notes:'Use a firm tone in trauma situations. Critical for spinal injury.'},
+  {id:'mov_p4',section:'movement',type:'phrase',english:'Can you feel this?',spanish:'¿Puedes sentir esto?',phonetic:'PWEH-dehs sen-TEER EHS-to',notes:'Touch the area while asking. Standard in neuro exams.'},
+  {id:'mov_p5',section:'movement',type:'phrase',english:'Turn to your side.',spanish:'Voltéate de lado.',phonetic:'bol-TEH-ah-teh deh LAH-do',notes:'Gesture the direction you want them to turn.'},
+  {id:'mov_p6',section:'movement',type:'phrase',english:'Squeeze my hand.',spanish:'Aprieta mi mano.',phonetic:'ah-PRYEH-tah mee MAH-no',notes:'Squeeze their hand first to demonstrate the action.'},
+  // MOVEMENT — words
+  {id:'mov_w1',section:'movement',type:'word',english:'walk',spanish:'caminar',phonetic:'kah-mee-NAR',notes:''},
+  {id:'mov_w2',section:'movement',type:'word',english:'arm',spanish:'brazo',phonetic:'BRAH-so',notes:''},
+  {id:'mov_w3',section:'movement',type:'word',english:'leg',spanish:'pierna',phonetic:'PYER-nah',notes:''},
+  {id:'mov_w4',section:'movement',type:'word',english:'hand',spanish:'mano',phonetic:'MAH-no',notes:''},
+  // CONSENT — phrases
+  {id:'con_p1',section:'consent',type:'phrase',english:'I need your signature.',spanish:'Necesito tu firma.',phonetic:'neh-seh-SEE-to too FEER-mah',notes:'Point to the signature line on the form.'},
+  {id:'con_p2',section:'consent',type:'phrase',english:'Do you understand?',spanish:'¿Entiendes?',phonetic:'en-TYEN-dehs',notes:"Follow up with '¿Tienes preguntas?' (TYEH-nehs preh-GOON-tahs) = 'Do you have questions?'"},
+  {id:'con_p3',section:'consent',type:'phrase',english:'This procedure is necessary.',spanish:'Este procedimiento es necesario.',phonetic:'EHS-teh pro-seh-dee-MYEN-to ehs neh-seh-SAH-ryo',notes:'Use when explaining why a treatment plan is required.'},
+  {id:'con_p4',section:'consent',type:'phrase',english:'You have the right to refuse.',spanish:'Tienes el derecho a negarte.',phonetic:'TYEH-nehs el deh-REH-cho ah neh-GAR-teh',notes:'Inform patients of their rights before any procedure.'},
+  {id:'con_p5',section:'consent',type:'phrase',english:'Is there someone we should call?',spanish:'¿Hay alguien a quien debemos llamar?',phonetic:'eye AL-gyen ah KYEN deh-BEH-mos yah-MAR',notes:'For emergency contacts, next of kin, or guardians.'},
+  // CONSENT — words
+  {id:'con_w1',section:'consent',type:'word',english:'signature',spanish:'firma',phonetic:'FEER-mah',notes:''},
+  {id:'con_w2',section:'consent',type:'word',english:'consent',spanish:'consentimiento',phonetic:'kon-sen-tee-MYEN-to',notes:''},
+  {id:'con_w3',section:'consent',type:'word',english:'rights',spanish:'derechos',phonetic:'deh-REH-chos',notes:''},
+  // DISCHARGE — phrases
+  {id:'dis_p1',section:'discharge',type:'phrase',english:'You can go home.',spanish:'Puedes irte a casa.',phonetic:'PWEH-dehs EER-teh ah KAH-sah',notes:''},
+  {id:'dis_p2',section:'discharge',type:'phrase',english:'Take this medicine every eight hours.',spanish:'Toma este medicamento cada ocho horas.',phonetic:'TOH-mah EHS-teh meh-dee-kah-MEN-to KAH-dah OH-cho OH-rahs',notes:'Write the number and hold up fingers to reinforce dosing schedule.'},
+  {id:'dis_p3',section:'discharge',type:'phrase',english:'Come back if it gets worse.',spanish:'Regresa si empeora.',phonetic:'reh-GREH-sah see em-peh-OH-rah',notes:''},
+  {id:'dis_p4',section:'discharge',type:'phrase',english:'Follow up with your doctor in one week.',spanish:'Haz una cita con tu doctor en una semana.',phonetic:'ahs OO-nah SEE-tah kon too dok-TOR en OO-nah seh-MAH-nah',notes:'Hand them the appointment slip if available.'},
+  {id:'dis_p5',section:'discharge',type:'phrase',english:"Don't lift heavy objects.",spanish:'No levantes objetos pesados.',phonetic:'no leh-BAN-tehs ob-HEH-tos peh-SAH-dos',notes:'Common post-surgical or musculoskeletal instruction.'},
+  {id:'dis_p6',section:'discharge',type:'phrase',english:'Rest for two days.',spanish:'Descansa por dos días.',phonetic:'dehs-KAN-sah por dos DEE-ahs',notes:'Adjust the number of days as clinically appropriate.'},
+  // DISCHARGE — words
+  {id:'dis_w1',section:'discharge',type:'word',english:'appointment',spanish:'cita',phonetic:'SEE-tah',notes:''},
+  {id:'dis_w2',section:'discharge',type:'word',english:'pharmacy',spanish:'farmacia',phonetic:'far-MAH-syah',notes:''},
+  {id:'dis_w3',section:'discharge',type:'word',english:'rest',spanish:'descanso',phonetic:'dehs-KAN-so',notes:''},
+  // EMERGENCY — phrases
+  {id:'emr_p1',section:'emergency',type:'phrase',english:'I need help!',spanish:'¡Necesito ayuda!',phonetic:'neh-seh-SEE-to ah-YOO-dah',notes:'Can be called out loudly to alert nearby staff.'},
+  {id:'emr_p2',section:'emergency',type:'phrase',english:'Stay calm.',spanish:'Mantente calmado.',phonetic:'man-TEN-teh kal-MAH-do',notes:"Use 'calmada' (kal-MAH-dah) for a female patient."},
+  {id:'emr_p3',section:'emergency',type:'phrase',english:'Are you having trouble breathing?',spanish:'¿Tienes dificultad para respirar?',phonetic:'TYEH-nehs dee-fee-kool-TAD PAH-rah rehs-pee-RAR',notes:'Key screening question in any respiratory emergency.'},
+  {id:'emr_p4',section:'emergency',type:'phrase',english:'Do you have chest pain?',spanish:'¿Tienes dolor en el pecho?',phonetic:'TYEH-nehs do-LOR en el PEH-cho',notes:'Cardinal question for cardiac events. Ask alongside radiation to arm and diaphoresis.'},
+  {id:'emr_p5',section:'emergency',type:'phrase',english:"Don't move.",spanish:'No te muevas.',phonetic:'no tay MWEH-bahs',notes:'Critical in trauma. Enforce firmly and explain if possible.'},
+  {id:'emr_p6',section:'emergency',type:'phrase',english:"We're going to help you.",spanish:'Te vamos a ayudar.',phonetic:'tay BAH-mos ah ah-yoo-DAR',notes:'Reassurance is part of emergency care — use it early and often.'},
+  {id:'emr_p7',section:'emergency',type:'phrase',english:'Are you allergic to any medications?',spanish:'¿Eres alérgico a algún medicamento?',phonetic:'EH-rehs ah-LEHR-hee-ko ah al-GOON meh-dee-kah-MEN-to',notes:"Use 'alérgica' (ah-LEHR-hee-kah) for a female patient."},
+  // EMERGENCY — words
+  {id:'emr_w1',section:'emergency',type:'word',english:'help',spanish:'ayuda',phonetic:'ah-YOO-dah',notes:''},
+  {id:'emr_w2',section:'emergency',type:'word',english:'emergency',spanish:'emergencia',phonetic:'eh-mehr-HEN-syah',notes:''},
+  {id:'emr_w3',section:'emergency',type:'word',english:'chest',spanish:'pecho',phonetic:'PEH-cho',notes:''},
+  {id:'emr_w4',section:'emergency',type:'word',english:'breathing',spanish:'respiración',phonetic:'rehs-pee-rah-SYON',notes:''},
+];
+
+const LS_KEY  = 'hosp_es_progress';
+const LS_TYPE = 'hosp_es_type';
+const LS_SECS = 'hosp_es_sections';
+
+function loadProgress(){ try{ return JSON.parse(localStorage.getItem(LS_KEY))||{}; }catch{ return {}; } }
+function saveProgress(p){ try{ localStorage.setItem(LS_KEY,JSON.stringify(p)); }catch{} }
+let progress = loadProgress();
+
+const selSections = new Set();
+let cardType = 'both';
+let deck=[], idx=0, flipped=false, mode='browse';
+
+function init(){
+  const list = document.getElementById('sec-list');
+  for(const [id,s] of Object.entries(SECTIONS)){
+    const count = CARDS.filter(c=>c.section===id).length;
+    const btn = document.createElement('button');
+    btn.className='sec-btn';
+    btn.dataset.id=id;
+    btn.style.setProperty('--c',s.color);
+    btn.innerHTML=`<span class="sec-btn-left"><span class="dot" style="background:${s.color}"></span>${s.emoji} ${s.label}</span><span class="sec-count">${count}</span>`;
+    btn.onclick=()=>toggleSection(id,btn);
+    list.appendChild(btn);
+  }
+
+  // restore type
+  try{ const t=localStorage.getItem(LS_TYPE); if(t) setType(t,true); }catch{}
+  // restore sections
+  try{
+    const ss=JSON.parse(localStorage.getItem(LS_SECS));
+    if(Array.isArray(ss)){
+      ss.forEach(id=>{
+        const b=document.querySelector(`.sec-btn[data-id="${id}"]`);
+        if(b){ selSections.add(id); b.classList.add('on'); }
+      });
+      buildDeck();
+    }
+  }catch{}
+
+  document.addEventListener('keydown',e=>{
+    if(!deck.length) return;
+    if(e.key==='ArrowLeft'){ prev(); return; }
+    if(e.key==='ArrowRight'){ next(); return; }
+    if(e.key===' '){ e.preventDefault(); flip(); return; }
+    if(e.key.toLowerCase()==='s'){ shuffle(); return; }
+    if(mode==='quiz'&&flipped){
+      if(e.key.toLowerCase()==='k') markCard(true);
+      if(e.key.toLowerCase()==='u') markCard(false);
+    }
+  });
+  updateProgressPanel();
+}
+
+function setMode(m){
+  mode=m;
+  document.getElementById('modeBrowse').classList.toggle('active',m==='browse');
+  document.getElementById('modeQuiz').classList.toggle('active',m==='quiz');
+  document.getElementById('quizHint').style.display=m==='quiz'?'':'none';
+  idx=0; render();
+}
+
+function setType(t,skipSave){
+  cardType=t;
+  document.getElementById('typeWords').classList.toggle('active',t==='word');
+  document.getElementById('typePhrases').classList.toggle('active',t==='phrase');
+  document.getElementById('typeBoth').classList.toggle('active',t==='both');
+  if(!skipSave){ try{ localStorage.setItem(LS_TYPE,t); }catch{} }
+  buildDeck();
+}
+
+function toggleSection(id,btn){
+  selSections.has(id)?selSections.delete(id):selSections.add(id);
+  btn.classList.toggle('on',selSections.has(id));
+  saveSections(); buildDeck();
+}
+function selectAll(){
+  for(const id of Object.keys(SECTIONS)){
+    selSections.add(id);
+    const b=document.querySelector(`.sec-btn[data-id="${id}"]`);
+    if(b) b.classList.add('on');
+  }
+  saveSections(); buildDeck();
+}
+function clearAll(){
+  selSections.clear();
+  document.querySelectorAll('.sec-btn').forEach(b=>b.classList.remove('on'));
+  saveSections(); buildDeck();
+}
+function saveSections(){ try{ localStorage.setItem(LS_SECS,JSON.stringify([...selSections])); }catch{} }
+
+function buildDeck(){
+  deck = selSections.size===0 ? [] : CARDS.filter(c=>{
+    if(!selSections.has(c.section)) return false;
+    if(cardType==='both') return true;
+    return c.type===cardType;
+  });
+  idx=0; render();
+}
+
+function shuffle(){
+  for(let i=deck.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [deck[i],deck[j]]=[deck[j],deck[i]];
+  }
+  idx=0; showCard();
+}
+function prev(){ if(idx>0){ idx--; showCard(); } }
+function next(){ if(idx<deck.length-1){ idx++; showCard(); } }
+function flip(){
+  if(!deck.length) return;
+  flipped=!flipped;
+  document.getElementById('card').classList.toggle('flipped',flipped);
+  if(mode==='quiz'){
+    document.getElementById('quizBtns').style.display=flipped?'flex':'none';
+    document.getElementById('ctrls').style.display='none';
+  }
+}
+
+function markCard(known){
+  const c=deck[idx];
+  progress[c.id]=known;
+  saveProgress(progress);
+  updateProgressPanel();
+  const badge=document.getElementById('quizBadge');
+  badge.textContent=known?'✓ Known':'✗ Review';
+  badge.className='quiz-card-badge '+(known?'badge-known':'badge-unknown');
+  badge.style.display='';
+  setTimeout(()=>{ if(idx<deck.length-1){ idx++; showCard(); } else showCard(); },400);
+}
+
+function resetProgress(){
+  if(!confirm('Reset all quiz progress?')) return;
+  progress={}; saveProgress(progress); updateProgressPanel();
+  if(deck.length) showCard();
+}
+
+function updateProgressPanel(){
+  const ids=deck.map(c=>c.id);
+  const known=ids.filter(id=>progress[id]===true).length;
+  const unknown=ids.filter(id=>progress[id]===false).length;
+  const total=deck.length;
+  const pct=total?Math.round(known/total*100):0;
+  document.getElementById('pKnown').textContent=known;
+  document.getElementById('pUnknown').textContent=unknown;
+  document.getElementById('pTotal').textContent=total;
+  document.getElementById('progFill').style.width=pct+'%';
+  document.getElementById('progPct').textContent=pct+'%';
+}
+
+function render(){
+  const has=deck.length>0;
+  document.getElementById('empty').style.display=has?'none':'flex';
+  document.getElementById('scene').style.display=has?'block':'none';
+  document.getElementById('statsBar').style.display=has?'flex':'none';
+  document.getElementById('kbdHint').style.display=has?'block':'none';
+  if(has) showCard();
+  updateProgressPanel();
+}
+
+function showCard(){
+  flipped=false;
+  document.getElementById('card').classList.remove('flipped');
+  document.getElementById('ctrls').style.display=deck.length&&mode==='browse'?'flex':'none';
+  document.getElementById('quizBtns').style.display='none';
+
+  const c=deck[idx];
+  const sec=SECTIONS[c.section];
+
+  // Front
+  const tb=document.getElementById('fTypeBadge');
+  tb.textContent=c.type==='word'?'Vocabulary':'Phrase';
+  tb.className='type-badge '+(c.type==='word'?'word':'phrase');
+
+  const sb=document.getElementById('fSecBadge');
+  sb.textContent=sec.emoji+' '+sec.label;
+  sb.style.cssText=`background:${sec.color}22;color:${sec.color};border:1px solid ${sec.color}55`;
+
+  document.getElementById('fEnglish').textContent=c.english;
+
+  const badge=document.getElementById('quizBadge');
+  if(mode==='quiz'&&progress[c.id]!==undefined){
+    badge.textContent=progress[c.id]?'✓ Known':'✗ Review';
+    badge.className='quiz-card-badge '+(progress[c.id]?'badge-known':'badge-unknown');
+    badge.style.display='';
+  } else { badge.style.display='none'; }
+
+  // Back
+  document.getElementById('bSpanish').textContent=c.spanish;
+  let html=`<div class="dl"><div class="dl-label">Pronunciation</div><div class="phonetic">${c.phonetic}</div></div>`;
+  if(c.notes) html+=`<div class="dl"><div class="dl-label">Clinical Notes</div><div class="notes">${c.notes}</div></div>`;
+  html+=`<div class="dl" style="margin-top:auto"><div class="dl-label">Section</div><div class="notes" style="font-style:normal">${sec.emoji} ${sec.label} &nbsp;·&nbsp; ${c.type==='word'?'Vocabulary':'Full Phrase'}</div></div>`;
+  document.getElementById('bDetails').innerHTML=html;
+
+  // Nav
+  const pct=((idx+1)/deck.length*100).toFixed(0);
+  document.getElementById('navFill').style.width=pct+'%';
+  document.getElementById('navText').textContent=`${idx+1}/${deck.length}`;
+  document.getElementById('statsText').textContent=`${sec.emoji} ${sec.label}`;
+
+  ['btnPrev','qPrev'].forEach(id=>{ const el=document.getElementById(id); if(el) el.disabled=idx===0; });
+  ['btnNext','qNext'].forEach(id=>{ const el=document.getElementById(id); if(el) el.disabled=idx===deck.length-1; });
+}
+
+init();
+</script>
+</body>
+</html>

@@ -133,6 +133,14 @@ body{
 .empty .ico{font-size:3rem}
 .empty p{font-size:.88rem;text-align:center;max-width:240px;line-height:1.5}
 
+/* ── Browser notice ── */
+.browser-notice{
+  display:none;width:100%;max-width:540px;flex-shrink:0;
+  text-align:center;font-size:.72rem;color:var(--muted);
+  background:var(--surf2);border:1px solid var(--border);
+  border-radius:8px;padding:6px 14px;
+}
+
 /* ── Stats row ── */
 .stats-row{
   display:flex;align-items:center;justify-content:space-between;
@@ -340,6 +348,9 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--border);border-r
       <div class="ico">🧪</div>
       <p>Select molecule families from the panel on the left to load your deck</p>
     </div>
+
+    <!-- Browser notice -->
+    <div class="browser-notice" id="browserNotice">🔒 Quiz progress saves to this browser only — clearing browser data will reset it</div>
 
     <!-- Stats row -->
     <div class="stats-row" id="statsBar" style="display:none">
@@ -745,10 +756,11 @@ function updateProgressPanel() {
 // ── Render ────────────────────────────────────────────────────────────────────
 function render() {
   const has = deck.length > 0;
-  document.getElementById('empty').style.display    = has ? 'none'  : 'flex';
-  document.getElementById('scene').style.display    = has ? 'block' : 'none';
-  document.getElementById('statsBar').style.display = has ? 'flex'  : 'none';
-  document.getElementById('kbdHint').style.display  = has ? 'block' : 'none';
+  document.getElementById('empty').style.display         = has ? 'none'  : 'flex';
+  document.getElementById('scene').style.display         = has ? 'block' : 'none';
+  document.getElementById('statsBar').style.display      = has ? 'flex'  : 'none';
+  document.getElementById('kbdHint').style.display       = has ? 'block' : 'none';
+  document.getElementById('browserNotice').style.display = has ? 'block' : 'none';
 
   if (has) showCard();
   updateProgressPanel();
