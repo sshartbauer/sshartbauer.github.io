@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Organic Chemistry Flashcards</title>
+<script src="https://cdn.jsdelivr.net/npm/smiles-drawer@1.0.10/dist/smiles-drawer.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --slate:#395C6B; --pink:#C96460; --peach:#F08667; --teal:#00AFB9; --yellow:#FDFCDC;
+  --bg:#080e14; --surf:#0d1b26; --surf2:#132233; --border:#2a4858; --text:#FDFCDC; --muted:#6fa0af;
+  --known:#2ecc71; --unknown:#e74c3c;
+}
+html,body{height:100%;overflow:hidden}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+  display:flex;flex-direction:column;
+}
+
+/* ── Top bar ── */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 20px;border-bottom:1px solid var(--border);
+  background:linear-gradient(90deg,#060c12,#0a1520);flex-shrink:0;
+}
+.topbar h1{
+  font-size:1.15rem;font-weight:800;letter-spacing:-.02em;
+  color:var(--teal);
+}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.mode-toggle{
+  display:flex;border:1px solid var(--border);border-radius:8px;overflow:hidden;
+}
+.mode-btn{
+  padding:5px 14px;font-size:.75rem;font-weight:600;cursor:pointer;
+  border:none;background:var(--surf2);color:var(--muted);transition:all .15s;
+}
+.mode-btn.active{background:var(--teal);color:#080e14}
+.reset-btn{
+  padding:5px 12px;border-radius:7px;border:1px solid var(--border);
+  background:var(--surf2);color:var(--muted);font-size:.73rem;cursor:pointer;transition:all .15s;
+}
+.reset-btn:hover{border-color:var(--pink);color:var(--pink)}
+
+/* ── Main layout ── */
+.main{display:flex;flex:1;overflow:hidden}
+
+/* ── LEFT SIDEBAR ── */
+.sidebar{
+  width:240px;flex-shrink:0;
+  background:linear-gradient(180deg,#0a1720 0%,#08131e 100%);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.sidebar-hdr{
+  padding:14px 16px 10px;border-bottom:1px solid var(--border);
+  display:flex;justify-content:space-between;align-items:center;flex-shrink:0;
+}
+.sidebar-hdr span{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+.sidebar-acts{display:flex;gap:5px}
+.btn-xs{
+  padding:2px 9px;border-radius:5px;border:1px solid var(--border);
+  background:var(--surf2);color:var(--text);font-size:.68rem;cursor:pointer;transition:all .15s;
+}
+.btn-xs:hover{border-color:var(--teal);color:var(--teal)}
+
+.sidebar-body{flex:1;overflow-y:auto;padding:10px 12px 16px}
+.sidebar-body::-webkit-scrollbar{width:4px}
+.sidebar-body::-webkit-scrollbar-track{background:transparent}
+.sidebar-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+.fam-group{margin-bottom:12px}
+.group-label{
+  font-size:.57rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;
+  color:var(--slate);margin-bottom:6px;padding-left:2px;
+  display:flex;align-items:center;gap:5px;
+}
+.group-label::after{content:'';flex:1;height:1px;background:var(--border)}
+.fam-col{display:flex;flex-direction:column;gap:4px}
+.fam-btn{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:5px 10px;border-radius:8px;border:1.5px solid transparent;background:var(--surf2);
+  color:var(--muted);font-size:.75rem;font-weight:500;cursor:pointer;
+  transition:all .15s;user-select:none;width:100%;text-align:left;
+}
+.fam-btn:hover{color:var(--text);border-color:var(--c)}
+.fam-btn.on{
+  background:color-mix(in srgb,var(--c) 16%,transparent);
+  border-color:var(--c);color:var(--c);
+}
+.fam-btn-left{display:flex;align-items:center;gap:6px}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--c);flex-shrink:0}
+.fam-count{font-size:.65rem;opacity:.7}
+
+/* ── PROGRESS PANEL in sidebar ── */
+.prog-panel{
+  flex-shrink:0;border-top:1px solid var(--border);padding:12px 14px;
+  background:#06101a;
+}
+.prog-panel-title{font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:8px}
+.prog-stats{display:flex;gap:8px;margin-bottom:8px}
+.prog-stat{
+  flex:1;background:var(--surf2);border-radius:7px;padding:6px 8px;text-align:center;
+  border:1px solid var(--border);
+}
+.prog-stat-val{font-size:1.1rem;font-weight:800;line-height:1}
+.prog-stat-lbl{font-size:.58rem;color:var(--muted);margin-top:2px}
+.prog-stat.known .prog-stat-val{color:var(--known)}
+.prog-stat.unknown .prog-stat-val{color:var(--unknown)}
+.prog-stat.total .prog-stat-val{color:var(--teal)}
+.prog-bar-wrap{display:flex;align-items:center;gap:7px;font-size:.7rem;color:var(--muted)}
+.prog-bar{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--known),var(--teal));border-radius:3px;transition:width .4s}
+
+/* ── RIGHT CONTENT ── */
+.content{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:flex-start;padding:20px 24px 16px;overflow-y:auto;gap:14px;
+}
+.content::-webkit-scrollbar{width:5px}
+.content::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* ── Empty state ── */
+.empty{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:14px;width:100%;max-width:540px;min-height:380px;
+  background:linear-gradient(160deg,#0d1b26,#0a1620);
+  border:2px dashed var(--border);border-radius:18px;color:var(--muted);
+  margin:auto;
+}
+.empty .ico{font-size:3rem}
+.empty p{font-size:.88rem;text-align:center;max-width:240px;line-height:1.5}
+
+/* ── Stats row ── */
+.stats-row{
+  display:flex;align-items:center;justify-content:space-between;
+  width:100%;max-width:540px;font-size:.78rem;color:var(--muted);flex-shrink:0;
+}
+.nav-prog{display:flex;align-items:center;gap:8px;flex:1;margin-left:12px}
+.nav-bar{flex:1;height:3px;background:var(--border);border-radius:2px;overflow:hidden}
+.nav-fill{height:100%;background:linear-gradient(90deg,var(--teal),var(--peach));border-radius:2px;transition:width .3s}
+
+/* ── Card ── */
+.scene{width:100%;max-width:540px;height:400px;perspective:1400px;flex-shrink:0}
+.card{
+  width:100%;height:100%;position:relative;
+  transform-style:preserve-3d;
+  transition:transform .6s cubic-bezier(.4,0,.2,1);cursor:pointer;
+}
+.card.flipped{transform:rotateY(180deg)}
+.face{
+  position:absolute;inset:0;border-radius:18px;
+  backface-visibility:hidden;-webkit-backface-visibility:hidden;
+  display:flex;overflow:hidden;
+}
+
+/* Front */
+.front{
+  background:var(--yellow);color:#1a2c3a;
+  flex-direction:column;align-items:center;justify-content:center;
+  padding:32px 28px;gap:12px;
+  border:1px solid #e8e6c0;
+  box-shadow:0 10px 40px rgba(0,0,0,.5),0 0 0 1px rgba(253,252,220,.08);
+}
+.tags{display:flex;flex-wrap:wrap;gap:4px;justify-content:center}
+.tag{
+  padding:2px 9px;border-radius:10px;font-size:.63rem;
+  font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+}
+.mol-name{font-size:clamp(1.6rem,4.5vw,2.4rem);font-weight:800;color:#1a2c3a;text-align:center;line-height:1.05}
+.mol-formula{font-size:1.1rem;font-weight:500;color:var(--slate);font-family:Georgia,serif}
+.mol-iupac{font-size:.74rem;color:#6a8a9a;font-style:italic;text-align:center}
+.flip-hint{font-size:.68rem;color:#a0b8c0;position:absolute;bottom:14px;display:flex;align-items:center;gap:4px}
+
+/* Back */
+.back{
+  background:linear-gradient(160deg,#0b1c2c 0%,#0d2035 100%);
+  color:var(--text);
+  transform:rotateY(180deg);flex-direction:row;align-items:stretch;
+  padding:18px;border:1px solid var(--border);
+  box-shadow:0 10px 40px rgba(0,0,0,.55);
+}
+.back-l{
+  flex:0 0 190px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:8px;padding-right:14px;
+}
+.back-r{
+  flex:1;display:flex;flex-direction:column;gap:9px;
+  overflow-y:auto;padding-left:14px;border-left:1px solid var(--border);
+}
+.back-r::-webkit-scrollbar{width:3px}
+.back-r::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.struct-canvas{background:#fff;border-radius:9px;display:block;box-shadow:0 2px 10px rgba(0,0,0,.35)}
+.smiles{
+  font-family:'SF Mono','Fira Code',monospace;font-size:.62rem;
+  color:#56d364;word-break:break-all;text-align:center;
+  background:#06101a;padding:4px 7px;border-radius:5px;
+  border:1px solid var(--border);max-width:188px;
+}
+.dl{display:flex;flex-direction:column;gap:2px}
+.dl-label{font-size:.58rem;font-weight:800;text-transform:uppercase;letter-spacing:.09em;color:var(--teal)}
+.dl-text{font-size:.76rem;color:#c9dae0;line-height:1.4}
+.chips{display:flex;flex-wrap:wrap;gap:3px}
+.chip{
+  padding:2px 7px;border-radius:9px;font-size:.64rem;color:var(--peach);
+  background:rgba(240,134,103,.12);border:1px solid rgba(240,134,103,.3);
+}
+
+/* ── Controls ── */
+.ctrls{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.btn{
+  display:flex;align-items:center;gap:5px;padding:9px 18px;
+  border-radius:9px;border:1px solid var(--border);background:var(--surf);
+  color:var(--text);font-size:.84rem;font-weight:500;cursor:pointer;
+  transition:all .15s;
+}
+.btn:hover:not(:disabled){background:var(--surf2);border-color:var(--teal);box-shadow:0 0 10px rgba(0,175,185,.18)}
+.btn:disabled{opacity:.3;cursor:default}
+.btn-flip{
+  background:linear-gradient(135deg,rgba(0,175,185,.14),rgba(240,134,103,.14));
+  border-color:var(--teal);padding:9px 24px;font-weight:700;
+}
+
+/* ── Quiz buttons ── */
+.quiz-btns{
+  display:flex;align-items:center;gap:10px;flex-shrink:0;
+  animation:fadeUp .25s ease;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.btn-known{
+  flex:1;max-width:180px;padding:10px 0;border-radius:10px;border:none;
+  background:rgba(46,204,113,.15);border:1.5px solid var(--known);
+  color:var(--known);font-size:.88rem;font-weight:700;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;
+}
+.btn-known:hover{background:rgba(46,204,113,.28)}
+.btn-unknown{
+  flex:1;max-width:180px;padding:10px 0;border-radius:10px;border:none;
+  background:rgba(231,76,60,.12);border:1.5px solid var(--unknown);
+  color:var(--unknown);font-size:.88rem;font-weight:700;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;
+}
+.btn-unknown:hover{background:rgba(231,76,60,.26)}
+.quiz-card-badge{
+  position:absolute;top:12px;right:12px;padding:3px 10px;border-radius:20px;
+  font-size:.65rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+  pointer-events:none;z-index:2;
+}
+.badge-known{background:rgba(46,204,113,.2);color:var(--known);border:1px solid var(--known)}
+.badge-unknown{background:rgba(231,76,60,.15);color:var(--unknown);border:1px solid var(--unknown)}
+
+.kbd-hint{font-size:.67rem;color:var(--muted);text-align:center;flex-shrink:0}
+kbd{display:inline-block;padding:1px 5px;border:1px solid var(--border);border-radius:4px;background:var(--surf2);font-size:.64rem;font-family:monospace}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <h1>⚗️ Organic Chemistry Flashcards</h1>
+  <div class="topbar-right">
+    <div class="mode-toggle">
+      <button class="mode-btn active" id="modeBrowse" onclick="setMode('browse')">Browse</button>
+      <button class="mode-btn" id="modeQuiz" onclick="setMode('quiz')">Quiz</button>
+    </div>
+    <button class="reset-btn" onclick="resetProgress()" title="Reset all known/unknown">↺ Reset progress</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- LEFT SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-hdr">
+      <span>Families</span>
+      <div class="sidebar-acts">
+        <button class="btn-xs" onclick="selectAll()">All</button>
+        <button class="btn-xs" onclick="clearAll()">Clear</button>
+      </div>
+    </div>
+    <div class="sidebar-body">
+      <div class="fam-group">
+        <div class="group-label">Carbon</div>
+        <div class="fam-col" id="grp-carbon"></div>
+      </div>
+      <div class="fam-group">
+        <div class="group-label">Nitrogen</div>
+        <div class="fam-col" id="grp-nitrogen"></div>
+      </div>
+      <div class="fam-group">
+        <div class="group-label">Oxygen / Carbonyl</div>
+        <div class="fam-col" id="grp-oxygen"></div>
+      </div>
+      <div class="fam-group">
+        <div class="group-label">Heteroatoms</div>
+        <div class="fam-col" id="grp-other"></div>
+      </div>
+      <div class="fam-group">
+        <div class="group-label">Ring Systems</div>
+        <div class="fam-col" id="grp-rings"></div>
+      </div>
+      <div class="fam-group">
+        <div class="group-label">Biomolecules</div>
+        <div class="fam-col" id="grp-bio"></div>
+      </div>
+    </div>
+
+    <!-- Progress panel -->
+    <div class="prog-panel">
+      <div class="prog-panel-title">Quiz Progress</div>
+      <div class="prog-stats">
+        <div class="prog-stat known">
+          <div class="prog-stat-val" id="pKnown">0</div>
+          <div class="prog-stat-lbl">Known</div>
+        </div>
+        <div class="prog-stat unknown">
+          <div class="prog-stat-val" id="pUnknown">0</div>
+          <div class="prog-stat-lbl">Review</div>
+        </div>
+        <div class="prog-stat total">
+          <div class="prog-stat-val" id="pTotal">0</div>
+          <div class="prog-stat-lbl">In Deck</div>
+        </div>
+      </div>
+      <div class="prog-bar-wrap">
+        <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+        <span id="progPct">0%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT CONTENT -->
+  <div class="content">
+
+    <!-- Empty state -->
+    <div class="empty" id="empty">
+      <div class="ico">🧪</div>
+      <p>Select molecule families from the panel on the left to load your deck</p>
+    </div>
+
+    <!-- Stats row -->
+    <div class="stats-row" id="statsBar" style="display:none">
+      <span id="statsText" style="flex-shrink:0"></span>
+      <div class="nav-prog">
+        <div class="nav-bar"><div class="nav-fill" id="navFill" style="width:0%"></div></div>
+        <span id="navText" style="white-space:nowrap">0/0</span>
+      </div>
+    </div>
+
+    <!-- Scene -->
+    <div class="scene" id="scene" style="display:none">
+      <div class="card" id="card" onclick="flip()">
+        <!-- Front -->
+        <div class="face front">
+          <div id="quizBadge" class="quiz-card-badge" style="display:none"></div>
+          <div class="tags" id="fTags"></div>
+          <div class="mol-name" id="fName"></div>
+          <div class="mol-formula" id="fFormula"></div>
+          <div class="mol-iupac" id="fIupac"></div>
+          <div class="flip-hint">↩ click or press Space to reveal</div>
+        </div>
+        <!-- Back -->
+        <div class="face back">
+          <div class="back-l">
+            <canvas class="struct-canvas" id="canvas" width="190" height="190"></canvas>
+            <div class="smiles" id="bSmiles"></div>
+          </div>
+          <div class="back-r" id="bDetails"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Browse controls -->
+    <div class="ctrls" id="ctrls" style="display:none">
+      <button class="btn" id="btnPrev" onclick="prev()">← Prev</button>
+      <button class="btn btn-flip" onclick="flip()">↩ Flip</button>
+      <button class="btn" id="btnNext" onclick="next()">Next →</button>
+      <button class="btn" onclick="shuffle()" title="Shuffle">🔀</button>
+    </div>
+
+    <!-- Quiz controls (shown after flip in quiz mode) -->
+    <div class="quiz-btns" id="quizBtns" style="display:none">
+      <button class="btn" id="qPrev" onclick="prev()">← Prev</button>
+      <button class="btn-unknown" onclick="markCard(false)">✗ Still learning</button>
+      <button class="btn-known" onclick="markCard(true)">✓ Got it</button>
+      <button class="btn" id="qNext" onclick="next()">Next →</button>
+    </div>
+
+    <div class="kbd-hint" id="kbdHint" style="display:none">
+      <kbd>←</kbd> <kbd>→</kbd> navigate &nbsp;
+      <kbd>Space</kbd> flip &nbsp;
+      <kbd>S</kbd> shuffle &nbsp;
+      <span id="quizHint" style="display:none">&nbsp; <kbd>K</kbd> known &nbsp; <kbd>U</kbd> review</span>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<script>
+// ── Palette ──────────────────────────────────────────────────────────────────
+const T='#00AFB9',P='#F08667',K='#C96460',Y='#e8d878',S='#5a8fa0';
+
+// ── Families ─────────────────────────────────────────────────────────────────
+const FAM={
+  alkane:{label:'Alkanes',color:P,group:'carbon'},
+  alkene:{label:'Alkenes & Dienes',color:T,group:'carbon'},
+  alkyne:{label:'Alkynes',color:K,group:'carbon'},
+  n5:{label:'N-Heterocycles (5)',color:K,group:'nitrogen'},
+  n6:{label:'N-Heterocycles (6)',color:P,group:'nitrogen'},
+  nuc:{label:'Nucleobases',color:T,group:'nitrogen'},
+  amine:{label:'Amines',color:K,group:'nitrogen'},
+  amide:{label:'Amides & Ureas',color:T,group:'nitrogen'},
+  nitrile:{label:'Nitriles',color:P,group:'nitrogen'},
+  alc:{label:'Alcohols',color:T,group:'oxygen'},
+  acid:{label:'Carboxylic Acids',color:K,group:'oxygen'},
+  ester:{label:'Esters & Lactones',color:P,group:'oxygen'},
+  acyl:{label:'Acyl Halides & Anhydrides',color:K,group:'oxygen'},
+  ether:{label:'Ethers & Epoxides',color:P,group:'oxygen'},
+  cok:{label:'Aldehydes & Ketones',color:T,group:'oxygen'},
+  halo:{label:'Organohalides',color:K,group:'other'},
+  thiol:{label:'Thiols & Sulfides',color:Y,group:'other'},
+  cyc:{label:'Cycloalkanes',color:S,group:'rings'},
+  aro:{label:'Aromatic HC',color:Y,group:'rings'},
+  ohet:{label:'O-Heterocycles',color:T,group:'rings'},
+  sugar:{label:'Carbohydrates',color:P,group:'bio'},
+  aa:{label:'Amino Acids',color:T,group:'bio'},
+};
+
+// ── Molecule database ─────────────────────────────────────────────────────────
+const MOLS=[
+  // ALKANES
+  {id:'methane',name:'Methane',smiles:'C',formula:'CH₄',mw:'16.04 g/mol',iupac:'methane',fam:['alkane'],desc:'Simplest alkane. Tetrahedral carbon with four C–H bonds. No structural isomers.',uses:'Natural gas (major component); fuel; synthesis of hydrogen and acetylene.',props:['sp³ carbon','gas at RT','nonpolar','bp −162 °C']},
+  {id:'ethane',name:'Ethane',smiles:'CC',formula:'C₂H₆',mw:'30.07 g/mol',iupac:'ethane',fam:['alkane'],desc:'Two sp³ carbons. Free rotation around C–C bond. Staggered conformation preferred.',uses:'Petrochemical; cracked to ethylene; natural gas component.',props:['free rotation','staggered vs eclipsed','gas at RT','bp −89 °C']},
+  {id:'propane',name:'Propane',smiles:'CCC',formula:'C₃H₈',mw:'44.10 g/mol',iupac:'propane',fam:['alkane'],desc:'Three-carbon chain. First alkane with chain flexibility. Two types of H: primary and secondary.',uses:'LPG fuel; portable cooking gas; propellant; starting material in synthesis.',props:['primary + secondary H','anti conformation preferred','gas at RT','bp −42 °C']},
+  {id:'butane',name:'n-Butane',smiles:'CCCC',formula:'C₄H₁₀',mw:'58.12 g/mol',iupac:'butane',fam:['alkane'],desc:'Four-carbon chain. Anti conformation along C2–C3 most stable. First alkane with structural isomers.',uses:'Lighter fluid; fuel; butyl rubber precursor; starting material for butadiene.',props:['anti conformation favored','anti-gauche energy diff ≈ 3.8 kJ/mol','bp −1 °C']},
+  {id:'isobutane',name:'Isobutane',smiles:'CC(C)C',formula:'C₄H₁₀',mw:'58.12 g/mol',iupac:'2-methylpropane',fam:['alkane'],desc:'Branched isomer of butane. One tertiary carbon. More stable than n-butane (more hyperconjugation).',uses:'Refrigerant (R-600a); aerosol propellant; alkylation feedstock for gasoline.',props:['tertiary C–H','1 tertiary H + 9 primary H','bp −12 °C','more stable than n-butane']},
+  {id:'pentane',name:'n-Pentane',smiles:'CCCCC',formula:'C₅H₁₂',mw:'72.15 g/mol',iupac:'pentane',fam:['alkane'],desc:'Five-carbon straight chain. Liquid at RT. First alkane commonly used as a laboratory solvent.',uses:'Solvent (nonpolar); blowing agent for polystyrene foam; pentane isomers in gasoline.',props:['liquid at RT','bp 36 °C','highly flammable','nonpolar solvent']},
+  {id:'neopentane',name:'Neopentane',smiles:'CC(C)(C)C',formula:'C₅H₁₂',mw:'72.15 g/mol',iupac:'2,2-dimethylpropane',fam:['alkane'],desc:'Most branched pentane isomer. Quaternary central carbon. All 12 H are equivalent (primary).',uses:'Reference compound for NMR studies; gasoline additive (high octane).',props:['quaternary carbon','12 equivalent H','high symmetry','bp 9.5 °C']},
+  {id:'cyclohexane_alk',name:'Cyclohexane',smiles:'C1CCCCC1',formula:'C₆H₁₂',mw:'84.16 g/mol',iupac:'cyclohexane',fam:['alkane','cyc'],desc:'6-membered saturated ring. Chair conformation is strain-free. Axial vs equatorial substituent analysis.',uses:'Core of steroids and terpenes; industrial solvent; nylon-6,6 precursor.',props:['strain-free chair','axial/equatorial','chair⇌boat 10 kJ/mol','hydrophobic']},
+  // ALKENES
+  {id:'ethylene',name:'Ethylene',smiles:'C=C',formula:'C₂H₄',mw:'28.05 g/mol',iupac:'ethene',fam:['alkene'],desc:'Simplest alkene. sp² carbons. Planar geometry. π bond restricts rotation.',uses:'Most produced organic chemical worldwide; polyethylene; ethanol; PVC monomer.',props:['sp² carbons','planar','π bond BDE 270 kJ/mol','gas at RT']},
+  {id:'propene',name:'Propene',smiles:'CC=C',formula:'C₃H₆',mw:'42.08 g/mol',iupac:'prop-1-ene',fam:['alkene'],desc:'Three-carbon alkene. Allylic C–H bonds are especially reactive (resonance stabilized radical/cation).',uses:'Polypropylene; propylene oxide; isopropanol; acrylonitrile production.',props:['allylic C–H reactive','Markovnikov addition','gas at RT','bp −47 °C']},
+  {id:'2butene',name:'2-Butene',smiles:'CC=CC',formula:'C₄H₈',mw:'56.11 g/mol',iupac:'but-2-ene',fam:['alkene'],desc:'Internal alkene. Exists as cis and trans (E/Z) isomers. Trans more stable than cis.',uses:'Fuel; chemical intermediate; illustrates E/Z isomerism.',props:['cis/trans isomers','internal alkene','more substituted → more stable','bp ≈ 4 °C']},
+  {id:'isobutylene',name:'Isobutylene',smiles:'CC(=C)C',formula:'C₄H₈',mw:'56.11 g/mol',iupac:'2-methylprop-1-ene',fam:['alkene'],desc:'Trisubstituted alkene. Highly reactive toward electrophiles. Gives tertiary carbocation.',uses:'Butyl rubber; MTBE production; antioxidant BHT precursor.',props:['trisubstituted','Markovnikov gives 3° carbocation','gas at RT','reactive']},
+  {id:'butadiene',name:'1,3-Butadiene',smiles:'C=CC=C',formula:'C₄H₆',mw:'54.09 g/mol',iupac:'buta-1,3-diene',fam:['alkene'],desc:'Simplest conjugated diene. π electrons delocalized over 4 carbons. s-cis and s-trans conformations.',uses:'Synthetic rubber (SBR, polybutadiene); Diels–Alder diene; nylon-6,6 precursor.',props:['conjugated diene','Diels–Alder reactive','s-cis required for DA','gas at RT']},
+  {id:'isoprene',name:'Isoprene',smiles:'C=C(C)C=C',formula:'C₅H₈',mw:'68.12 g/mol',iupac:'2-methylbuta-1,3-diene',fam:['alkene'],desc:'The isoprene unit (C5) is the building block of all terpenoids and steroids.',uses:'Natural rubber monomer; all terpenes/steroids built from isoprene units.',props:['conjugated diene','C5 building block','biosynthesis via MVA/MEP pathway']},
+  {id:'cyclohexene',name:'Cyclohexene',smiles:'C1=CCCCC1',formula:'C₆H₁₀',mw:'82.14 g/mol',iupac:'cyclohex-1-ene',fam:['alkene','cyc'],desc:'Cyclic alkene. Half-chair/envelope transition state. Allylic positions activated.',uses:'Synthesis; produces cyclohexanol, cyclohexanone; Diels–Alder products.',props:['ring constrains geometry','half-chair TS','allylic positions reactive']},
+  // ALKYNES
+  {id:'acetylene',name:'Acetylene',smiles:'C#C',formula:'C₂H₂',mw:'26.04 g/mol',iupac:'ethyne',fam:['alkyne'],desc:'Simplest alkyne. sp carbons. Linear geometry. Highly acidic terminal C–H (pKₐ 25).',uses:'Oxyacetylene welding; PVC/vinyl acetate precursor; Reppe chemistry.',props:['sp carbons','linear','terminal C–H pKₐ 25','gas at RT']},
+  {id:'propyne',name:'Propyne',smiles:'CC#C',formula:'C₃H₄',mw:'40.06 g/mol',iupac:'prop-1-yne',fam:['alkyne'],desc:'Terminal alkyne. sp³–sp bond to methyl. Terminal C–H is acidic and can form acetylide.',uses:'Synthesis; Reppe reactions; acetylide alkylation to build carbon chains.',props:['terminal alkyne','pKₐ ≈ 25','forms acetylide with base','gas at RT']},
+  {id:'2butyne',name:'2-Butyne',smiles:'CC#CC',formula:'C₄H₆',mw:'54.09 g/mol',iupac:'but-2-yne',fam:['alkyne'],desc:'Internal alkyne. No acidic terminal H. Can be reduced to cis or trans alkene selectively.',uses:'Lindlar reduction gives cis-2-butene; Na/NH₃ reduction gives trans-2-butene.',props:['internal alkyne','no acidic H','selective reduction possible','bp 27 °C']},
+  {id:'phenylacetylene',name:'Phenylacetylene',smiles:'C#Cc1ccccc1',formula:'C₈H₆',mw:'102.13 g/mol',iupac:'ethynylbenzene',fam:['alkyne','aro'],desc:'Terminal alkyne conjugated with benzene. pKₐ ≈ 20 (more acidic than simple alkynes).',uses:'Sonogashira coupling partner; polymer precursor; pharmaceutical synthesis.',props:['conjugated with ring','pKₐ ≈ 20','Sonogashira coupling','liquid at RT']},
+  // ORGANOHALIDES
+  {id:'chloromethane',name:'Chloromethane',smiles:'CCl',formula:'CH₃Cl',mw:'50.49 g/mol',iupac:'chloromethane',fam:['halo'],desc:'Methyl halide. Primary sp³ carbon. C–Cl bond polarized. SN2 highly favorable.',uses:'Silicone production; methylating agent; refrigerant (R-40); foam blowing.',props:['primary alkyl chloride','excellent SN2 substrate','C–Cl BDE 339 kJ/mol','gas at RT']},
+  {id:'dcm',name:'Dichloromethane',smiles:'ClCCl',formula:'CH₂Cl₂',mw:'84.93 g/mol',iupac:'dichloromethane',fam:['halo'],desc:'Geminal dihaloalkane. Two C–Cl bonds. Polar but not protic solvent. Low boiling point.',uses:'Most common lab solvent (DCM); paint stripper; extraction solvent; propellant.',props:['polar aprotic','bp 40 °C','immiscible with water','good extraction solvent']},
+  {id:'chloroform',name:'Chloroform',smiles:'ClC(Cl)Cl',formula:'CHCl₃',mw:'119.38 g/mol',iupac:'trichloromethane',fam:['halo'],desc:'Three C–Cl bonds. Slightly acidic C–H. Historical anesthetic. Dense liquid.',uses:'NMR solvent (CDCl₃); industrial solvent; PTFE (Teflon) precursor; once used as anesthetic.',props:['dense liquid (1.49 g/mL)','CDCl₃ is NMR standard','mildly acidic CH','carcinogen']},
+  {id:'ccl4',name:'Carbon Tetrachloride',smiles:'ClC(Cl)(Cl)Cl',formula:'CCl₄',mw:'153.82 g/mol',iupac:'tetrachloromethane',fam:['halo'],desc:'Four C–Cl bonds. Highly symmetric (Td). No C–H bonds. Non-flammable.',uses:'Historical dry cleaning solvent; fire extinguisher; NMR solvent. Now avoided (ozone depleting, hepatotoxic).',props:['highly symmetric (Td)','nonpolar','non-flammable','hepatotoxic']},
+  {id:'vinyl_cl',name:'Vinyl Chloride',smiles:'C=CCl',formula:'C₂H₃Cl',mw:'62.50 g/mol',iupac:'chloroethene',fam:['halo','alkene'],desc:'sp² C–Cl bond. Chlorine on alkene carbon. Less reactive in SN2 than alkyl chlorides.',uses:'PVC (polyvinyl chloride) monomer — one of the world\'s most produced plastics.',props:['sp² C–Cl (unreactive SN2)','PVC monomer','carcinogen','gas at RT']},
+  {id:'chlorobenzene',name:'Chlorobenzene',smiles:'Clc1ccccc1',formula:'C₆H₅Cl',mw:'112.56 g/mol',iupac:'chlorobenzene',fam:['halo','aro'],desc:'Aryl halide. C–Cl bond conjugated with ring (resonance). Very resistant to SN2.',uses:'Solvent; DDT intermediate; phenol production; herbicide precursor.',props:['aryl halide','resonance stabilized C–Cl','EAS deactivator (o/p director)','bp 132 °C']},
+  {id:'allyl_cl',name:'Allyl Chloride',smiles:'ClCC=C',formula:'C₃H₅Cl',mw:'76.52 g/mol',iupac:'3-chloroprop-1-ene',fam:['halo','alkene'],desc:'Allylic halide. C–Cl on carbon adjacent to C=C. Very reactive in SN1 and SN2 (allylic stabilization).',uses:'Epichlorohydrin precursor; allyl resins; pharmaceutical synthesis.',props:['allylic halide','fast SN1 and SN2','allylic cation resonance-stabilized']},
+  // ETHERS
+  {id:'diethyl_ether',name:'Diethyl Ether',smiles:'CCOCC',formula:'C₄H₁₀O',mw:'74.12 g/mol',iupac:'ethoxyethane',fam:['ether'],desc:'Symmetric ether. Oxygen lone pairs make it a Lewis base. Bent C–O–C geometry.',uses:'Classic anesthetic (1846); extraction solvent; Grignard solvent; starter fluid.',props:['polar aprotic','bp 34.6 °C','forms explosive peroxides','immiscible with water']},
+  {id:'dme',name:'Dimethyl Ether',smiles:'COC',formula:'C₂H₆O',mw:'46.07 g/mol',iupac:'methoxymethane',fam:['ether'],desc:'Simplest ether. Isomer of ethanol but very different properties — no H-bonding.',uses:'Propellant in aerosols; clean-burning fuel alternative to diesel; chemical synthesis.',props:['gas at RT (bp −24 °C)','no H-bonding','isomer of ethanol','clean combustion']},
+  {id:'anisole',name:'Anisole',smiles:'COc1ccccc1',formula:'C₇H₈O',mw:'108.14 g/mol',iupac:'methoxybenzene',fam:['ether','aro'],desc:'Methoxy group (-OCH₃) on benzene. Oxygen lone pair donates into ring via resonance.',uses:'Perfume ingredient; solvent; EAS reactions (strong o/p activator).',props:['aryl ether','strong ring activator (o/p)','pleasant odor','bp 154 °C']},
+  {id:'thf',name:'Tetrahydrofuran (THF)',smiles:'C1CCOC1',formula:'C₄H₈O',mw:'72.11 g/mol',iupac:'oxolane',fam:['ether','ohet'],desc:'Cyclic ether (oxolane). 5-membered ring. Good Lewis base. Coordinates strongly to metals.',uses:'Premier aprotic polar solvent; Grignard/organolithium reactions; polymer chemistry.',props:['cyclic ether','bp 66 °C','forms explosive peroxides on standing','miscible with water']},
+  {id:'ethylene_oxide',name:'Ethylene Oxide',smiles:'C1CO1',formula:'C₂H₄O',mw:'44.05 g/mol',iupac:'oxirane',fam:['ether','ohet'],desc:'Simplest epoxide. 3-membered ring. Highly strained (ring strain ≈ 114 kJ/mol). Electrophilic.',uses:'Ethylene glycol/polyester production; sterilization agent; polyethylene oxide.',props:['epoxide (oxirane)','highly strained','opens with both acids and bases','carcinogen']},
+  {id:'prop_oxide',name:'Propylene Oxide',smiles:'CC1CO1',formula:'C₃H₆O',mw:'58.08 g/mol',iupac:'2-methyloxirane',fam:['ether'],desc:'Chiral epoxide (one stereocentre). Opens regioselectively — nucleophile attacks less hindered carbon (basic), more hindered (acidic).',uses:'Polyols for polyurethane; propylene glycol production; solvent; fumigant.',props:['chiral epoxide','regioselective ring opening','industrial chemical']},
+  // ESTERS
+  {id:'ethyl_acetate',name:'Ethyl Acetate',smiles:'CC(=O)OCC',formula:'C₄H₈O₂',mw:'88.11 g/mol',iupac:'ethyl ethanoate',fam:['ester'],desc:'Acetyl group esterified with ethanol. Resonance between C=O and O lone pair.',uses:'Nail polish remover; most widely used ester solvent; artificial fruit flavor.',props:['pleasant fruity odor','bp 77 °C','moderately miscible with water','low toxicity']},
+  {id:'methyl_benzoate',name:'Methyl Benzoate',smiles:'COC(=O)c1ccccc1',formula:'C₈H₈O₂',mw:'136.15 g/mol',iupac:'methyl benzoate',fam:['ester','aro'],desc:'Aromatic ester. Phenyl ring slightly deactivates carbonyl toward nucleophilic acyl substitution.',uses:'Fragrance (oil of Niobe); insect repellent solvent; pharmaceutical intermediate.',props:['aromatic ester','pleasant floral odor','bp 199 °C','liquid at RT']},
+  {id:'aspirin',name:'Aspirin',smiles:'CC(=O)Oc1ccccc1C(=O)O',formula:'C₉H₈O₄',mw:'180.16 g/mol',iupac:'2-acetoxybenzoic acid',fam:['ester','acid'],desc:'Phenolic ester of acetic acid + salicylic acid. Contains both ester and carboxylic acid groups.',uses:'Analgesic, antipyretic, anti-inflammatory; antiplatelet (blood thinner). One of world\'s most used drugs.',props:['phenolic ester','irreversible COX inhibitor','hydrolyzes in basic conditions','bp 140 °C dec.']},
+  {id:'gbl',name:'γ-Butyrolactone',smiles:'O=C1CCCO1',formula:'C₄H₆O₂',mw:'86.09 g/mol',iupac:'oxolan-2-one',fam:['ester','ohet'],desc:'Cyclic ester (lactone). 5-membered ring. Ring strain makes it slightly more reactive than open-chain esters.',uses:'Solvent; electrolyte in batteries; precursor to NMP, PVP, and GABA analogues.',props:['γ-lactone','bp 204 °C','miscible with water','opens with nucleophiles']},
+  {id:'methyl_acrylate',name:'Methyl Acrylate',smiles:'C=CC(=O)OC',formula:'C₄H₆O₂',mw:'86.09 g/mol',iupac:'methyl prop-2-enoate',fam:['ester','alkene'],desc:'α,β-Unsaturated ester. Conjugated C=C–C=O system. Michael acceptor.',uses:'Polyacrylate polymer precursor; Michael addition reactions; adhesives.',props:['Michael acceptor','conjugated','polymerizes readily','acrid odor']},
+  {id:'caprolactone',name:'ε-Caprolactone',smiles:'O=C1CCCCO1',formula:'C₆H₁₀O₂',mw:'114.14 g/mol',iupac:'oxan-2-one',fam:['ester','ohet'],desc:'7-membered cyclic ester (δ-lactone). Opens readily by ring-opening polymerization.',uses:'Biodegradable polycaprolactone (PCL) polymer; drug delivery; sutures.',props:['macrolactone','ring-opening polymerization','biodegradable polymer precursor']},
+  // AMIDES
+  {id:'formamide',name:'Formamide',smiles:'NC=O',formula:'CH₃NO',mw:'45.04 g/mol',iupac:'formamide',fam:['amide'],desc:'Simplest amide. N lone pair delocalized into C=O. C–N bond has partial double-bond character.',uses:'Solvent; nucleic acid denaturation; formylation reagent; synthesis of heterocycles.',props:['partial double bond C–N','high bp (210 °C)','H-bond donor + acceptor','resonance inhibits rotation']},
+  {id:'acetamide',name:'Acetamide',smiles:'CC(N)=O',formula:'C₂H₅NO',mw:'59.07 g/mol',iupac:'acetamide',fam:['amide'],desc:'Two-carbon primary amide. Planar geometry around C–N. Much less basic than amines (pKₐ −1).',uses:'Plasticizer; synthesis; model for peptide bond in biochemistry.',props:['primary amide','pKₐ (conjugate acid) ≈ −1','planar C–N–H','mp 82 °C']},
+  {id:'nmethylacetamide',name:'N-Methylacetamide',smiles:'CNC(C)=O',formula:'C₃H₇NO',mw:'73.09 g/mol',iupac:'N-methylacetamide',fam:['amide'],desc:'Secondary amide — best simple model for a peptide bond. Rotation around C–N bond is slow (rotational barrier ≈ 80 kJ/mol).',uses:'Peptide bond model; solvent; dipolar aprotic solvent (NMA).',props:['peptide bond model','hindered C–N rotation','cis/trans isomers in NMR','bp 206 °C']},
+  {id:'benzamide',name:'Benzamide',smiles:'NC(=O)c1ccccc1',formula:'C₇H₇NO',mw:'121.14 g/mol',iupac:'benzamide',fam:['amide','aro'],desc:'Aromatic primary amide. Phenyl group removes electron density from C=O via conjugation.',uses:'Pharmaceutical scaffold; fragrance; synthesis of heterocycles like benzimidazole.',props:['aromatic amide','mp 130 °C','less reactive than alkyl amides toward hydrolysis']},
+  {id:'urea',name:'Urea',smiles:'NC(N)=O',formula:'CH₄N₂O',mw:'60.06 g/mol',iupac:'urea',fam:['amide'],desc:'Two amino groups on one carbonyl. First organic compound synthesized from inorganic material (Wöhler, 1828). End product of nitrogen metabolism.',uses:'Fertilizer (world\'s most used N-fertilizer); protein denaturing agent; Foley catheter lubricant; synthesis.',props:['diamide','Wöhler synthesis 1828','urine metabolite','mp 133 °C','H-bonding network']},
+  {id:'caprolactam',name:'ε-Caprolactam',smiles:'O=C1CCCCCN1',formula:'C₆H₁₁NO',mw:'113.16 g/mol',iupac:'azepan-2-one',fam:['amide','cyc'],desc:'7-membered cyclic amide (lactam). Formed from cyclohexanone via Beckmann rearrangement.',uses:'Nylon-6 monomer (ring-opening polymerization); the world\'s most important lactam.',props:['lactam (cyclic amide)','nylon-6 precursor','Beckmann rearrangement product','mp 70 °C']},
+  // ACYL HALIDES & ANHYDRIDES
+  {id:'acetyl_cl',name:'Acetyl Chloride',smiles:'CC(=O)Cl',formula:'C₂H₃ClO',mw:'78.50 g/mol',iupac:'ethanoyl chloride',fam:['acyl'],desc:'Acyl chloride. Most reactive carboxylic acid derivative. C–Cl is an excellent leaving group.',uses:'Acetylating agent for alcohols (→ esters) and amines (→ amides); Friedel–Crafts acylation.',props:['most reactive RCOX','pungent odor','reacts violently with water','Friedel–Crafts reagent']},
+  {id:'benzoyl_cl',name:'Benzoyl Chloride',smiles:'O=C(Cl)c1ccccc1',formula:'C₇H₅ClO',mw:'140.57 g/mol',iupac:'benzoyl chloride',fam:['acyl','aro'],desc:'Aromatic acyl chloride. Phenyl group slightly deactivates C=O vs alkyl acyl chlorides.',uses:'Benzoylation of nucleophiles; Friedel–Crafts to make benzophenones; Schotten–Baumann conditions.',props:['aromatic acyl chloride','lachrymatory','bp 197 °C','reacts with water']},
+  {id:'acetic_anhydride',name:'Acetic Anhydride',smiles:'CC(=O)OC(C)=O',formula:'C₄H₆O₃',mw:'102.09 g/mol',iupac:'ethanoic anhydride',fam:['acyl'],desc:'Symmetric anhydride. Two carbonyl groups joined by oxygen. Milder than acyl chloride but still very reactive.',uses:'Aspirin and acetaminophen synthesis; cellulose acetate; acetic acid production; acetylations.',props:['milder than acyl chloride','reacts with H₂O → 2 AcOH','bp 140 °C','industrial reagent']},
+  {id:'phthalic_anhydride',name:'Phthalic Anhydride',smiles:'O=C1OC(=O)c2ccccc12',formula:'C₈H₄O₃',mw:'148.12 g/mol',iupac:'2-benzofuran-1,3-dione',fam:['acyl','aro','ohet'],desc:'Cyclic anhydride of phthalic acid. 5-membered anhydride ring fused to benzene.',uses:'Phthalate plasticizers; alkyd resins; dyes (phthalocyanine); pharmaceutical synthesis.',props:['cyclic anhydride','stable solid','mp 131 °C','opens with nucleophiles']},
+  // NITRILES
+  {id:'acetonitrile',name:'Acetonitrile',smiles:'CC#N',formula:'C₂H₃N',mw:'41.05 g/mol',iupac:'acetonitrile',fam:['nitrile'],desc:'Simplest nitrile. Linear C≡N group. Polar aprotic solvent. C and N are sp hybridized.',uses:'HPLC solvent; dipolar aprotic solvent; hydrolysis to acetic acid/acetamide; pharmaceutical.',props:['polar aprotic','bp 82 °C','miscible with water','linear C≡N']},
+  {id:'benzonitrile',name:'Benzonitrile',smiles:'N#Cc1ccccc1',formula:'C₇H₅N',mw:'103.12 g/mol',iupac:'benzonitrile',fam:['nitrile','aro'],desc:'Aromatic nitrile. C≡N conjugated with benzene ring. Mild electrophile.',uses:'Synthesis of amines, amidines, heterocycles; pharmaceutical intermediates.',props:['aromatic nitrile','bp 191 °C','pleasant odor','mild EAS deactivator']},
+  {id:'acrylonitrile',name:'Acrylonitrile',smiles:'C=CC#N',formula:'C₃H₃N',mw:'53.06 g/mol',iupac:'prop-2-enenitrile',fam:['nitrile','alkene'],desc:'Vinyl nitrile. Conjugated C=C–C≡N. Michael acceptor. Polymerizes readily.',uses:'PAN fiber (acrylic wool); ABS and SAN plastics; nitrile rubber; Michael reactions.',props:['Michael acceptor','conjugated','carcinogen','bp 77 °C']},
+  {id:'malononitrile',name:'Malononitrile',smiles:'N#CCC#N',formula:'C₃H₂N₂',mw:'66.06 g/mol',iupac:'propanedinitrile',fam:['nitrile'],desc:'Two nitrile groups flanking a CH₂. Very acidic methylene (pKₐ 11) — active methylene compound.',uses:'Knoevenagel condensations; pharmaceutical synthesis; photovoltaic dyes.',props:['pKₐ 11 (very acidic CH₂)','active methylene','Knoevenagel substrate']},
+  // THIOLS & SULFIDES
+  {id:'methanethiol',name:'Methanethiol',smiles:'CS',formula:'CH₄S',mw:'48.11 g/mol',iupac:'methanethiol',fam:['thiol'],desc:'Simplest thiol (mercaptan). S–H bond. Thiols are much more acidic than alcohols (pKₐ 10.3 vs 15.5).',uses:'Added to natural gas for odor detection; biological signaling; methionine precursor.',props:['pKₐ 10.3 (more acidic than alcohols)','skunk-like odor','detectable at ppb levels','gas at RT']},
+  {id:'ethanethiol',name:'Ethanethiol',smiles:'CCS',formula:'C₂H₆S',mw:'62.13 g/mol',iupac:'ethanethiol',fam:['thiol'],desc:'Two-carbon thiol. More volatile than ethanol; weaker H-bonding. Sulfur is a better nucleophile than oxygen.',uses:'Gas odorant; chemical intermediate; cysteine model; protecting group chemistry.',props:['bp 35 °C','strong odor','better nucleophile than alcohols','pKₐ 10.6']},
+  {id:'dms',name:'Dimethyl Sulfide',smiles:'CSC',formula:'C₂H₆S',mw:'62.13 g/mol',iupac:'methylsulfanylmethane',fam:['thiol'],desc:'Simplest dialkyl sulfide. Sulfur is a better nucleophile and Lewis base than oxygen ether.',uses:'Oxidized to DMSO; oceanic sulfur cycle (DMS from algae); cloud nucleation; Swern oxidation.',props:['sulfide (thioether)','good soft nucleophile','oceanic climate relevance','bp 38 °C']},
+  {id:'dmso',name:'Dimethyl Sulfoxide',smiles:'CS(C)=O',formula:'C₂H₆OS',mw:'78.13 g/mol',iupac:'methylsulfinylmethane',fam:['thiol'],desc:'Sulfoxide — oxidized sulfide. Dipolar aprotic solvent. Sulfur in +2 oxidation state.',uses:'Universal solvent; cryoprotectant; Swern oxidation (with oxalyl chloride); drug delivery.',props:['dipolar aprotic solvent','bp 189 °C','miscible with water','Swern oxidation reagent']},
+  {id:'thiophenol',name:'Thiophenol',smiles:'Sc1ccccc1',formula:'C₆H₆S',mw:'110.17 g/mol',iupac:'benzenethiol',fam:['thiol','aro'],desc:'Aromatic thiol (PhSH). More acidic than aliphatic thiols (pKₐ 6.5) due to ring resonance.',uses:'Radical reactions; SNAr reactions; protecting group chemistry; ligand in metal catalysis.',props:['pKₐ 6.5 (more acidic than aliphatic thiols)','excellent soft nucleophile','strong odor']},
+  // CARBOHYDRATES
+  {id:'glucose',name:'D-Glucose (open chain)',smiles:'OCC(O)C(O)C(O)C(O)C=O',formula:'C₆H₁₂O₆',mw:'180.16 g/mol',iupac:'(2R,3S,4R,5R)-2,3,4,5,6-pentahydroxyhexanal',fam:['sugar'],desc:'Aldohexose. Open chain has aldehyde (C1), four CHOH, and primary alcohol (C6). In solution ≥99% exists as pyranose ring.',uses:'Cellular energy currency; glycolysis substrate; photosynthesis product; blood sugar.',props:['aldehyde in open form','pyranose predominates in solution','4 stereocenters','D-series']},
+  {id:'fructose',name:'D-Fructose (open chain)',smiles:'OCC(=O)C(O)C(O)C(O)CO',formula:'C₆H₁₂O₆',mw:'180.16 g/mol',iupac:'(3S,4R,5R)-1,3,4,5,6-pentahydroxyhexan-2-one',fam:['sugar'],desc:'Ketohexose. Open chain has ketone at C2. In solution exists predominantly as furanose ring (5-membered).',uses:'Fruit sugar; sweeter than sucrose; fructose corn syrup; metabolized differently than glucose.',props:['ketone in open form','furanose predominates','sweeter than glucose','4 stereocenters']},
+  {id:'ribose',name:'D-Ribose (open chain)',smiles:'OCC(O)C(O)C(O)C=O',formula:'C₅H₁₀O₅',mw:'150.13 g/mol',iupac:'(2R,3R,4S)-2,3,4,5-tetrahydroxypentanal',fam:['sugar'],desc:'Aldopentose. Backbone of RNA and ATP. In solution exists as furanose (5-membered pyranose).',uses:'RNA nucleoside sugar; ATP/ADP/AMP; NAD+ and FAD; ribozymes.',props:['RNA sugar','3 stereocenters','furanose in RNA','part of energy carriers (ATP)']},
+  {id:'deoxyribose',name:'2-Deoxyribose',smiles:'OCCC(O)C(O)C=O',formula:'C₅H₁₀O₄',mw:'134.13 g/mol',iupac:'(3R,4S)-3,4-dihydroxy-5-hydroxypentanal',fam:['sugar'],desc:'Aldopentose lacking the 2-OH. DNA backbone sugar. Less reactive than ribose (no 2-OH for hydrolysis).',uses:'DNA nucleoside sugar. DNA is more stable than RNA precisely because of this missing -OH.',props:['DNA sugar','missing 2-OH (vs ribose)','makes DNA more stable than RNA','furanose in DNA']},
+  {id:'galactose',name:'D-Galactose',smiles:'OCC(O)C(O)C(O)C(O)C=O',formula:'C₆H₁₂O₆',mw:'180.16 g/mol',iupac:'(2R,3S,4S,5R)-2,3,4,5,6-pentahydroxyhexanal',fam:['sugar'],desc:'Aldohexose. C4-epimer of glucose (differs only at C4 stereochemistry). Galactosemia if not metabolized.',uses:'Lactose component (galactose + glucose); cell surface glycoproteins; galactolipids in brain.',props:['C4-epimer of glucose','component of lactose','part of glycoproteins','less soluble than glucose']},
+  {id:'sucrose',name:'Sucrose',smiles:'OCC1OC(CO)(O1)[C@@H]2[C@@H](O)[C@H](O)[C@@H](O2)CO',formula:'C₁₂H₂₂O₁₁',mw:'342.30 g/mol',iupac:'sucrose',fam:['sugar'],desc:'Disaccharide of glucose + fructose linked α(1→2)β. No free anomeric OH — non-reducing sugar.',uses:'Table sugar; sweetener; calorific food additive; fermentation substrate.',props:['disaccharide','non-reducing sugar','no free anomeric OH','hydrolysis (inversion) gives equal glucose+fructose']},
+  // AMINO ACIDS
+  {id:'glycine',name:'Glycine',smiles:'NCC(=O)O',formula:'C₂H₅NO₂',mw:'75.03 g/mol',iupac:'aminoacetic acid',fam:['aa','acid'],desc:'Simplest amino acid. No side chain (R = H). Only achiral proteinogenic amino acid.',uses:'Neurotransmitter (inhibitory in spinal cord); collagen component; pharmaceutical synthesis.',props:['achiral','only amino acid without stereocentre','Gly or G','pI 5.97']},
+  {id:'alanine',name:'L-Alanine',smiles:'NC(C)C(=O)O',formula:'C₃H₇NO₂',mw:'89.09 g/mol',iupac:'(S)-2-aminopropanoic acid',fam:['aa','acid'],desc:'Smallest chiral amino acid. Methyl side chain. S configuration. Nonpolar aliphatic.',uses:'Protein structural role; glucose–alanine cycle; transamination reactions.',props:['nonpolar aliphatic','Ala or A','S configuration','pI 6.0']},
+  {id:'serine',name:'L-Serine',smiles:'NC(CO)C(=O)O',formula:'C₃H₇NO₃',mw:'105.09 g/mol',iupac:'(S)-2-amino-3-hydroxypropanoic acid',fam:['aa','acid','alc'],desc:'Polar amino acid with hydroxymethyl side chain. –OH can be phosphorylated. In serine protease active sites.',uses:'Serine protease active site (catalytic triad); phosphorylation; sphingolipid biosynthesis.',props:['polar, uncharged','hydroxymethyl side chain','Ser or S','key in enzyme catalysis']},
+  {id:'cysteine',name:'L-Cysteine',smiles:'NC(CS)C(=O)O',formula:'C₃H₇NO₂S',mw:'121.16 g/mol',iupac:'(R)-2-amino-3-mercaptopropanoic acid',fam:['aa','acid','thiol'],desc:'Contains thiol (–SH) side chain. Two cysteines form disulfide bonds (–S–S–) to stabilize protein structure.',uses:'Disulfide bridges in proteins (e.g. insulin); antioxidant (glutathione precursor); hair permanent waves.',props:['thiol side chain','disulfide bonds stabilize proteins','Cys or C','pKₐ of SH ≈ 8.3']},
+  {id:'phenylalanine',name:'L-Phenylalanine',smiles:'NC(Cc1ccccc1)C(=O)O',formula:'C₉H₁₁NO₂',mw:'165.19 g/mol',iupac:'(S)-2-amino-3-phenylpropanoic acid',fam:['aa','acid','aro'],desc:'Aromatic, nonpolar amino acid. Large hydrophobic benzyl side chain. Essential amino acid.',uses:'Tyrosine and neurotransmitter (dopamine, epinephrine) precursor; aspartame component.',props:['essential amino acid','aromatic hydrophobic','Phe or F','PKU if phenylalanine hydroxylase deficient']},
+  {id:'tryptophan',name:'L-Tryptophan',smiles:'NC(Cc1c[nH]c2ccccc12)C(=O)O',formula:'C₁₁H₁₂N₂O₂',mw:'204.23 g/mol',iupac:'(S)-2-amino-3-(1H-indol-3-yl)propanoic acid',fam:['aa','acid','n5','aro'],desc:'Essential amino acid with indole side chain. Largest amino acid. Strongly UV-absorbing at 280 nm.',uses:'Serotonin/melatonin precursor; niacin precursor; fluorescent probe in biochemistry.',props:['largest amino acid','indole side chain','essential','absorbs at 280 nm','Trp or W']},
+  {id:'aspartate',name:'Aspartic Acid',smiles:'NC(CC(=O)O)C(=O)O',formula:'C₄H₇NO₄',mw:'133.10 g/mol',iupac:'(S)-2-aminobutanedioic acid',fam:['aa','acid'],desc:'Dicarboxylic amino acid. Negatively charged at physiological pH. Hydrophilic. Aspartate in citric acid cycle.',uses:'OAA/aspartate cycle; Asp catalytic residue in aspartate proteases; aspartame component.',props:['acidic amino acid (pKₐ side chain ≈ 3.9)','negative charge at pH 7','Asp or D','pI 2.77']},
+  {id:'lysine',name:'L-Lysine',smiles:'NC(CCCCN)C(=O)O',formula:'C₆H₁₄N₂O₂',mw:'146.19 g/mol',iupac:'(S)-2,6-diaminohexanoic acid',fam:['aa','acid','amine'],desc:'Basic amino acid with ε-amino group on 4-carbon side chain. Positively charged at physiological pH.',uses:'Histone methylation/acetylation (epigenetics); ubiquitin attachment; essential amino acid.',props:['basic amino acid (pKₐ ε-NH₃⁺ ≈ 10.5)','positive charge at pH 7','Lys or K','essential amino acid']},
+  // N-HETEROCYCLES 5
+  {id:'pyrrole',name:'Pyrrole',smiles:'c1cc[nH]c1',formula:'C₄H₅N',mw:'67.09 g/mol',iupac:'1H-pyrrole',fam:['n5'],desc:'5-membered aromatic ring with one NH. N lone pair is part of the π system (6 electrons total).',uses:'Core of porphyrins (heme, chlorophyll), bile pigments, indigo dye, many alkaloids.',props:['aromatic','weakly basic (pKₐ 0.4)','N–H pKₐ ≈ 17','slightly water-soluble']},
+  {id:'imidazole',name:'Imidazole',smiles:'c1c[nH]cn1',formula:'C₃H₄N₂',mw:'68.08 g/mol',iupac:'1H-imidazole',fam:['n5'],desc:'5-membered ring with one pyrrole-type NH and one pyridine-type N. Both tautomers equivalent.',uses:'Histidine side chain; histamine; antifungals; enzyme catalytic triads.',props:['aromatic','amphoteric (pKₐ 6.99)','tautomerism','water-soluble']},
+  {id:'pyrazole',name:'Pyrazole',smiles:'c1cc[nH]n1',formula:'C₃H₄N₂',mw:'68.08 g/mol',iupac:'1H-pyrazole',fam:['n5'],desc:'Adjacent N–N at positions 1 and 2. One NH type, one pyridine-type N.',uses:'Celecoxib (COX-2 inhibitor); many agrochemicals; pharmaceutical scaffold.',props:['aromatic','weakly basic (pKₐ 2.5)','tautomerism']},
+  {id:'thiazole',name:'Thiazole',smiles:'c1cncs1',formula:'C₃H₃NS',mw:'85.13 g/mol',iupac:'1,3-thiazole',fam:['n5'],desc:'5-membered ring with N at 3 and S at 1. Both heteroatoms contribute to aromaticity.',uses:'Core of Vitamin B₁ (thiamine); penicillin side chain; many bioactive drugs.',props:['aromatic','weakly basic','stable to acid/base']},
+  {id:'oxazole',name:'Oxazole',smiles:'c1cnoc1',formula:'C₃H₃NO',mw:'69.06 g/mol',iupac:'1,3-oxazole',fam:['n5','ohet'],desc:'5-membered aromatic ring with N at 3 and O at 1.',uses:'Antibiotics; natural products scaffold; pharmaceutical building block.',props:['aromatic','weakly basic','found in marine natural products']},
+  {id:'indole',name:'Indole',smiles:'c1ccc2[nH]ccc2c1',formula:'C₈H₇N',mw:'117.15 g/mol',iupac:'1H-indole',fam:['n5','aro'],desc:'Benzene fused with pyrrole. Bicyclic, fully aromatic. EAS at C3 most favorable.',uses:'Tryptophan and serotonin core; melatonin; plant alkaloids (strychnine, ergot); floral scent.',props:['aromatic','very weakly basic','EAS at C3','mp 52 °C']},
+  {id:'benzimidazole',name:'Benzimidazole',smiles:'c1ccc2[nH]cnc2c1',formula:'C₇H₆N₂',mw:'118.14 g/mol',iupac:'1H-benzimidazole',fam:['n5','aro'],desc:'Benzene fused with imidazole. Core of many drugs; both NH and ring N present.',uses:'Omeprazole (proton pump inhibitor); anthelmintics (mebendazole); vitamin B₁₂ core.',props:['aromatic','amphoteric','drug scaffold','mp 170 °C']},
+  // N-HETEROCYCLES 6
+  {id:'pyridine',name:'Pyridine',smiles:'c1ccncc1',formula:'C₅H₅N',mw:'79.10 g/mol',iupac:'pyridine',fam:['n6','aro'],desc:'6-membered aromatic ring with one N. Lone pair on N is NOT in π system → basic. EAS harder than benzene.',uses:'NAD+ and Vitamin B₃ core; many drugs; common solvent and ligand.',props:['aromatic','basic (pKₐ 5.2)','EAS deactivated','water-miscible']},
+  {id:'pyrimidine',name:'Pyrimidine',smiles:'c1ncncc1',formula:'C₄H₄N₂',mw:'80.09 g/mol',iupac:'pyrimidine (1,3-diazine)',fam:['n6'],desc:'N at positions 1 and 3. More π-deficient than pyridine. Core of cytosine, thymine, uracil.',uses:'DNA/RNA base core; barbiturates; sulfa drugs; many pharmaceuticals.',props:['aromatic','less basic than pyridine (pKₐ 1.3)','π-deficient ring','water-soluble']},
+  {id:'pyrazine',name:'Pyrazine',smiles:'c1cnccn1',formula:'C₄H₄N₂',mw:'80.09 g/mol',iupac:'pyrazine (1,4-diazine)',fam:['n6'],desc:'N at positions 1 and 4. Highly symmetric. Characteristic roasted/nutty aroma.',uses:'Bread/coffee/chocolate flavor; pharmaceutical scaffold.',props:['aromatic','weakly basic (pKₐ 0.65)','characteristic aroma','symmetric']},
+  {id:'quinoline',name:'Quinoline',smiles:'c1ccc2ncccc2c1',formula:'C₉H₇N',mw:'129.16 g/mol',iupac:'quinoline',fam:['n6','aro'],desc:'Benzene fused with pyridine at N. Benzo[b]pyridine.',uses:'Quinine (antimalarial); fluoroquinolone antibiotics (ciprofloxacin); dyes.',props:['aromatic','basic (pKₐ 4.85)','hygroscopic liquid']},
+  {id:'isoquinoline',name:'Isoquinoline',smiles:'c1ccc2cnccc2c1',formula:'C₉H₇N',mw:'129.16 g/mol',iupac:'isoquinoline',fam:['n6','aro'],desc:'Benzene fused with pyridine; N at position 2. Isomer of quinoline.',uses:'Papaverine, berberine, morphine-type alkaloids; pharmaceutical scaffold.',props:['aromatic','basic (pKₐ 5.4)','opium alkaloid scaffold']},
+  {id:'purine',name:'Purine',smiles:'c1ncc2[nH]cnc2n1',formula:'C₅H₄N₄',mw:'120.11 g/mol',iupac:'9H-purine',fam:['n5','n6'],desc:'Fused pyrimidine + imidazole. Four nitrogens. Parent of adenine and guanine.',uses:'Adenine, guanine, caffeine, xanthine, uric acid are all purines.',props:['bicyclic aromatic','tautomerism','H-bond donor/acceptor']},
+  // NUCLEOBASES
+  {id:'adenine',name:'Adenine',smiles:'Nc1ncnc2[nH]cnc12',formula:'C₅H₅N₅',mw:'135.13 g/mol',iupac:'9H-purin-6-amine',fam:['nuc','n5','n6'],desc:'Purine base with amino group at C6. Pairs with thymine (DNA) or uracil (RNA) via 2 H-bonds.',uses:'DNA/RNA base; ATP/ADP/AMP energy currency; NAD+, FAD, coenzyme A.',props:['purine base','2 H-bonds to T/U','UV absorbing ~260 nm']},
+  {id:'guanine',name:'Guanine',smiles:'Nc1nc2[nH]cnc2c(=O)[nH]1',formula:'C₅H₅N₅O',mw:'151.13 g/mol',iupac:'2-amino-9H-purin-6(1H)-one',fam:['nuc','n5','n6'],desc:'Purine base with amino (C2) and oxo (C6) groups. Pairs with cytosine via 3 H-bonds.',uses:'DNA/RNA base; G–C pairs most stable; GTP in signal transduction.',props:['purine base','3 H-bonds to C','poorly water-soluble','most stable base pair']},
+  {id:'cytosine',name:'Cytosine',smiles:'Nc1ccnc(=O)[nH]1',formula:'C₄H₅N₃O',mw:'111.10 g/mol',iupac:'4-aminopyrimidin-2(1H)-one',fam:['nuc','n6'],desc:'Pyrimidine base with amino (C4) and keto (C2). Pairs with guanine via 3 H-bonds.',uses:'DNA/RNA base; CpG methylation (epigenetics); spontaneous deamination → uracil (mutagenic).',props:['pyrimidine base','H-bond donor + acceptor','spontaneous deamination']},
+  {id:'thymine',name:'Thymine',smiles:'Cc1c[nH]c(=O)nc1=O',formula:'C₅H₆N₂O₂',mw:'126.11 g/mol',iupac:'5-methyluracil',fam:['nuc','n6'],desc:'Pyrimidine base (DNA only). Uracil with a methyl at C5. 2 H-bonds to adenine.',uses:'DNA-specific base; thymine dimers from UV exposure cause mutations (repaired by photolyase/NER).',props:['pyrimidine base','DNA-specific','UV-induced dimer formation']},
+  {id:'uracil',name:'Uracil',smiles:'O=c1cc[nH]c(=O)[nH]1',formula:'C₄H₄N₂O₂',mw:'112.09 g/mol',iupac:'pyrimidine-2,4(1H,3H)-dione',fam:['nuc','n6'],desc:'Pyrimidine base in RNA only. Like thymine without the C5 methyl. 2 H-bonds to adenine.',uses:'RNA base (mRNA, rRNA, tRNA). In nucleotide cofactors (UTP, UDP-glucose).',props:['pyrimidine base','RNA-specific','replaces thymine in RNA']},
+  // O-HETEROCYCLES
+  {id:'furan',name:'Furan',smiles:'c1ccoc1',formula:'C₄H₄O',mw:'68.07 g/mol',iupac:'furan',fam:['ohet','aro'],desc:'5-membered aromatic ring with one O. O lone pair is in π system. EAS at C2/C5.',uses:'Natural product scaffold; furfural precursor; Diels–Alder diene.',props:['aromatic','volatile (bp 31 °C)','excellent Diels–Alder diene','reactive to acid']},
+  {id:'benzofuran',name:'Benzofuran',smiles:'c1ccc2occc2c1',formula:'C₈H₆O',mw:'118.13 g/mol',iupac:'1-benzofuran',fam:['ohet','aro'],desc:'Benzene fused with furan. Fully aromatic bicyclic.',uses:'Amiodarone (antiarrhythmic); plant-derived bioactive compounds.',props:['aromatic','bicyclic','pleasant odor']},
+  {id:'chromene',name:'2H-Chromene',smiles:'C1=CC2=CC=CC=C2O1',formula:'C₉H₈O',mw:'132.16 g/mol',iupac:'2H-1-benzopyran',fam:['ohet','aro'],desc:'Benzopyran: benzene fused with partially unsaturated pyran. Core of flavonoids.',uses:'Core of flavonoids, anthocyanins (plant pigments), tocopherols (Vitamin E).',props:['partially aromatic','flavonoid scaffold','widespread in plants']},
+  {id:'dioxane',name:'1,4-Dioxane',smiles:'C1COCCO1',formula:'C₄H₈O₂',mw:'88.11 g/mol',iupac:'1,4-dioxane',fam:['ohet','ether'],desc:'6-membered ring with O at 1 and 4. Chair conformation. No dipole moment (symmetric).',uses:'Aprotic solvent; pharmaceutical processing; Pd-catalysis.',props:['cyclic ether','zero dipole (symmetric)','bp 101 °C','miscible with water','suspected carcinogen']},
+  // CYCLOALKANES
+  {id:'cyclopropane',name:'Cyclopropane',smiles:'C1CC1',formula:'C₃H₆',mw:'42.08 g/mol',iupac:'cyclopropane',fam:['cyc'],desc:'3-membered ring. Highest ring strain (≈115 kJ/mol). Banana bonds. Bond angles 60° vs ideal 109.5°.',uses:'Anesthetic (historical); ring found in many natural products; strain drives ring-opening.',props:['high ring strain','banana bonds','reacts like alkene','gas at RT']},
+  {id:'cyclobutane',name:'Cyclobutane',smiles:'C1CCC1',formula:'C₄H₈',mw:'56.11 g/mol',iupac:'cyclobutane',fam:['cyc'],desc:'4-membered ring. Slightly puckered. Ring strain ≈110 kJ/mol. Found in some antibiotics.',uses:'Model for ring strain; found in oxetane antibiotics and natural products.',props:['ring strain','puckered conformation','gas at RT']},
+  {id:'cyclopentane',name:'Cyclopentane',smiles:'C1CCCC1',formula:'C₅H₁₀',mw:'70.13 g/mol',iupac:'cyclopentane',fam:['cyc'],desc:'5-membered ring. Envelope conformation. Low ring strain (26 kJ/mol). Very stable.',uses:'Core of steroids, prostaglandins, terpenes, furanose sugars.',props:['low ring strain','envelope conformation','liquid at RT','hydrophobic']},
+  {id:'cycloheptane',name:'Cycloheptane',smiles:'C1CCCCCC1',formula:'C₇H₁₄',mw:'98.19 g/mol',iupac:'cycloheptane',fam:['cyc'],desc:'7-membered medium ring. Transannular strain. Several low-energy conformations.',uses:'Model for medium-ring chemistry; found in some terpenoids.',props:['medium ring','transannular strain','multiple conformers']},
+  {id:'decalin',name:'Decalin',smiles:'C1CCC2CCCCC2C1',formula:'C₁₀H₁₈',mw:'138.25 g/mol',iupac:'decahydronaphthalene',fam:['cyc'],desc:'Two fused cyclohexane rings. cis and trans isomers differ in ring-junction geometry. Rigid trans form.',uses:'Model for steroid A/B ring junction; industrial solvent.',props:['cis/trans isomers','trans more stable','rigid structure']},
+  // AROMATIC HYDROCARBONS
+  {id:'benzene',name:'Benzene',smiles:'c1ccccc1',formula:'C₆H₆',mw:'78.11 g/mol',iupac:'benzene',fam:['aro'],desc:'Archetypal aromatic compound. 6 π electrons (4n+2, n=1). Resonance energy 150 kJ/mol.',uses:'Fundamental building block; styrene/ethylbenzene/cyclohexane precursor. Carcinogen.',props:['aromatic','planar','resonance energy 150 kJ/mol','carcinogen']},
+  {id:'naphthalene',name:'Naphthalene',smiles:'c1ccc2ccccc2c1',formula:'C₁₀H₈',mw:'128.17 g/mol',iupac:'naphthalene',fam:['aro'],desc:'Two fused benzene rings. 10 π electrons. Classic PAH.',uses:'Mothballs; dye/phthalate precursor; organic semiconductor research.',props:['aromatic','sublimes at RT','pungent odor','planar']},
+  {id:'anthracene',name:'Anthracene',smiles:'c1ccc2cc3ccccc3cc2c1',formula:'C₁₄H₁₀',mw:'178.23 g/mol',iupac:'anthracene',fam:['aro'],desc:'Three linearly fused rings. 14 π electrons. Fluorescent. Middle ring most reactive.',uses:'Anthraquinone dyes; scintillator; organic semiconductor.',props:['aromatic','fluorescent (blue-violet)','linear fusion','middle ring reactive']},
+  {id:'toluene',name:'Toluene',smiles:'Cc1ccccc1',formula:'C₇H₈',mw:'92.14 g/mol',iupac:'methylbenzene',fam:['aro'],desc:'Benzene with methyl group. Methyl is o/p director. Benzylic C–H weak (activated by ring).',uses:'Solvent; TNT/benzaldehyde/benzoic acid precursor; polyurethane (TDI).',props:['aromatic','methyl activates ring (o/p)','benzylic C–H reactive','flammable']},
+  {id:'phenol',name:'Phenol',smiles:'Oc1ccccc1',formula:'C₆H₆O',mw:'94.11 g/mol',iupac:'phenol',fam:['aro','alc'],desc:'OH on benzene. pKₐ 9.95 — much more acidic than alcohols (pKₐ ~16) due to resonance stabilization of phenoxide.',uses:'First antiseptic (Lister, 1865); aspirin/Bakelite/BPA precursor; dyes.',props:['acidic alcohol (pKₐ 9.95)','strong o/p activator','antiseptic','toxic']},
+  {id:'aniline',name:'Aniline',smiles:'Nc1ccccc1',formula:'C₆H₇N',mw:'93.13 g/mol',iupac:'aniline',fam:['aro','amine'],desc:'Primary aromatic amine. NH₂ lone pair delocalized into ring — far less basic than aliphatic amines.',uses:'Dye/rubber/polyurethane (MDI)/pharmaceutical precursor. Historic role in synthetic dye industry.',props:['aromatic amine','weakly basic (pKₐ 4.6)','strong o/p activator','toxic']},
+  {id:'styrene',name:'Styrene',smiles:'C=Cc1ccccc1',formula:'C₈H₈',mw:'104.15 g/mol',iupac:'ethenylbenzene',fam:['aro','alkene'],desc:'Conjugated vinyl-benzene system. Polymerizes very readily. Extended π conjugation.',uses:'Polystyrene; ABS plastic; styrene-butadiene rubber; HIPS.',props:['conjugated','polymerizes readily','sweet odor','slightly toxic']},
+  // CARBOXYLIC ACIDS
+  {id:'formic',name:'Formic Acid',smiles:'OC=O',formula:'CH₂O₂',mw:'46.03 g/mol',iupac:'methanoic acid',fam:['acid'],desc:'Simplest carboxylic acid. Has aldehyde-like C–H. Strongest simple monocarboxylic acid.',uses:'Ant/bee sting component; leather tanning; preservative (E236); reducing agent.',props:['pKₐ 3.75','corrosive','reducing agent','miscible with water']},
+  {id:'acetic',name:'Acetic Acid',smiles:'CC(=O)O',formula:'C₂H₄O₂',mw:'60.05 g/mol',iupac:'ethanoic acid',fam:['acid'],desc:'Main component of vinegar (5% solution). Acetyl-CoA serves as C2 building block in biosynthesis.',uses:'Vinegar; vinyl acetate/acetic anhydride production; food acidulant (E260).',props:['pKₐ 4.75','pungent odor','water-miscible','weak acid']},
+  {id:'benzoic',name:'Benzoic Acid',smiles:'OC(=O)c1ccccc1',formula:'C₇H₆O₂',mw:'122.12 g/mol',iupac:'benzoic acid',fam:['acid','aro'],desc:'Phenyl-COOH. Ring slightly withdraws electron density. More acidic than acetic acid.',uses:'Food preservative (sodium benzoate, E211); pharmaceutical intermediate.',props:['pKₐ 4.20','crystalline solid','sublimable','mild antibacterial']},
+  {id:'oxalic',name:'Oxalic Acid',smiles:'OC(=O)C(=O)O',formula:'C₂H₂O₄',mw:'90.03 g/mol',iupac:'ethanedioic acid',fam:['acid'],desc:'Simplest dicarboxylic acid. Two adjacent COOH. Much stronger than monoacids.',uses:'Kidney stone component (Ca²⁺ salt); found in spinach/rhubarb; bleaching.',props:['pKₐ₁ 1.25','diprotic','insoluble Ca²⁺ salt','reducing agent']},
+  {id:'lactic',name:'Lactic Acid',smiles:'CC(O)C(=O)O',formula:'C₃H₆O₃',mw:'90.08 g/mol',iupac:'(S)-2-hydroxypropanoic acid',fam:['acid','alc'],desc:'α-Hydroxy acid with chiral centre. L-form from anaerobic metabolism.',uses:'Muscle fatigue metabolite; food acidulant; PLA bioplastic; skincare AHA.',props:['pKₐ 3.86','chiral (L/D)','α-hydroxy acid','hygroscopic']},
+  {id:'citric',name:'Citric Acid',smiles:'OC(CC(=O)O)(CC(=O)O)C(=O)O',formula:'C₆H₈O₇',mw:'192.12 g/mol',iupac:'2-hydroxypropane-1,2,3-tricarboxylic acid',fam:['acid'],desc:'Tricarboxylic acid with central tertiary alcohol. Krebs/TCA cycle intermediate.',uses:'Food acidulant (E330); Krebs cycle; cleaning agent; chelation of metals.',props:['triprotic (pKₐ 3.1/4.8/6.4)','water-soluble','chelates metal ions','TCA cycle']},
+  // ALCOHOLS
+  {id:'methanol',name:'Methanol',smiles:'CO',formula:'CH₄O',mw:'32.04 g/mol',iupac:'methanol',fam:['alc'],desc:'Simplest primary alcohol. Metabolized to formaldehyde → formic acid → blindness/death.',uses:'Solvent; fuel; formaldehyde/acetic acid precursor; denaturant.',props:['primary alcohol','toxic (30 mL lethal)','pKₐ 15.5','miscible with water']},
+  {id:'ethanol',name:'Ethanol',smiles:'CCO',formula:'C₂H₆O',mw:'46.07 g/mol',iupac:'ethanol',fam:['alc'],desc:'Fermentation product. Primary alcohol. Oxidized to acetaldehyde → acetic acid.',uses:'Beverages; antiseptic; biofuel; solvent.',props:['primary alcohol','pKₐ 15.9','miscible with water','flammable']},
+  {id:'isopropanol',name:'Isopropanol (IPA)',smiles:'CC(O)C',formula:'C₃H₈O',mw:'60.10 g/mol',iupac:'propan-2-ol',fam:['alc'],desc:'Simplest secondary alcohol. OH on C2. Oxidizes to acetone.',uses:'Rubbing alcohol; 70% disinfectant; pharmaceutical solvent; acetone precursor.',props:['secondary alcohol','pKₐ 16.5','70% most effective antiseptic','azeotrope with water']},
+  {id:'glycerol',name:'Glycerol',smiles:'OCC(O)CO',formula:'C₃H₈O₃',mw:'92.09 g/mol',iupac:'propane-1,2,3-triol',fam:['alc'],desc:'Triol backbone of all triglycerides. Three OH groups. Very hygroscopic.',uses:'Fat hydrolysis product; food humectant (E422); soap by-product; nitroglycerin precursor.',props:['triol','viscous','very hygroscopic','sweet','non-toxic']},
+  {id:'ethylene_glycol',name:'Ethylene Glycol',smiles:'OCCO',formula:'C₂H₆O₂',mw:'62.07 g/mol',iupac:'ethane-1,2-diol',fam:['alc'],desc:'Simplest diol. Two adjacent OH groups. Viscous. Lowers freezing point significantly.',uses:'Automotive antifreeze; PET polyester precursor; deicing fluids.',props:['diol','viscous','miscible with water','toxic (→ oxalic acid)','sweet taste']},
+  // ALDEHYDES & KETONES
+  {id:'formaldehyde',name:'Formaldehyde',smiles:'C=O',formula:'CH₂O',mw:'30.03 g/mol',iupac:'methanal',fam:['cok'],desc:'Simplest aldehyde. No α-carbon stabilization. Highly electrophilic. Polymerizes to paraformaldehyde.',uses:'Preservative (formalin); Bakelite/urea-formaldehyde resins; disinfectant.',props:['gas at RT','reactive aldehyde','carcinogen','polymerizes readily']},
+  {id:'acetaldehyde',name:'Acetaldehyde',smiles:'CC=O',formula:'C₂H₄O',mw:'44.05 g/mol',iupac:'ethanal',fam:['cok'],desc:'Metabolic product of ethanol oxidation by ADH. Responsible for hangover symptoms.',uses:'Acetic acid/ethyl acetate precursor; industrial synthesis.',props:['volatile (bp 20 °C)','toxic','carcinogenic','reactive']},
+  {id:'benzaldehyde',name:'Benzaldehyde',smiles:'O=Cc1ccccc1',formula:'C₇H₆O',mw:'106.12 g/mol',iupac:'benzaldehyde',fam:['cok','aro'],desc:'Simplest aromatic aldehyde. Phenyl conjugated with C=O. Characteristic almond scent.',uses:'Artificial almond flavoring; dye/pharmaceutical precursor; Cannizzaro reaction substrate.',props:['almond odor','oxidizes to benzoic acid','less reactive than aliphatic aldehydes']},
+  {id:'acetone',name:'Acetone',smiles:'CC(C)=O',formula:'C₃H₆O',mw:'58.08 g/mol',iupac:'propan-2-one',fam:['cok'],desc:'Simplest ketone. Symmetric. Two methyl groups donate electrons to C=O — less reactive than aldehydes.',uses:'Nail polish remover; industrial solvent; produced in diabetic ketoacidosis.',props:['ketone','bp 56 °C','water-miscible','non-toxic in small amounts']},
+  {id:'cyclohexanone',name:'Cyclohexanone',smiles:'O=C1CCCCC1',formula:'C₆H₁₀O',mw:'98.14 g/mol',iupac:'cyclohexan-1-one',fam:['cok','cyc'],desc:'Cyclic ketone. Both adjacent CH₂ groups are α-positions for enolization.',uses:'Solvent; ε-caprolactam (nylon-6) precursor via Beckmann rearrangement.',props:['cyclic ketone','peppermint odor','both α-CH₂ active','Beckmann substrate']},
+  {id:'acetophenone',name:'Acetophenone',smiles:'CC(=O)c1ccccc1',formula:'C₈H₈O',mw:'120.15 g/mol',iupac:'1-phenylethan-1-one',fam:['cok','aro'],desc:'Simplest aryl ketone. Orange-blossom aroma. Phenyl slightly deactivates carbonyl.',uses:'Fragrance; hypnotic (historical); pharmaceutical precursor.',props:['aryl ketone','orange-blossom scent','bp 202 °C','crystalline']},
+  // AMINES
+  {id:'methylamine',name:'Methylamine',smiles:'CN',formula:'CH₅N',mw:'31.06 g/mol',iupac:'methanamine',fam:['amine'],desc:'Simplest primary amine. Strongly basic (pKₐ 10.6). Fishy odor.',uses:'Pesticide/pharmaceutical precursor; protein decomposition product.',props:['primary amine','basic (pKₐ 10.6)','gas at RT','fishy odor']},
+  {id:'dimethylamine',name:'Dimethylamine',smiles:'CNC',formula:'C₂H₇N',mw:'45.08 g/mol',iupac:'N-methylmethanamine',fam:['amine'],desc:'Secondary amine. Most basic simple amine due to dual inductive donation and limited steric effect.',uses:'DMSO/DMA precursor; N-nitrosamine precursor; food aromas.',props:['secondary amine','most basic (pKₐ 10.7)','gas at RT','fishy odor']},
+  {id:'aniline_amine',name:'Aniline',smiles:'Nc1ccccc1',formula:'C₆H₇N',mw:'93.13 g/mol',iupac:'aniline',fam:['amine','aro'],desc:'Aromatic amine. NH₂ lone pair delocalized into ring — far less basic than aliphatic amines (pKₐ 4.6).',uses:'Dye/rubber/MDI/pharmaceutical precursor. Historic synthetic dye industry.',props:['weakly basic (pKₐ 4.6)','strong o/p ring activator','toxic']},
+  {id:'piperidine',name:'Piperidine',smiles:'C1CCNCC1',formula:'C₅H₁₁N',mw:'85.15 g/mol',iupac:'piperidine',fam:['amine','cyc'],desc:'6-membered saturated ring with NH. Chair conformation. Most basic simple secondary cyclic amine.',uses:'Alkaloid core (piperine, coniine); prolific in drug synthesis.',props:['secondary cyclic amine','strongly basic (pKₐ 11.2)','chair conformation']},
+  {id:'morpholine',name:'Morpholine',smiles:'O1CCNCC1',formula:'C₄H₉NO',mw:'87.12 g/mol',iupac:'morpholine',fam:['amine','ohet'],desc:'O and N in 6-membered ring at 1,4. Amine properties dominate; O reduces basicity vs piperidine.',uses:'Drug scaffold; corrosion inhibitor; Knoevenagel catalyst; organocatalysis.',props:['secondary cyclic amine','basic (pKₐ 8.3)','O lowers basicity','water-miscible']},
+  {id:'piperazine',name:'Piperazine',smiles:'C1CNCCN1',formula:'C₄H₁₀N₂',mw:'86.14 g/mol',iupac:'piperazine',fam:['amine','cyc'],desc:'1,4-diamine in 6-membered ring. Both N equivalent. Widely used drug scaffold.',uses:'Quetiapine, itraconazole, mebendazole — piperazine in many drugs.',props:['diamine (cyclic)','pKₐ 9.8 and 5.3','drug scaffold','crystalline solid']},
+];
+
+// ── localStorage helpers ──────────────────────────────────────────────────────
+const LS_KEY = 'chem_fc_progress';
+function loadProgress() {
+  try { return JSON.parse(localStorage.getItem(LS_KEY)) || {}; }
+  catch { return {}; }
+}
+function saveProgress(p) {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(p)); } catch {}
+}
+let progress = loadProgress(); // {molId: true=known, false=unknown}
+
+// ── State ─────────────────────────────────────────────────────────────────────
+const GROUP_MAP = {carbon:'grp-carbon',nitrogen:'grp-nitrogen',oxygen:'grp-oxygen',other:'grp-other',rings:'grp-rings',bio:'grp-bio'};
+const sel = new Set();
+let deck = [], idx = 0, flipped = false, drawer = null, mode = 'browse';
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+function init() {
+  for (const [id, f] of Object.entries(FAM)) {
+    const col = document.getElementById(GROUP_MAP[f.group]);
+    if (!col) continue;
+    const b = document.createElement('button');
+    b.className = 'fam-btn';
+    b.dataset.id = id;
+    b.style.setProperty('--c', f.color);
+    const count = MOLS.filter(m => m.fam.includes(id)).length;
+    b.innerHTML = `<span class="fam-btn-left"><span class="dot" style="background:${f.color}"></span>${f.label}</span><span class="fam-count">${count}</span>`;
+    b.onclick = () => toggle(id, b);
+    col.appendChild(b);
+  }
+
+  if (window.SmilesDrawer) {
+    drawer = new SmilesDrawer.Drawer({
+      width:190, height:190, bondThickness:0.9,
+      themes:{light:{C:'#1e293b',O:'#c0392b',N:'#2471a3',S:'#b7950b',H:'#94a3b8',default:'#1e293b'}}
+    });
+  }
+
+  document.addEventListener('keydown', e => {
+    if (!deck.length) return;
+    if (e.key==='ArrowLeft')  { prev(); return; }
+    if (e.key==='ArrowRight') { next(); return; }
+    if (e.key===' ')          { e.preventDefault(); flip(); return; }
+    if (e.key.toLowerCase()==='s') { shuffle(); return; }
+    if (mode==='quiz' && flipped) {
+      if (e.key.toLowerCase()==='k') markCard(true);
+      if (e.key.toLowerCase()==='u') markCard(false);
+    }
+  });
+
+  updateProgressPanel();
+}
+
+// ── Mode ──────────────────────────────────────────────────────────────────────
+function setMode(m) {
+  mode = m;
+  document.getElementById('modeBrowse').classList.toggle('active', m==='browse');
+  document.getElementById('modeQuiz').classList.toggle('active', m==='quiz');
+  document.getElementById('quizHint').style.display = m==='quiz' ? '' : 'none';
+  idx = 0;
+  render();
+}
+
+// ── Family toggling ───────────────────────────────────────────────────────────
+function toggle(id, btn) {
+  sel.has(id) ? sel.delete(id) : sel.add(id);
+  btn.classList.toggle('on', sel.has(id));
+  buildDeck();
+}
+function selectAll() {
+  for (const id of Object.keys(FAM)) {
+    sel.add(id);
+    const b = document.querySelector(`[data-id="${id}"]`);
+    if (b) b.classList.add('on');
+  }
+  buildDeck();
+}
+function clearAll() {
+  sel.clear();
+  document.querySelectorAll('.fam-btn').forEach(b => b.classList.remove('on'));
+  buildDeck();
+}
+
+// ── Deck ──────────────────────────────────────────────────────────────────────
+function buildDeck() {
+  if (!sel.size) { deck = []; }
+  else {
+    const seen = new Set();
+    deck = MOLS.filter(m => {
+      if (seen.has(m.id)) return false;
+      if (m.fam.some(f => sel.has(f))) { seen.add(m.id); return true; }
+      return false;
+    });
+  }
+  idx = 0;
+  render();
+}
+
+function shuffle() {
+  for (let i = deck.length-1; i>0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [deck[i],deck[j]] = [deck[j],deck[i]];
+  }
+  idx = 0; showCard();
+}
+function prev() { if (idx>0) { idx--; showCard(); } }
+function next() { if (idx<deck.length-1) { idx++; showCard(); } }
+function flip() {
+  if (!deck.length) return;
+  flipped = !flipped;
+  document.getElementById('card').classList.toggle('flipped', flipped);
+  // In quiz mode, show/hide mark buttons only after flip
+  if (mode==='quiz') {
+    document.getElementById('quizBtns').style.display = flipped ? 'flex' : 'none';
+    document.getElementById('ctrls').style.display = 'none';
+  }
+}
+
+// ── Quiz marking ──────────────────────────────────────────────────────────────
+function markCard(known) {
+  const m = deck[idx];
+  progress[m.id] = known;
+  saveProgress(progress);
+  updateProgressPanel();
+  // Show badge on front
+  const badge = document.getElementById('quizBadge');
+  badge.textContent = known ? '✓ Known' : '✗ Review';
+  badge.className = 'quiz-card-badge ' + (known ? 'badge-known' : 'badge-unknown');
+  badge.style.display = '';
+  // Auto-advance
+  setTimeout(() => {
+    if (idx < deck.length-1) { idx++; showCard(); }
+    else { showCard(); } // stay on last, badge will show
+  }, 400);
+}
+
+function resetProgress() {
+  if (!confirm('Reset all quiz progress?')) return;
+  progress = {};
+  saveProgress(progress);
+  updateProgressPanel();
+  if (deck.length) showCard();
+}
+
+// ── Progress panel ────────────────────────────────────────────────────────────
+function updateProgressPanel() {
+  const deckIds = deck.map(m => m.id);
+  const known   = deckIds.filter(id => progress[id]===true).length;
+  const unknown = deckIds.filter(id => progress[id]===false).length;
+  const total   = deck.length;
+  const pct     = total ? Math.round(known/total*100) : 0;
+
+  document.getElementById('pKnown').textContent   = known;
+  document.getElementById('pUnknown').textContent = unknown;
+  document.getElementById('pTotal').textContent   = total;
+  document.getElementById('progFill').style.width = pct+'%';
+  document.getElementById('progPct').textContent  = pct+'%';
+}
+
+// ── Render ────────────────────────────────────────────────────────────────────
+function render() {
+  const has = deck.length > 0;
+  document.getElementById('empty').style.display    = has ? 'none'  : 'flex';
+  document.getElementById('scene').style.display    = has ? 'block' : 'none';
+  document.getElementById('statsBar').style.display = has ? 'flex'  : 'none';
+  document.getElementById('kbdHint').style.display  = has ? 'block' : 'none';
+
+  if (has) showCard();
+  updateProgressPanel();
+}
+
+function showCard() {
+  flipped = false;
+  document.getElementById('card').classList.remove('flipped');
+
+  // Controls visibility
+  const isBrowse = mode==='browse';
+  document.getElementById('ctrls').style.display    = deck.length && isBrowse ? 'flex' : 'none';
+  document.getElementById('quizBtns').style.display = 'none'; // hidden until flipped in quiz mode
+
+  const m = deck[idx];
+
+  // Front
+  document.getElementById('fName').textContent    = m.name;
+  document.getElementById('fFormula').textContent = m.formula;
+  document.getElementById('fIupac').textContent   = m.iupac;
+  document.getElementById('fTags').innerHTML = m.fam.map(f =>
+    `<span class="tag" style="background:${FAM[f].color}22;color:${FAM[f].color};border:1px solid ${FAM[f].color}55">${FAM[f].label}</span>`
+  ).join('');
+
+  // Quiz badge
+  const badge = document.getElementById('quizBadge');
+  if (mode==='quiz' && progress[m.id]!==undefined) {
+    badge.textContent = progress[m.id] ? '✓ Known' : '✗ Review';
+    badge.className = 'quiz-card-badge ' + (progress[m.id] ? 'badge-known' : 'badge-unknown');
+    badge.style.display = '';
+  } else {
+    badge.style.display = 'none';
+  }
+
+  // Back
+  document.getElementById('bSmiles').textContent = m.smiles;
+  document.getElementById('bDetails').innerHTML = `
+    <div class="dl"><div class="dl-label">Molecular Weight</div><div class="dl-text">${m.mw}</div></div>
+    <div class="dl"><div class="dl-label">Structure / Features</div><div class="dl-text">${m.desc}</div></div>
+    <div class="dl"><div class="dl-label">Importance / Uses</div><div class="dl-text">${m.uses}</div></div>
+    <div class="dl"><div class="dl-label">Key Properties</div>
+      <div class="chips">${m.props.map(p=>`<span class="chip">${p}</span>`).join('')}</div>
+    </div>`;
+
+  drawStruct(m.smiles);
+
+  // Nav bar
+  const pct = ((idx+1)/deck.length*100).toFixed(0);
+  document.getElementById('navFill').style.width = pct+'%';
+  document.getElementById('navText').textContent = `${idx+1} / ${deck.length}`;
+  document.getElementById('statsText').textContent = `${deck.length} card${deck.length!==1?'s':''} loaded`;
+
+  document.getElementById('btnPrev') && (document.getElementById('btnPrev').disabled = idx===0);
+  document.getElementById('btnNext') && (document.getElementById('btnNext').disabled = idx===deck.length-1);
+  const qp = document.getElementById('qPrev');
+  const qn = document.getElementById('qNext');
+  if (qp) qp.disabled = idx===0;
+  if (qn) qn.disabled = idx===deck.length-1;
+}
+
+function drawStruct(smiles) {
+  const c = document.getElementById('canvas');
+  if (!drawer) return;
+  SmilesDrawer.parse(smiles, tree => {
+    drawer.draw(tree, 'canvas', 'light', false);
+  }, () => {
+    const ctx = c.getContext('2d');
+    ctx.clearRect(0,0,c.width,c.height);
+    ctx.fillStyle='#7d8590';ctx.font='11px monospace';ctx.textAlign='center';
+    ctx.fillText('(structure unavailable)',c.width/2,c.height/2);
+  });
+}
+
+init();
+</script>
+</body>
+</html>
