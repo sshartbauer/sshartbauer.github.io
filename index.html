@@ -256,14 +256,15 @@
     }
 
     .section-label {
-      font-size: 10px;
-      letter-spacing: 4px;
-      text-transform: uppercase;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 36px;
+      font-weight: 300;
+      letter-spacing: 0.5px;
       color: var(--teal);
       margin-bottom: 40px;
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 20px;
     }
 
     .section-label::after {
@@ -297,6 +298,7 @@
     }
 
     .card:hover { background: var(--card-hover); }
+    a.card { text-decoration: none; cursor: pointer; }
 
     .card.accent-teal    { border-left-color: var(--teal); }
     .card.accent-peach   { border-left-color: var(--peach); }
@@ -582,12 +584,12 @@
         <span class="card-status">Coming Soon</span>
       </div>
 
-      <div class="card accent-peach">
+      <a class="card accent-peach" href="https://sshartbauer.github.io/ochem/" target="_blank">
         <div class="card-meta">Academic Study</div>
         <div class="card-title">Organic Chemistry Flashcard App</div>
         <div class="card-desc">An interactive study tool for organic chemistry concepts, reactions, and mechanisms.</div>
-        <span class="card-status">Coming Soon</span>
-      </div>
+        <span class="card-status active">Live</span>
+      </a>
 
     </div>
   </section>
