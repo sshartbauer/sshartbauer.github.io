@@ -3,7 +3,7 @@
 // The API key never touches the client.
 
 const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
-const MODEL             = 'claude-sonnet-4-5';
+const MODEL             = 'claude-haiku-4-5-20251001';
 
 // ── Simple in-memory rate limiter ──────────────────────────────────────────
 // Resets on cold start (per-instance), which is fine for low traffic.
