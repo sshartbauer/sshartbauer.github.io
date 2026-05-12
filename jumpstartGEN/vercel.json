@@ -1,4 +1,7 @@
 {
   "buildCommand": null,
-  "outputDirectory": "jumpstartgen"
+  "outputDirectory": "jumpstartgen",
+  "functions": {
+    "api/claude.js": { "runtime": "nodejs20.x" }
+  }
 }
