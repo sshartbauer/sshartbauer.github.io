@@ -1,58 +1,46 @@
 // api/claude.js — Vercel serverless function
-// Proxies requests to Anthropic API using a server-side key.
+// Streams Anthropic API responses to avoid proxy/edge timeout on slow generations.
 // The API key never touches the client.
 
 const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
 const MODEL             = 'claude-haiku-4-5-20251001';
 
 // ── Simple in-memory rate limiter ──────────────────────────────────────────
-// Resets on cold start (per-instance), which is fine for low traffic.
-// For production, swap this out for Upstash Redis:
-//   https://vercel.com/marketplace/upstash
-const rateLimitMap = new Map();   // ip → { count, windowStart }
-const RATE_LIMIT   = 20;          // max requests per window
-const WINDOW_MS    = 60 * 1000;   // 1 minute window
+const rateLimitMap = new Map();
+const RATE_LIMIT   = 20;
+const WINDOW_MS    = 60 * 1000;
 
 function checkRateLimit(ip) {
-  const now  = Date.now();
+  const now   = Date.now();
   const entry = rateLimitMap.get(ip) || { count: 0, windowStart: now };
-
-  // Reset window if expired
   if (now - entry.windowStart > WINDOW_MS) {
     entry.count = 0;
     entry.windowStart = now;
   }
-
   entry.count += 1;
   rateLimitMap.set(ip, entry);
-
   return entry.count <= RATE_LIMIT;
 }
 
 // ── Handler ────────────────────────────────────────────────────────────────
 module.exports = async function handler(req, res) {
-  // CORS headers on every response
+  // CORS on every response
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  // Handle preflight
-  if (req.method === 'OPTIONS') {
-    return res.status(204).end();
-  }
+  if (req.method === 'OPTIONS') return res.status(204).end();
+  if (req.method !== 'POST')    return res.status(405).json({ error: 'Method not allowed' });
 
-  // Only allow POST
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-
-  // Rate limit by IP
-  const ip = req.headers['x-forwarded-for']?.split(',')[0].trim() || req.socket?.remoteAddress || 'unknown';
+  // Rate limit
+  const ip = req.headers['x-forwarded-for']?.split(',')[0].trim()
+             || req.socket?.remoteAddress
+             || 'unknown';
   if (!checkRateLimit(ip)) {
     return res.status(429).json({ error: 'Too many requests. Please wait a moment before trying again.' });
   }
 
-  // Validate request body
+  // Validate
   const { prompt, maxTokens } = req.body || {};
   if (!prompt || typeof prompt !== 'string') {
     return res.status(400).json({ error: 'Missing or invalid prompt.' });
@@ -63,11 +51,10 @@ module.exports = async function handler(req, res) {
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
-    console.error('ANTHROPIC_API_KEY environment variable is not set.');
+    console.error('ANTHROPIC_API_KEY not set.');
     return res.status(500).json({ error: 'Server configuration error.' });
   }
 
-  // Forward to Anthropic
   try {
     const anthropicRes = await fetch(ANTHROPIC_API_URL, {
       method: 'POST',
@@ -78,22 +65,38 @@ module.exports = async function handler(req, res) {
       },
       body: JSON.stringify({
         model:      MODEL,
-        max_tokens: Math.min(maxTokens || 1200, 2000), // cap at 2k to keep responses fast
+        max_tokens: Math.min(maxTokens || 1200, 2000),
         messages:   [{ role: 'user', content: prompt }],
+        stream:     true,   // ← enables token-by-token streaming
       }),
     });
 
-    const data = await anthropicRes.json();
-
+    // If Anthropic itself errored before streaming started, relay the error as JSON
     if (!anthropicRes.ok) {
-      const msg = data?.error?.message || `Anthropic API error ${anthropicRes.status}`;
+      const errData = await anthropicRes.json().catch(() => ({}));
+      const msg = errData?.error?.message || `Anthropic API error ${anthropicRes.status}`;
       return res.status(anthropicRes.status).json({ error: msg });
     }
 
-    return res.status(200).json({ text: data.content[0].text });
+    // Stream SSE back to client — bytes flow continuously, no proxy timeout
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('X-Accel-Buffering', 'no'); // disable nginx/edge buffering
+
+    const reader = anthropicRes.body.getReader();
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      res.write(value);
+    }
+    res.end();
 
   } catch (err) {
-    console.error('Error calling Anthropic:', err);
-    return res.status(500).json({ error: 'Failed to reach AI service. Please try again.' });
+    console.error('Streaming error:', err);
+    if (!res.headersSent) {
+      res.status(500).json({ error: 'Failed to reach AI service. Please try again.' });
+    } else {
+      res.end();
+    }
   }
-}
+};

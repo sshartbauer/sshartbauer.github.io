@@ -1446,10 +1446,13 @@ function escHtml(s) {
   return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-// ── Claude API call ────────────────────────────────────
+// ── Claude API call (streaming) ─────────────────────────
+// Server sends Anthropic's SSE stream directly. We accumulate
+// text_delta events and return the full text — same API as before.
 async function callClaude(prompt, maxTokens = 1200, attempt = 1) {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 40000); // 40s hard cutoff
+  const timeout = setTimeout(() => controller.abort(), 45000);
+
   try {
     const res = await fetch('/api/claude', {
       method: 'POST',
@@ -1457,12 +1460,48 @@ async function callClaude(prompt, maxTokens = 1200, attempt = 1) {
       body: JSON.stringify({ prompt, maxTokens }),
       signal: controller.signal
     });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data?.error || `API error ${res.status}`);
-    return data.text;
+
+    // Non-2xx before streaming started → JSON error body
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data?.error || `API error ${res.status}`);
+    }
+
+    // Read SSE stream and accumulate text deltas
+    const reader  = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer   = '';
+    let fullText = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop(); // hold incomplete last line
+
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const raw = line.slice(6).trim();
+        if (raw === '[DONE]') continue;
+        try {
+          const evt = JSON.parse(raw);
+          if (evt.type === 'content_block_delta' && evt.delta?.type === 'text_delta') {
+            fullText += evt.delta.text;
+          } else if (evt.type === 'error') {
+            throw new Error(evt.error?.message || 'Streaming error from AI service.');
+          }
+        } catch (parseErr) { /* skip malformed lines */ }
+      }
+    }
+
+    if (!fullText) throw new Error('Empty response from AI service.');
+    return fullText;
+
   } catch (err) {
-    if (attempt === 1 && (err.name === 'AbortError' || err.message.includes('fetch'))) {
-      // Auto-retry once on network/timeout errors
+    // Auto-retry once on network/abort errors
+    if (attempt === 1 && (err.name === 'AbortError' || err.message.toLowerCase().includes('fetch'))) {
       return callClaude(prompt, maxTokens, 2);
     }
     throw err;
