@@ -7,8 +7,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
-  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-
   <style>
     /* ── Variables ── */
     :root {
@@ -95,6 +93,18 @@
       transition: all 0.2s;
     }
     body.high-contrast .btn-hc { background: #fff; color: #000; border-color: #fff; }
+    .btn-demo-nav {
+      background: rgba(0,175,185,0.12);
+      border: 1px solid rgba(0,175,185,0.4);
+      color: var(--teal);
+      padding: 0.3rem 0.85rem;
+      border-radius: 5px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    .btn-demo-nav:hover { background: rgba(0,175,185,0.25); }
+
     /* history dropdown in nav */
     .history-wrap { position: relative; }
     .btn-history {
@@ -267,9 +277,7 @@
     .topic-panel.open { display: block; }
     .topic-panel h3 { font-size: 1.3rem; margin-bottom: 0.4rem; }
     .topic-panel .sub { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; }
-    .topic-input-row {
-      display: flex; gap: 0.75rem; flex-wrap: wrap;
-    }
+    .topic-input-row { display: flex; gap: 0.75rem; flex-wrap: wrap; }
     input#topic-input {
       flex: 1;
       min-width: 200px;
@@ -344,6 +352,55 @@
     }
     .scope-card-text { font-size: 0.93rem; line-height: 1.5; }
 
+    /* ── Preview Section ── */
+    #preview-section {
+      margin-bottom: 1.5rem;
+    }
+    .preview-heading {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 0.3rem;
+    }
+    .preview-sub {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      margin-bottom: 1.1rem;
+    }
+    .preview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 0.85rem;
+    }
+    .preview-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.1rem 1.25rem;
+      transition: border-color 0.2s;
+    }
+    .preview-card:hover { border-color: var(--border-light); }
+    .preview-card-icon { font-size: 1.2rem; margin-bottom: 0.4rem; }
+    .preview-card-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--teal);
+      margin-bottom: 0.4rem;
+    }
+    .preview-card-desc {
+      font-size: 0.83rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+    .preview-card-tip {
+      font-size: 0.78rem;
+      color: var(--burnt-peach);
+      margin-top: 0.5rem;
+      font-style: italic;
+    }
+
     /* ── Loading spinner ── */
     .spinner {
       display: inline-block;
@@ -358,7 +415,6 @@
 
     /* ── Results area ── */
     #results-area { display: none; }
-    #results-area.visible { display: block; }
 
     .section-card {
       background: var(--bg-card);
@@ -374,13 +430,27 @@
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px solid var(--border);
+      background: rgba(0,0,0,0.1);
     }
     .section-header h2 {
-      font-size: 1.35rem;
+      font-size: 1.55rem;
+      font-weight: 600;
+      color: var(--text);
       display: flex; align-items: center; gap: 0.6rem;
+      letter-spacing: -0.01em;
     }
-    .section-header h2 .icon { font-size: 1.1rem; }
+    .section-header h2 .icon { font-size: 1.15rem; }
     .section-body { padding: 1.25rem 1.5rem; }
+
+    /* Directional text inside sections */
+    .section-direction {
+      font-size: 0.82rem;
+      color: var(--text-dim);
+      border-left: 2px solid var(--border-light);
+      padding-left: 0.75rem;
+      margin-bottom: 1rem;
+      line-height: 1.6;
+    }
 
     /* ── Active question banner ── */
     .active-q-banner {
@@ -520,18 +590,44 @@
       font-family: 'Jost', sans-serif;
       font-size: 0.85rem;
     }
+    /* Citable toggle */
+    .citable-toggle-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.83rem;
+      color: var(--text-muted);
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.3rem 0.75rem;
+      cursor: pointer;
+      user-select: none;
+      transition: border-color 0.2s;
+    }
+    .citable-toggle-wrap:hover { border-color: var(--teal); color: var(--text); }
+    .citable-toggle-wrap input[type="checkbox"] { accent-color: var(--teal); cursor: pointer; }
+    /* Two-column papers grid */
+    .papers-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+    @media (max-width: 680px) { .papers-grid { grid-template-columns: 1fr; } }
     .paper-card {
       background: var(--bg-card2);
       border: 1px solid var(--border);
       border-radius: 9px;
-      padding: 1.25rem;
-      margin-bottom: 0.85rem;
+      padding: 0.9rem 1rem;
       transition: border-color 0.2s;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
     }
     .paper-card:hover { border-color: var(--border-light); }
     .paper-title {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 1.15rem;
+      font-size: 1rem;
       font-weight: 600;
       color: var(--text);
       margin-bottom: 0.3rem;
@@ -540,65 +636,66 @@
     .paper-title a { color: inherit; }
     .paper-title a:hover { color: var(--teal); }
     .paper-meta {
-      font-size: 0.82rem;
+      font-size: 0.78rem;
       color: var(--text-muted);
-      margin-bottom: 0.75rem;
+      margin-bottom: 0.6rem;
       display: flex;
       flex-wrap: wrap;
-      gap: 0.4rem 1rem;
+      gap: 0.3rem 0.75rem;
       align-items: center;
     }
-    .paper-meta .authors { max-width: 420px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .paper-meta .authors { max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .meta-sep { color: var(--text-dim); }
     .citation-count {
       background: rgba(57,92,107,0.3);
       border: 1px solid var(--blue-slate);
       color: var(--text-muted);
-      font-size: 0.75rem;
-      padding: 0.1rem 0.5rem;
+      font-size: 0.72rem;
+      padding: 0.1rem 0.45rem;
       border-radius: 99px;
     }
     .journal-trust {
       display: inline-flex; align-items: center; gap: 0.3rem;
-      font-size: 0.75rem; padding: 0.15rem 0.55rem;
+      font-size: 0.72rem; padding: 0.12rem 0.5rem;
       border-radius: 99px; border: 1px solid;
     }
     .trust-good    { background: rgba(62,207,142,0.1); color: #3ecf8e; border-color: #3ecf8e; }
     .trust-verify  { background: rgba(240,134,103,0.1); color: var(--burnt-peach); border-color: var(--burnt-peach); }
     .trust-unknown { background: rgba(122,149,176,0.1); color: var(--text-muted); border-color: var(--text-dim); }
     .paper-abstract {
-      font-size: 0.88rem;
+      font-size: 0.82rem;
       color: var(--text-muted);
-      line-height: 1.65;
-      margin-bottom: 0.85rem;
+      line-height: 1.6;
+      margin-bottom: 0.65rem;
       display: -webkit-box;
-      -webkit-line-clamp: 4;
+      -webkit-line-clamp: 3;
       -webkit-box-orient: vertical;
       overflow: hidden;
+      flex: 1;
     }
     .paper-abstract.expanded { display: block; -webkit-line-clamp: unset; }
     .abstract-expanded {
       background: rgba(0,175,185,0.06);
       border: 1px solid rgba(0,175,185,0.2);
       border-radius: 7px;
-      padding: 0.85rem 1rem;
-      margin-top: 0.75rem;
-      font-size: 0.88rem;
+      padding: 0.75rem 0.9rem;
+      margin-top: 0.65rem;
+      font-size: 0.82rem;
       line-height: 1.7;
       display: none;
     }
     .abstract-expanded.visible { display: block; }
-    .abstract-expanded .exp-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--teal); font-weight: 600; margin-bottom: 0.4rem; }
+    .abstract-expanded .exp-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--teal); font-weight: 600; margin-bottom: 0.4rem; }
     .paper-checklist {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.4rem 0.75rem;
-      margin-bottom: 0.85rem;
+      gap: 0.3rem 0.5rem;
+      margin-bottom: 0.65rem;
     }
     .check-item {
-      font-size: 0.78rem;
-      display: flex; align-items: center; gap: 0.3rem;
-      padding: 0.18rem 0.55rem;
+      font-size: 0.72rem;
+      display: flex; align-items: center; gap: 0.25rem;
+      padding: 0.15rem 0.45rem;
       border-radius: 99px;
       border: 1px solid;
     }
@@ -608,16 +705,17 @@
     .paper-actions {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.5rem;
+      gap: 0.4rem;
       align-items: center;
+      margin-top: auto;
     }
     .btn-explain {
       background: rgba(0,175,185,0.12);
       border: 1px solid rgba(0,175,185,0.35);
       color: var(--teal);
-      padding: 0.35rem 0.85rem;
+      padding: 0.28rem 0.7rem;
       border-radius: 6px;
-      font-size: 0.82rem;
+      font-size: 0.78rem;
       font-weight: 500;
       transition: all 0.2s;
     }
@@ -627,20 +725,20 @@
       background: rgba(240,134,103,0.12);
       border: 1px solid rgba(240,134,103,0.35);
       color: var(--burnt-peach);
-      padding: 0.35rem 0.85rem;
+      padding: 0.28rem 0.7rem;
       border-radius: 6px;
-      font-size: 0.82rem;
+      font-size: 0.78rem;
       font-weight: 500;
       transition: all 0.2s;
       text-decoration: none;
       display: inline-block;
     }
     .btn-pdf:hover { background: rgba(240,134,103,0.25); text-decoration: none; }
-    .btn-show-more {
+    .btn-expand-abstract {
       background: none; border: 1px solid var(--border); color: var(--text-muted);
-      padding: 0.25rem 0.6rem; border-radius: 5px; font-size: 0.78rem;
+      padding: 0.22rem 0.55rem; border-radius: 5px; font-size: 0.73rem;
     }
-    .btn-show-more:hover { border-color: var(--border-light); color: var(--text); }
+    .btn-expand-abstract:hover { border-color: var(--border-light); color: var(--text); }
 
     /* ── Methodology ── */
     .method-recommended {
@@ -743,32 +841,6 @@
       display: flex; align-items: center; gap: 0.4rem;
     }
     .btn-export:hover { background: var(--blue-slate); }
-    .email-wrap { display: flex; gap: 0.5rem; flex: 1; min-width: 240px; }
-    input#email-input {
-      flex: 1;
-      background: var(--bg-input);
-      border: 1px solid var(--border);
-      border-radius: 7px;
-      color: var(--text);
-      padding: 0.6rem 0.9rem;
-      font-size: 0.88rem;
-    }
-    input#email-input:focus { outline: none; border-color: var(--teal); }
-    input#email-input::placeholder { color: var(--text-dim); }
-    .btn-email {
-      background: rgba(201,100,96,0.15);
-      border: 1.5px solid var(--lobster-pink);
-      color: var(--lobster-pink);
-      padding: 0.6rem 1.1rem;
-      border-radius: 7px;
-      font-size: 0.88rem;
-      font-weight: 500;
-      transition: all 0.2s;
-      display: flex; align-items: center; gap: 0.4rem;
-      white-space: nowrap;
-    }
-    .btn-email:hover { background: var(--lobster-pink); color: #fff; }
-    .email-status { font-size: 0.8rem; margin-top: 0.5rem; }
 
     /* ── Disclaimer ── */
     .disclaimer {
@@ -811,6 +883,73 @@
       margin-bottom: 1rem;
     }
 
+    /* ── Demo Wizard ── */
+    #demo-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      pointer-events: none;
+    }
+    #demo-overlay.active { display: block; }
+    #demo-dim {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.78);
+      z-index: 1001;
+    }
+    #demo-spotlight {
+      position: fixed;
+      z-index: 1002;
+      border-radius: 10px;
+      box-shadow: 0 0 0 9999px rgba(0,0,0,0.0);
+      pointer-events: none;
+      transition: top 0.45s cubic-bezier(0.4,0,0.2,1), left 0.45s cubic-bezier(0.4,0,0.2,1), width 0.45s cubic-bezier(0.4,0,0.2,1), height 0.45s cubic-bezier(0.4,0,0.2,1);
+    }
+    #demo-callout {
+      position: fixed;
+      z-index: 1003;
+      background: var(--bg-card2);
+      border: 1px solid var(--teal);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      max-width: 360px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+      pointer-events: all;
+      transition: top 0.45s cubic-bezier(0.4,0,0.2,1), left 0.45s cubic-bezier(0.4,0,0.2,1);
+    }
+    #demo-callout-step {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--teal);
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+    }
+    #demo-callout-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+    }
+    #demo-callout-body {
+      font-size: 0.86rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+      margin-bottom: 1rem;
+    }
+    .demo-actions { display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; }
+    .btn-demo-prev { background: none; border: 1px solid var(--border-light); color: var(--text-muted); padding: 0.45rem 1rem; border-radius: 6px; font-size: 0.84rem; }
+    .btn-demo-prev:hover { border-color: var(--text-muted); }
+    .btn-demo-next { background: var(--teal); color: #0a1520; border: none; padding: 0.45rem 1.2rem; border-radius: 6px; font-size: 0.84rem; font-weight: 600; }
+    .btn-demo-next:hover { background: #00c8d4; }
+    .btn-demo-close { background: none; border: none; color: var(--text-dim); font-size: 0.8rem; margin-left: auto; text-decoration: underline; }
+    .btn-demo-close:hover { color: var(--lobster-pink); }
+    .demo-dots { display: flex; gap: 5px; margin-bottom: 0.75rem; }
+    .demo-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border-light); transition: background 0.2s; }
+    .demo-dot.active { background: var(--teal); }
+
     /* ── Responsive ── */
     @media (max-width: 640px) {
       nav { padding: 0.8rem 1rem; }
@@ -821,8 +960,9 @@
       .section-header { padding: 0.85rem 1rem; }
       .vars-grid { grid-template-columns: 1fr; }
       .export-row { flex-direction: column; }
-      .email-wrap { flex-direction: column; }
       .history-dropdown { width: calc(100vw - 2rem); right: -1rem; }
+      .preview-grid { grid-template-columns: 1fr; }
+      #demo-callout { max-width: calc(100vw - 2rem); left: 1rem !important; }
     }
   </style>
 </head>
@@ -836,6 +976,7 @@
     <a class="btn-nav-back" href="https://sshartbauer.github.io/#tools">⚙ Tools</a>
   </div>
   <div class="nav-right">
+    <button class="btn-demo-nav" onclick="startDemo()">▶ Take a Tour</button>
     <div class="history-wrap">
       <button class="btn-history" id="btn-history" onclick="toggleHistory()">
         ⏱ History <span class="badge" id="history-badge" style="display:none">0</span>
@@ -862,7 +1003,7 @@
 <main>
 
   <!-- Input card -->
-  <div class="input-card">
+  <div class="input-card" id="demo-input-card">
     <label class="input-label" for="question">Your research question</label>
     <p class="input-explainer">
       A research question is specific and answerable. <strong>"Climate change"</strong> is a topic.
@@ -890,6 +1031,62 @@
     <div class="topic-results" id="topic-results"></div>
   </div>
 
+  <!-- ══ PREVIEW SECTION ══ -->
+  <div id="preview-section">
+    <p class="preview-heading">What you'll get</p>
+    <p class="preview-sub">After you analyze your question, here's what appears — hover any card to learn more.</p>
+    <div class="preview-grid">
+      <div class="preview-card" id="demo-preview-query">
+        <div class="preview-card-icon">🔍</div>
+        <div class="preview-card-title">Query Optimizer</div>
+        <div class="preview-card-desc">4 ready-to-use search strings tailored to your exact question — optimized for either Google or Google Scholar. Switch between modes with the toggle. Copy any string directly into your search bar to find sources.</div>
+        <div class="preview-card-tip">💡 Try Google Scholar strings first for peer-reviewed results.</div>
+      </div>
+      <div class="preview-card" id="demo-preview-tiers">
+        <div class="preview-card-icon">📊</div>
+        <div class="preview-card-title">Source Tier Guide</div>
+        <div class="preview-card-desc">A ranked breakdown of source credibility, from raw primary data down to news articles. Expand the guide to see which types of sources carry the most weight for academic citation.</div>
+        <div class="preview-card-tip">💡 Always aim for Tier 1 or 2 sources in a research paper.</div>
+      </div>
+      <div class="preview-card" id="demo-preview-papers">
+        <div class="preview-card-icon">📄</div>
+        <div class="preview-card-title">Research Papers</div>
+        <div class="preview-card-desc">Up to 12 peer-reviewed papers from Semantic Scholar, shown side by side. Each card shows citation count, journal credibility, and whether the paper is open access. Use "Explain in plain English" to get a jargon-free summary of any abstract.</div>
+        <div class="preview-card-tip">💡 Toggle "Easily citable only" to filter to papers you can access and cite without a library login.</div>
+      </div>
+      <div class="preview-card" id="demo-preview-method">
+        <div class="preview-card-icon">🔬</div>
+        <div class="preview-card-title">Methodology Suggestion</div>
+        <div class="preview-card-desc">The most appropriate research design for your question — explained in plain English with no statistics jargon. Also lists alternative methods worth considering.</div>
+        <div class="preview-card-tip">💡 Share this with your professor when discussing your research approach.</div>
+      </div>
+      <div class="preview-card" id="demo-preview-vars">
+        <div class="preview-card-icon">📐</div>
+        <div class="preview-card-title">Suggested Variables</div>
+        <div class="preview-card-desc">Your independent variable (the cause), dependent variable (the effect), and likely confounders (things that could skew your results). These are the building blocks of your study design and help you search more precisely.</div>
+        <div class="preview-card-tip">💡 Knowing your variables helps you build stronger search strings.</div>
+      </div>
+      <div class="preview-card" id="demo-preview-datasets">
+        <div class="preview-card-icon">🗄</div>
+        <div class="preview-card-title">Datasets & Websites</div>
+        <div class="preview-card-desc">5 free, reputable data sources relevant to your specific question — with direct links. These are real datasets from sources like the Census Bureau, ICPSR, Our World in Data, and others.</div>
+        <div class="preview-card-tip">💡 Click any name to go directly to the dataset.</div>
+      </div>
+      <div class="preview-card" id="demo-preview-framings">
+        <div class="preview-card-icon">🔄</div>
+        <div class="preview-card-title">Alternative Framings</div>
+        <div class="preview-card-desc">3 reworded versions of your question at different scopes — narrower, comparative, or broader. Click any framing to instantly run a fresh full analysis on that version.</div>
+        <div class="preview-card-tip">💡 Use these if your original question is too broad or too narrow.</div>
+      </div>
+      <div class="preview-card" id="demo-preview-export">
+        <div class="preview-card-icon">📤</div>
+        <div class="preview-card-title">Export Your Brief</div>
+        <div class="preview-card-desc">Download a complete .txt research brief with all your results — search strings, papers, methodology, variables, and datasets — all in one file.</div>
+        <div class="preview-card-tip">💡 Great for bringing to office hours or a library appointment.</div>
+      </div>
+    </div>
+  </div>
+
   <!-- Loading state -->
   <div id="loading-area" style="display:none">
     <div class="loading-card">
@@ -912,7 +1109,7 @@
     </div>
 
     <!-- Query Optimizer -->
-    <div class="section-card">
+    <div class="section-card" id="demo-result-query">
       <div class="section-header">
         <h2><span class="icon">🔍</span> Query Optimizer</h2>
         <div class="mode-toggle">
@@ -921,47 +1118,51 @@
         </div>
       </div>
       <div class="section-body">
+        <p class="section-direction">Switch between Google and Google Scholar modes above, then copy any search string directly into your search bar to find sources.</p>
         <div class="synonyms-row" id="synonyms-row"></div>
         <div class="search-strings" id="search-strings"></div>
       </div>
     </div>
 
     <!-- Source Tier Guide -->
-    <div class="section-card">
+    <div class="section-card" id="demo-result-tiers">
       <div class="section-header" style="cursor:pointer" onclick="toggleTierGuide()">
         <h2><span class="icon">📊</span> Source Tier Guide</h2>
         <button class="collapsible-trigger" id="tier-trigger">
           Show guide <span class="collapsible-arrow">▶</span>
         </button>
       </div>
-      <div class="section-body collapsible-body" id="tier-body">
-        <div class="tier-list">
-          <div class="tier-item">
-            <span class="tier-num">1</span>
-            <div class="tier-text">
-              <strong>Primary / Raw Data</strong>
-              <span>Original datasets you analyze yourself — government surveys, health registries, census data (e.g. NHANES, IPUMS, Census.gov). Highest credibility for quantitative work.</span>
+      <div class="section-body">
+        <p class="section-direction">Click "Show guide" above to expand a ranked breakdown of source credibility — use it to evaluate which sources are strong enough to cite in your paper.</p>
+        <div class="collapsible-body" id="tier-body">
+          <div class="tier-list">
+            <div class="tier-item">
+              <span class="tier-num">1</span>
+              <div class="tier-text">
+                <strong>Primary / Raw Data</strong>
+                <span>Original datasets you analyze yourself — government surveys, health registries, census data (e.g. NHANES, IPUMS, Census.gov). Highest credibility for quantitative work.</span>
+              </div>
             </div>
-          </div>
-          <div class="tier-item">
-            <span class="tier-num">2</span>
-            <div class="tier-text">
-              <strong>Peer-Reviewed Research</strong>
-              <span>Published studies vetted by experts in the field — the gold standard for citation. Prioritize primary research articles over review articles when possible.</span>
+            <div class="tier-item">
+              <span class="tier-num">2</span>
+              <div class="tier-text">
+                <strong>Peer-Reviewed Research</strong>
+                <span>Published studies vetted by experts in the field — the gold standard for citation. Prioritize primary research articles over review articles when possible.</span>
+              </div>
             </div>
-          </div>
-          <div class="tier-item">
-            <span class="tier-num">3</span>
-            <div class="tier-text">
-              <strong>Government & Institutional Reports</strong>
-              <span>Reliable secondary sources — CDC reports, WHO white papers, Congressional Budget Office analyses. Good for context; not always peer-reviewed.</span>
+            <div class="tier-item">
+              <span class="tier-num">3</span>
+              <div class="tier-text">
+                <strong>Government & Institutional Reports</strong>
+                <span>Reliable secondary sources — CDC reports, WHO white papers, Congressional Budget Office analyses. Good for context; not always peer-reviewed.</span>
+              </div>
             </div>
-          </div>
-          <div class="tier-item">
-            <span class="tier-num">4</span>
-            <div class="tier-text">
-              <strong>News & General Web</strong>
-              <span>Useful for understanding the public conversation — not for citation in academic work. Always trace news stories back to their primary sources.</span>
+            <div class="tier-item">
+              <span class="tier-num">4</span>
+              <div class="tier-text">
+                <strong>News & General Web</strong>
+                <span>Useful for understanding the public conversation — not for citation in academic work. Always trace news stories back to their primary sources.</span>
+              </div>
             </div>
           </div>
         </div>
@@ -969,82 +1170,84 @@
     </div>
 
     <!-- Research Papers -->
-    <div class="section-card">
+    <div class="section-card" id="demo-result-papers">
       <div class="section-header">
         <h2><span class="icon">📄</span> Research Papers</h2>
       </div>
       <div class="section-body">
+        <p class="section-direction">Browse the papers below. Click <strong>Expand full abstract</strong> to read the full summary, or <strong>Explain in plain English</strong> to get a jargon-free breakdown. Click any paper title to open it.</p>
         <div class="papers-controls">
           <span class="papers-count" id="papers-count"></span>
+          <label class="citable-toggle-wrap">
+            <input type="checkbox" id="citable-toggle" onchange="filterAndRenderPapers()" />
+            Easily citable only (open access)
+          </label>
           <div class="sort-wrap">
             Sort by:
-            <select class="sort-select" id="sort-select" onchange="sortPapers()">
+            <select class="sort-select" id="sort-select" onchange="filterAndRenderPapers()">
               <option value="citations">Citation Count</option>
               <option value="recency">Recency</option>
             </select>
           </div>
         </div>
-        <div id="papers-list"></div>
+        <div class="papers-grid" id="papers-list"></div>
         <div id="papers-error" class="error-msg" style="display:none"></div>
       </div>
     </div>
 
     <!-- Methodology -->
-    <div class="section-card">
+    <div class="section-card" id="demo-result-method">
       <div class="section-header">
         <h2><span class="icon">🔬</span> Methodology Suggestion</h2>
       </div>
       <div class="section-body">
+        <p class="section-direction">This is the research design best suited to your question, explained in plain English. Use it to frame how you'll approach collecting and analyzing data — and share it with your professor or advisor.</p>
         <div id="methodology-content"></div>
       </div>
     </div>
 
     <!-- Suggested Variables -->
-    <div class="section-card">
+    <div class="section-card" id="demo-result-vars">
       <div class="section-header">
         <h2><span class="icon">📐</span> Suggested Variables</h2>
       </div>
       <div class="section-body">
+        <p class="section-direction">These are the key concepts your study measures. Understanding your independent variable (cause), dependent variable (effect), and confounders (things that could skew results) helps you search more precisely and write a stronger paper.</p>
         <div id="variables-content"></div>
       </div>
     </div>
 
     <!-- Datasets & Websites -->
-    <div class="section-card">
+    <div class="section-card" id="demo-result-datasets">
       <div class="section-header">
         <h2><span class="icon">🗄</span> Datasets & Websites</h2>
       </div>
       <div class="section-body">
+        <p class="section-direction">Click any dataset name below to visit the source directly. These are free, reputable sources relevant to your specific question — good for both background research and data collection.</p>
         <div id="datasets-content"></div>
       </div>
     </div>
 
     <!-- Question Refinements -->
-    <div class="section-card">
+    <div class="section-card" id="demo-result-framings">
       <div class="section-header">
         <h2><span class="icon">🔄</span> Alternative Framings</h2>
       </div>
       <div class="section-body">
-        <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:0.85rem;">Your question could also be approached as… Click any to run a fresh analysis.</p>
+        <p class="section-direction">Click any framing below to instantly run a fresh analysis on that version of your question — useful if your original is too broad, too narrow, or you want to try a different angle.</p>
         <div class="refinement-list" id="refinements-content"></div>
       </div>
     </div>
 
     <!-- Export & Email -->
-    <div class="section-card">
+    <div class="section-card" id="demo-result-export">
       <div class="section-header">
         <h2><span class="icon">📤</span> Export Your Research Brief</h2>
       </div>
       <div class="section-body">
+        <p class="section-direction">Download a complete .txt file with all your results — great for bringing to office hours, a library appointment, or sharing with a study group.</p>
         <div class="export-row">
           <button class="btn-export" onclick="exportBrief()">⬇ Download .txt</button>
-          <div style="flex:1">
-            <div class="email-wrap">
-              <input type="email" id="email-input" placeholder="your@email.com" />
-              <button class="btn-email" onclick="sendEmail()">✉ Email to me</button>
-            </div>
-            <div class="email-status" id="email-status"></div>
-          </div>
         </div>
       </div>
     </div>
@@ -1056,6 +1259,23 @@
 
   </div><!-- /results-area -->
 </main>
+
+<!-- ══ DEMO WIZARD OVERLAY ══ -->
+<div id="demo-overlay">
+  <div id="demo-dim" onclick="endDemo()"></div>
+  <div id="demo-spotlight"></div>
+  <div id="demo-callout">
+    <div class="demo-dots" id="demo-dots"></div>
+    <div id="demo-callout-step"></div>
+    <div id="demo-callout-title"></div>
+    <div id="demo-callout-body"></div>
+    <div class="demo-actions">
+      <button class="btn-demo-prev" id="demo-prev" onclick="demoStep(-1)">← Back</button>
+      <button class="btn-demo-next" id="demo-next" onclick="demoStep(1)">Next →</button>
+      <button class="btn-demo-close" onclick="endDemo()">Skip tour</button>
+    </div>
+  </div>
+</div>
 
 <!-- ══ JAVASCRIPT ══ -->
 <script>
@@ -1069,22 +1289,11 @@ const state = {
   topicQuestions: []
 };
 
-// ── EmailJS config (fill in after setting up emailjs.com account) ──
-const EMAILJS_SERVICE_ID  = 'YOUR_SERVICE_ID';
-const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';
-const EMAILJS_PUBLIC_KEY  = 'YOUR_PUBLIC_KEY';
-
 // ── Init ───────────────────────────────────────────────
 (function init() {
-  // Load HC pref
   if (sessionStorage.getItem('jumpstart_hc') === '1') {
     document.body.classList.add('high-contrast');
   }
-  // Init EmailJS if configured
-  if (EMAILJS_PUBLIC_KEY !== 'YOUR_PUBLIC_KEY') {
-    emailjs.init(EMAILJS_PUBLIC_KEY);
-  }
-  // Close history on outside click
   document.addEventListener('click', (e) => {
     const hw = document.getElementById('btn-history');
     const hd = document.getElementById('history-dropdown');
@@ -1101,8 +1310,7 @@ function toggleHC() {
 }
 
 function toggleTopicPanel() {
-  const p = document.getElementById('topic-panel');
-  p.classList.toggle('open');
+  document.getElementById('topic-panel').classList.toggle('open');
 }
 
 function toggleTierGuide() {
@@ -1127,6 +1335,7 @@ function showLoading(show) {
 
 function clearResults() {
   document.getElementById('results-area').style.display = 'none';
+  document.getElementById('preview-section').style.display = 'block';
   document.getElementById('question').value = '';
   state.currentQuestion = '';
   state.analysisData = null;
@@ -1176,7 +1385,7 @@ function escHtml(s) {
   return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-// ── Claude API call (proxied through Vercel serverless function) ───────────
+// ── Claude API call ────────────────────────────────────
 async function callClaude(prompt, maxTokens = 2000) {
   const res = await fetch('/api/claude', {
     method: 'POST',
@@ -1189,7 +1398,6 @@ async function callClaude(prompt, maxTokens = 2000) {
 }
 
 function parseJSON(text) {
-  // Strip markdown code fences if present
   const cleaned = text.replace(/^```(?:json)?\n?/,'').replace(/\n?```$/,'').trim();
   return JSON.parse(cleaned);
 }
@@ -1198,41 +1406,21 @@ function parseJSON(text) {
 async function suggestQuestions() {
   const topic = document.getElementById('topic-input').value.trim();
   if (!topic) return;
-
   const btn = document.getElementById('btn-suggest');
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span> Generating…';
   document.getElementById('topic-results').innerHTML = '';
-
   try {
     const prompt = `A beginning college student wants to research this topic: "${topic}"
-
 Generate exactly 5 researchable academic questions at varying scopes. Return ONLY valid JSON, no explanation:
-
-{
-  "questions": [
-    {"question": "...", "scope": "Narrow"},
-    {"question": "...", "scope": "Narrow"},
-    {"question": "...", "scope": "Manageable"},
-    {"question": "...", "scope": "Manageable"},
-    {"question": "...", "scope": "Broad"}
-  ]
-}
-
-Rules:
-- Narrow = answerable in a short paper (5-10 pages), very specific
-- Manageable = good semester-length project, moderate scope
-- Broad = thesis or extensive lit review scope
-- Questions should be specific enough to search for academic papers
-- Do not include PICO framing or clinical language unless topic is medical`;
-
+{"questions":[{"question":"...","scope":"Narrow"},{"question":"...","scope":"Narrow"},{"question":"...","scope":"Manageable"},{"question":"...","scope":"Manageable"},{"question":"...","scope":"Broad"}]}
+Rules: Narrow = answerable in a short paper (5-10 pages); Manageable = good semester-length project; Broad = thesis or extensive lit review scope. Questions should be specific enough to search for academic papers. Do not include PICO framing or clinical language unless topic is medical.`;
     const raw = await callClaude(prompt, 800);
     const data = parseJSON(raw);
     state.topicQuestions = data.questions;
     renderTopicQuestions(data.questions);
   } catch (err) {
-    document.getElementById('topic-results').innerHTML =
-      `<div class="error-msg">${escHtml(err.message)}</div>`;
+    document.getElementById('topic-results').innerHTML = `<div class="error-msg">${escHtml(err.message)}</div>`;
   } finally {
     btn.disabled = false;
     btn.textContent = 'Suggest Questions';
@@ -1243,7 +1431,7 @@ function renderTopicQuestions(questions) {
   const container = document.getElementById('topic-results');
   container.innerHTML = questions.map((q, i) => `
     <div class="scope-card" onclick="loadTopicQuestion(${i})">
-      <div class="scope-badge" data-scope="${escHtml(q.scope)}" title="${q.scope === 'Narrow' ? 'Good for a short paper' : q.scope === 'Broad' ? 'Better for a thesis or lit review' : 'Good for a semester-length project'}">
+      <div class="scope-badge" data-scope="${escHtml(q.scope)}">
         ${escHtml(q.scope)}
         <div class="scope-tooltip">${q.scope === 'Narrow' ? 'Narrow = good for a short paper.' : q.scope === 'Broad' ? 'Broad = better for a thesis or lit review.' : 'Manageable = solid for a semester-length project.'}</div>
       </div>
@@ -1262,16 +1450,13 @@ function loadTopicQuestion(idx) {
 // ── Main Analysis ──────────────────────────────────────
 async function runAnalysis() {
   const question = document.getElementById('question').value.trim();
-  if (!question) {
-    document.getElementById('question').focus();
-    return;
-  }
+  if (!question) { document.getElementById('question').focus(); return; }
 
   state.currentQuestion = question;
   addToHistory(question);
 
-  // UI: show loading, hide results
   document.getElementById('results-area').style.display = 'none';
+  document.getElementById('preview-section').style.display = 'none';
   showLoading(true);
 
   const btn = document.getElementById('btn-analyze');
@@ -1279,22 +1464,19 @@ async function runAnalysis() {
   document.getElementById('btn-analyze-text').innerHTML = '<span class="spinner"></span> Analyzing…';
 
   try {
-    // Step 1: Claude analysis
     setLoadingStep('Generating search strategies and analysis…');
     const analysisData = await fetchAnalysis(question);
     state.analysisData = analysisData;
 
-    // Step 2: Fetch papers
     setLoadingStep('Fetching papers from Semantic Scholar…');
     const papers = await fetchPapers(analysisData.search_query_plain);
     state.papers = papers;
 
-    // Step 3: Render
     setLoadingStep('Building your research brief…');
     renderResults(question, analysisData, papers);
-
   } catch (err) {
     showLoading(false);
+    document.getElementById('preview-section').style.display = 'block';
     document.getElementById('results-area').style.display = 'block';
     document.getElementById('results-area').innerHTML =
       `<div class="error-msg">⚠ ${escHtml(err.message)}</div>` +
@@ -1314,35 +1496,14 @@ Research question: "${question}"
 Return ONLY valid JSON (no markdown fences, no commentary) with this exact structure:
 {
   "search_query_plain": "a clean 4-6 word search phrase suitable for Semantic Scholar API",
-  "google_strings": [
-    "search string 1",
-    "search string 2",
-    "search string 3",
-    "search string 4"
-  ],
-  "scholar_strings": [
-    "\"exact phrase\" AND related term site:scholar.google.com",
-    "allintitle: key terms",
-    "\"key concept\" OR \"synonym\" AND outcome",
-    "author:LastName topic year"
-  ],
-  "synonyms": [
-    {"term": "original term", "alternatives": ["synonym1", "synonym2"]},
-    {"term": "another term", "alternatives": ["alt1", "alt2"]}
-  ],
-  "methodology": {
-    "recommended": "Method Name",
-    "definition": "One plain-English sentence defining what this method is.",
-    "alternatives": ["Alternative 1", "Alternative 2"]
-  },
+  "google_strings": ["search string 1","search string 2","search string 3","search string 4"],
+  "scholar_strings": ["\"exact phrase\" AND related term","allintitle: key terms","\"key concept\" OR \"synonym\" AND outcome","author:LastName topic year"],
+  "synonyms": [{"term": "original term", "alternatives": ["synonym1", "synonym2"]},{"term": "another term", "alternatives": ["alt1", "alt2"]}],
+  "methodology": {"recommended": "Method Name","definition": "One plain-English sentence defining what this method is.","alternatives": ["Alternative 1", "Alternative 2"]},
   "variables": {
     "independent": {"name": "Variable name", "explanation": "The cause or predictor — what you're testing."},
     "dependent": {"name": "Variable name", "explanation": "The outcome — what you're measuring."},
-    "confounders": [
-      {"name": "Confounder 1", "explanation": "Why this could skew your results."},
-      {"name": "Confounder 2", "explanation": "Why this could skew your results."},
-      {"name": "Confounder 3", "explanation": "Why this could skew your results."}
-    ]
+    "confounders": [{"name": "Confounder 1", "explanation": "Why this could skew your results."},{"name": "Confounder 2", "explanation": "Why this could skew your results."},{"name": "Confounder 3", "explanation": "Why this could skew your results."}]
   },
   "datasets": [
     {"name": "Dataset Name", "url": "https://...", "description": "One sentence about what data is here."},
@@ -1351,18 +1512,14 @@ Return ONLY valid JSON (no markdown fences, no commentary) with this exact struc
     {"name": "Dataset Name", "url": "https://...", "description": "One sentence about what data is here."},
     {"name": "Dataset Name", "url": "https://...", "description": "One sentence about what data is here."}
   ],
-  "refinements": [
-    "A more specific version of the question that narrows scope",
-    "A comparative framing — e.g. comparing two groups or time periods",
-    "A broader or differently-angled version of the question"
-  ]
+  "refinements": ["A more specific version of the question that narrows scope","A comparative framing — e.g. comparing two groups or time periods","A broader or differently-angled version of the question"]
 }
 
 Guidelines:
 - Google strings: natural language phrases a student would actually type, 4-8 words each, no operators
 - Scholar strings: use Boolean operators (AND, OR, NOT), quotation marks for phrases, allintitle: for title searches
 - Synonyms: identify 2-3 key terms in the question and give their academic or alternate equivalents
-- Datasets: recommend the most relevant ones for THIS specific question from general academic sources (Kaggle, IPUMS, Census.gov, data.gov, ICPSR, Our World in Data, Google Dataset Search, County Health Rankings, MIT Election Lab, World Bank, OECD, etc.)
+- Datasets: recommend the most relevant ones for THIS specific question
 - Methodology: recommend the most appropriate study design for this question
 - Keep all explanations friendly, clear, and free of jargon`;
 
@@ -1374,10 +1531,7 @@ Guidelines:
 async function fetchPapers(query) {
   const fields = 'title,authors,year,abstract,citationCount,isOpenAccess,openAccessPdf,journal,publicationTypes,externalIds';
   const url = `https://api.semanticscholar.org/graph/v1/paper/search?query=${encodeURIComponent(query)}&fields=${fields}&limit=12`;
-
-  const res = await fetch(url, {
-    headers: { 'Accept': 'application/json' }
-  });
+  const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
   if (!res.ok) throw new Error(`Semantic Scholar returned ${res.status}. Try again in a moment.`);
   const data = await res.json();
   return (data.data || []).filter(p => p.title);
@@ -1385,35 +1539,19 @@ async function fetchPapers(query) {
 
 // ── Render Results ─────────────────────────────────────
 function renderResults(question, analysis, papers) {
-  // Active question
   document.getElementById('active-q-text').textContent = question;
-
-  // Query optimizer
   renderQueryOptimizer(analysis);
-
-  // Papers
   renderPapers(papers);
-
-  // Methodology
   renderMethodology(analysis.methodology);
-
-  // Variables
   renderVariables(analysis.variables);
-
-  // Datasets
   renderDatasets(analysis.datasets);
-
-  // Refinements
   renderRefinements(analysis.refinements);
-
-  // Show results
   document.getElementById('results-area').style.display = 'block';
   document.getElementById('results-area').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 // ── Query Optimizer ────────────────────────────────────
 function renderQueryOptimizer(analysis) {
-  // Synonyms
   const synRow = document.getElementById('synonyms-row');
   if (analysis.synonyms && analysis.synonyms.length > 0) {
     const parts = analysis.synonyms.map(s =>
@@ -1423,8 +1561,6 @@ function renderQueryOptimizer(analysis) {
   } else {
     synRow.innerHTML = '';
   }
-
-  // Store strings on state for mode switching
   state.googleStrings  = analysis.google_strings  || [];
   state.scholarStrings = analysis.scholar_strings || [];
   state.currentMode = 'google';
@@ -1442,7 +1578,7 @@ function switchMode(mode) {
 
 function renderSearchStrings(strings) {
   const container = document.getElementById('search-strings');
-  container.innerHTML = (strings || []).map((s, i) => `
+  container.innerHTML = (strings || []).map((s) => `
     <div class="search-string-item">
       <span class="search-string-text">${escHtml(s)}</span>
       <button class="btn-copy" onclick="copyText(${JSON.stringify(s)}, this)">Copy</button>
@@ -1451,27 +1587,33 @@ function renderSearchStrings(strings) {
 }
 
 // ── Papers ─────────────────────────────────────────────
-function sortPapers() {
-  const mode = document.getElementById('sort-select').value;
-  const sorted = [...state.papers].sort((a, b) => {
-    if (mode === 'citations') return (b.citationCount || 0) - (a.citationCount || 0);
+function filterAndRenderPapers() {
+  const citableOnly = document.getElementById('citable-toggle').checked;
+  const sortMode = document.getElementById('sort-select').value;
+  let papers = [...state.papers];
+  if (citableOnly) papers = papers.filter(p => p.isOpenAccess);
+  papers.sort((a, b) => {
+    if (sortMode === 'citations') return (b.citationCount || 0) - (a.citationCount || 0);
     return (b.year || 0) - (a.year || 0);
   });
-  renderPapersList(sorted);
+  renderPapersList(papers);
+  document.getElementById('papers-count').textContent =
+    papers.length > 0
+      ? `${papers.length} paper${papers.length !== 1 ? 's' : ''} shown`
+      : 'No papers match this filter.';
 }
 
 function renderPapers(papers) {
-  const count = papers.length;
+  document.getElementById('citable-toggle').checked = false;
+  document.getElementById('sort-select').value = 'citations';
   document.getElementById('papers-count').textContent =
-    count > 0 ? `${count} papers found` : 'No papers found for this query.';
-
+    papers.length > 0 ? `${papers.length} papers found` : 'No papers found for this query.';
   const sorted = [...papers].sort((a, b) => (b.citationCount || 0) - (a.citationCount || 0));
   renderPapersList(sorted);
-
-  if (count === 0) {
+  if (papers.length === 0) {
     document.getElementById('papers-error').style.display = 'block';
     document.getElementById('papers-error').textContent =
-      'No results returned from Semantic Scholar. Try a different search string from the Query Optimizer above, or check your spelling.';
+      'No results from Semantic Scholar. Try a different search string from the Query Optimizer above.';
   } else {
     document.getElementById('papers-error').style.display = 'none';
   }
@@ -1480,58 +1622,46 @@ function renderPapers(papers) {
 function renderPapersList(papers) {
   const container = document.getElementById('papers-list');
   const currentYear = new Date().getFullYear();
-
+  if (papers.length === 0) {
+    container.innerHTML = '<p style="color:var(--text-dim);font-size:0.88rem;grid-column:1/-1">No papers match this filter.</p>';
+    return;
+  }
   container.innerHTML = papers.map((p, idx) => {
-    const title      = p.title || 'Untitled';
-    const year       = p.year || 'n.d.';
-    const authors    = (p.authors || []).map(a => a.name).join(', ') || 'Unknown authors';
-    const citations  = p.citationCount != null ? p.citationCount : '—';
-    const abstract   = p.abstract || 'No abstract available.';
-    const journal    = p.journal?.name || '';
-    const pdfUrl     = p.openAccessPdf?.url || null;
-    const isOA       = p.isOpenAccess;
-    const pubTypes   = p.publicationTypes || [];
-    const doi        = p.externalIds?.DOI || '';
+    const title     = p.title || 'Untitled';
+    const year      = p.year || 'n.d.';
+    const authors   = (p.authors || []).map(a => a.name).join(', ') || 'Unknown authors';
+    const citations = p.citationCount != null ? p.citationCount : '—';
+    const abstract  = p.abstract || 'No abstract available.';
+    const journal   = p.journal?.name || '';
+    const pdfUrl    = p.openAccessPdf?.url || null;
+    const isOA      = p.isOpenAccess;
+    const pubTypes  = p.publicationTypes || [];
+    const doi       = p.externalIds?.DOI || '';
 
-    // Citability checks
     const isPeerReviewed = pubTypes.includes('JournalArticle') || pubTypes.includes('Review') || !!journal;
     const isRecent       = year === 'n.d.' ? null : (currentYear - year) <= 10;
     const isReview       = pubTypes.includes('Review') || pubTypes.includes('MetaAnalysis') || pubTypes.includes('SystematicReview');
     const isPrimary      = !isReview;
-
-    // Journal trust (simplified heuristic)
-    const trustInfo = assessJournalTrust(journal);
+    const trustInfo      = assessJournalTrust(journal);
 
     return `
     <div class="paper-card" id="paper-${idx}">
       <div class="paper-title">
-        ${doi
-          ? `<a href="https://doi.org/${doi}" target="_blank" rel="noopener">${escHtml(title)}</a>`
-          : escHtml(title)}
+        ${doi ? `<a href="https://doi.org/${doi}" target="_blank" rel="noopener">${escHtml(title)}</a>` : escHtml(title)}
       </div>
       <div class="paper-meta">
         <span class="authors" title="${escHtml(authors)}">${escHtml(authors)}</span>
         <span class="meta-sep">·</span>
         <span>${year}</span>
-        ${journal ? `<span class="meta-sep">·</span><span>${escHtml(journal)}</span>` : ''}
-        <span class="citation-count">📊 ${citations} citations</span>
-        ${journal ? `<span class="journal-trust ${trustInfo.cls}" title="${escHtml(trustInfo.tooltip)}">
-          ${trustInfo.icon} ${escHtml(trustInfo.label)}
-        </span>` : ''}
+        ${journal ? `<span class="meta-sep">·</span><span style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(journal)}</span>` : ''}
+        <span class="citation-count">📊 ${citations}</span>
+        ${journal ? `<span class="journal-trust ${trustInfo.cls}" title="${escHtml(trustInfo.tooltip)}">${trustInfo.icon} ${escHtml(trustInfo.label)}</span>` : ''}
       </div>
       <div class="paper-checklist">
-        <span class="check-item ${isPeerReviewed ? 'check-pass' : 'check-fail'}">
-          ${isPeerReviewed ? '✓' : '✗'} Peer-reviewed
-        </span>
-        <span class="check-item ${isRecent === null ? 'check-warn' : isRecent ? 'check-pass' : 'check-warn'}">
-          ${isRecent === null ? '?' : isRecent ? '✓' : '⚠'} ${isRecent === false ? `Published ${year} — over 10 years old` : 'Recent enough'}
-        </span>
-        <span class="check-item ${isPrimary ? 'check-pass' : 'check-warn'}">
-          ${isPrimary ? '✓' : '○'} ${isPrimary ? 'Primary research' : 'Review / meta-analysis'}
-        </span>
-        <span class="check-item ${isOA ? 'check-pass' : 'check-fail'}">
-          ${isOA ? '✓' : '✗'} ${isOA ? 'Open access' : 'Paywalled'}
-        </span>
+        <span class="check-item ${isPeerReviewed ? 'check-pass' : 'check-fail'}">${isPeerReviewed ? '✓' : '✗'} Peer-reviewed</span>
+        <span class="check-item ${isRecent === null ? 'check-warn' : isRecent ? 'check-pass' : 'check-warn'}">${isRecent === false ? `⚠ ${year}` : '✓ Recent'}</span>
+        <span class="check-item ${isPrimary ? 'check-pass' : 'check-warn'}">${isPrimary ? '✓ Primary' : '○ Review'}</span>
+        <span class="check-item ${isOA ? 'check-pass' : 'check-fail'}">${isOA ? '✓ Open access' : '✗ Paywalled'}</span>
       </div>
       <div class="paper-abstract" id="abstract-text-${idx}">${escHtml(abstract)}</div>
       <div class="abstract-expanded" id="abstract-exp-${idx}">
@@ -1542,7 +1672,7 @@ function renderPapersList(papers) {
         <button class="btn-explain" id="explain-btn-${idx}" onclick="explainAbstract(${idx}, ${JSON.stringify(abstract).replace(/'/g,"\\'")})" ${!abstract || abstract === 'No abstract available.' ? 'disabled' : ''}>
           💬 Explain in plain English
         </button>
-        <button class="btn-show-more" onclick="toggleAbstract(${idx})">Show full abstract</button>
+        <button class="btn-expand-abstract" onclick="toggleAbstract(${idx})">Expand full abstract</button>
         ${pdfUrl ? `<a class="btn-pdf" href="${escHtml(pdfUrl)}" target="_blank" rel="noopener">📄 PDF</a>` : ''}
       </div>
     </div>`;
@@ -1550,36 +1680,22 @@ function renderPapersList(papers) {
 }
 
 function toggleAbstract(idx) {
-  const el = document.getElementById(`abstract-text-${idx}`);
-  const btn = el.parentElement.querySelector('.btn-show-more');
+  const el  = document.getElementById(`abstract-text-${idx}`);
+  const btn = el.parentElement.querySelector('.btn-expand-abstract');
   el.classList.toggle('expanded');
-  btn.textContent = el.classList.contains('expanded') ? 'Collapse abstract' : 'Show full abstract';
+  btn.textContent = el.classList.contains('expanded') ? 'Collapse abstract' : 'Expand full abstract';
 }
 
 function assessJournalTrust(journal) {
   if (!journal) return { cls: 'trust-unknown', icon: '○', label: 'Unable to verify', tooltip: 'No journal information available.' };
-
   const j = journal.toLowerCase();
-  // Known high-quality journals / publishers
-  const established = [
-    'nature','science','cell','lancet','nejm','jama','bmj','plos','annals',
-    'american journal','journal of','proceedings','quarterly','review of',
-    'oxford','cambridge','wiley','elsevier','springer','sage','taylor',
-    'pnas','pediatrics','circulation','blood','gut','brain','chest',
-    'epidemiology','public health','economics','sociology','psychology','political'
-  ];
-  const predatory = ['mdpi','frontiers in','hindawi','scientific reports'];
-
+  const established = ['nature','science','cell','lancet','nejm','jama','bmj','plos','annals','american journal','journal of','proceedings','quarterly','review of','oxford','cambridge','wiley','elsevier','springer','sage','taylor','pnas','pediatrics','circulation','blood','gut','brain','chest','epidemiology','public health','economics','sociology','psychology','political'];
+  const predatory   = ['mdpi','frontiers in','hindawi','scientific reports'];
   const isEstablished = established.some(k => j.includes(k));
   const isPossiblyPredatory = predatory.some(k => j.includes(k));
-
-  if (isEstablished && !isPossiblyPredatory) {
-    return { cls: 'trust-good', icon: '✓', label: 'Well-established journal', tooltip: 'Recognized publisher. Standard peer-review likely.' };
-  }
-  if (isPossiblyPredatory) {
-    return { cls: 'trust-verify', icon: '⚠', label: 'Verify before citing', tooltip: 'Some journals from this publisher have inconsistent peer review. Check the specific article.' };
-  }
-  return { cls: 'trust-unknown', icon: '○', label: 'Unable to verify', tooltip: 'Could not confirm peer-review status. Check the journal directly.' };
+  if (isEstablished && !isPossiblyPredatory) return { cls: 'trust-good', icon: '✓', label: 'Well-established', tooltip: 'Recognized publisher. Standard peer-review likely.' };
+  if (isPossiblyPredatory) return { cls: 'trust-verify', icon: '⚠', label: 'Verify first', tooltip: 'Some journals from this publisher have inconsistent peer review. Check the specific article.' };
+  return { cls: 'trust-unknown', icon: '○', label: 'Unverified', tooltip: 'Could not confirm peer-review status. Check the journal directly.' };
 }
 
 // ── Abstract Explainer ─────────────────────────────────
@@ -1587,19 +1703,11 @@ async function explainAbstract(idx, abstract) {
   const btn = document.getElementById(`explain-btn-${idx}`);
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner" style="border-top-color:var(--teal);border-color:rgba(0,175,185,0.3)"></span> Explaining…';
-
   try {
-    const prompt = `Explain this academic abstract in 3-4 plain sentences that a first-year college student would understand. No jargon. Focus on: what they studied, what they found, and why it matters.
-
-Abstract:
-${abstract}
-
-Return only the plain-English explanation, no intro phrase like "This study...". Write as if speaking directly to a curious undergrad.`;
-
+    const prompt = `Explain this academic abstract in 3-4 plain sentences that a first-year college student would understand. No jargon. Focus on: what they studied, what they found, and why it matters.\n\nAbstract:\n${abstract}\n\nReturn only the plain-English explanation, no intro phrase like "This study...". Write as if speaking directly to a curious undergrad.`;
     const summary = await callClaude(prompt, 400);
-    const expDiv  = document.getElementById(`abstract-exp-${idx}`);
     document.getElementById(`abstract-exp-text-${idx}`).textContent = summary.trim();
-    expDiv.classList.add('visible');
+    document.getElementById(`abstract-exp-${idx}`).classList.add('visible');
     btn.innerHTML = '✓ Explained';
     btn.style.borderColor = '#3ecf8e';
     btn.style.color = '#3ecf8e';
@@ -1631,8 +1739,7 @@ function renderVariables(v) {
       <div class="var-type conf">Confounder</div>
       <div class="var-name">${escHtml(c.name)}</div>
       <div class="var-exp">${escHtml(c.explanation)}</div>
-    </div>
-  `).join('');
+    </div>`).join('');
   document.getElementById('variables-content').innerHTML = `
     <div class="vars-grid">
       <div class="var-card">
@@ -1646,8 +1753,7 @@ function renderVariables(v) {
         <div class="var-exp">${escHtml(v.dependent?.explanation || '')}</div>
       </div>
       ${confounders}
-    </div>
-  `;
+    </div>`;
 }
 
 // ── Datasets ───────────────────────────────────────────
@@ -1662,24 +1768,18 @@ function renderDatasets(datasets) {
         <div class="dataset-item">
           <div class="dataset-name"><a href="${escHtml(d.url)}" target="_blank" rel="noopener">${escHtml(d.name)}</a></div>
           <div class="dataset-desc">${escHtml(d.description)}</div>
-        </div>
-      `).join('')}
-    </div>
-  `;
+        </div>`).join('')}
+    </div>`;
 }
 
 // ── Refinements ────────────────────────────────────────
 function renderRefinements(refinements) {
-  if (!refinements || !refinements.length) {
-    document.getElementById('refinements-content').innerHTML = '';
-    return;
-  }
+  if (!refinements || !refinements.length) { document.getElementById('refinements-content').innerHTML = ''; return; }
   document.getElementById('refinements-content').innerHTML = refinements.map((r, i) => `
     <div class="refinement-item" onclick="loadRefinement(${JSON.stringify(r)})">
       <div class="refinement-label">Alternative ${i + 1}</div>
       ${escHtml(r)}
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
 function loadRefinement(question) {
@@ -1693,40 +1793,32 @@ function buildBriefText() {
   const q = state.currentQuestion;
   const a = state.analysisData;
   const p = state.papers;
-
-  let txt = `JUMPSTART RESEARCH BRIEF\n${'='.repeat(50)}\n\n`;
-  txt += `Research Question:\n${q}\n\n`;
-
+  let txt = `JUMPSTART RESEARCH BRIEF\n${'='.repeat(50)}\n\nResearch Question:\n${q}\n\n`;
   if (a) {
     txt += `SEARCH STRINGS (Google)\n${'-'.repeat(30)}\n`;
     (a.google_strings || []).forEach((s, i) => { txt += `${i+1}. ${s}\n`; });
     txt += `\nSEARCH STRINGS (Google Scholar)\n${'-'.repeat(30)}\n`;
     (a.scholar_strings || []).forEach((s, i) => { txt += `${i+1}. ${s}\n`; });
-
     if (a.methodology) {
       txt += `\nMETHODOLOGY SUGGESTION\n${'-'.repeat(30)}\n`;
       txt += `Recommended: ${a.methodology.recommended}\n${a.methodology.definition}\n`;
       if (a.methodology.alternatives?.length) txt += `Also consider: ${a.methodology.alternatives.join(', ')}\n`;
     }
-
     if (a.variables) {
       txt += `\nSUGGESTED VARIABLES\n${'-'.repeat(30)}\n`;
       txt += `Independent: ${a.variables.independent?.name} — ${a.variables.independent?.explanation}\n`;
       txt += `Dependent: ${a.variables.dependent?.name} — ${a.variables.dependent?.explanation}\n`;
       (a.variables.confounders || []).forEach(c => { txt += `Confounder: ${c.name} — ${c.explanation}\n`; });
     }
-
     if (a.datasets?.length) {
       txt += `\nDATA SOURCES\n${'-'.repeat(30)}\n`;
       a.datasets.forEach(d => { txt += `${d.name}: ${d.url}\n  ${d.description}\n`; });
     }
-
     if (a.refinements?.length) {
       txt += `\nALTERNATIVE FRAMINGS\n${'-'.repeat(30)}\n`;
       a.refinements.forEach((r, i) => { txt += `${i+1}. ${r}\n`; });
     }
   }
-
   if (p.length) {
     txt += `\nRESEARCH PAPERS (${p.length} found)\n${'-'.repeat(30)}\n`;
     p.forEach((paper, i) => {
@@ -1738,10 +1830,7 @@ function buildBriefText() {
       if (paper.abstract) txt += `   Abstract: ${paper.abstract.substring(0, 300)}${paper.abstract.length > 300 ? '...' : ''}\n`;
     });
   }
-
-  txt += `\n${'='.repeat(50)}\n`;
-  txt += `Generated by JumpstartGEN. AI-generated content should be verified.\n`;
-  txt += `Paper results sourced from Semantic Scholar.\n`;
+  txt += `\n${'='.repeat(50)}\nGenerated by JumpstartGEN. AI-generated content should be verified.\nPaper results sourced from Semantic Scholar.\n`;
   return txt;
 }
 
@@ -1750,49 +1839,158 @@ function exportBrief() {
   const blob = new Blob([txt], { type: 'text/plain;charset=utf-8' });
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
-  a.href = url;
-  a.download = `jumpstart-brief-${Date.now()}.txt`;
-  a.click();
+  a.href = url; a.download = `jumpstart-brief-${Date.now()}.txt`; a.click();
   URL.revokeObjectURL(url);
 }
 
-async function sendEmail() {
-  const email = document.getElementById('email-input').value.trim();
-  const status = document.getElementById('email-status');
-  if (!email) { status.innerHTML = '<span style="color:var(--lobster-pink)">Please enter your email address.</span>'; return; }
-
-  const subject = `Jumpstart Research Brief — ${state.currentQuestion?.substring(0, 60)}`;
-  const body    = buildBriefText();
-
-  // Try EmailJS first
-  if (EMAILJS_SERVICE_ID !== 'YOUR_SERVICE_ID') {
-    status.innerHTML = '<span style="color:var(--text-muted)">Sending…</span>';
-    try {
-      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-        to_email: email,
-        subject:  subject,
-        message:  body
-      });
-      status.innerHTML = '<span style="color:#3ecf8e">✓ Sent! Check your inbox.</span>';
-      return;
-    } catch (err) {
-      console.warn('EmailJS failed, falling back to mailto:', err);
-    }
-  }
-
-  // Fallback: mailto
-  const mailtoLink = `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body.substring(0, 1800))}`;
-  window.open(mailtoLink, '_self');
-  status.innerHTML = '<span style="color:var(--text-muted)">Opened your email client. (Brief may be truncated — use Download for full version.)</span>';
-}
-
-// ── Keyboard shortcut: Enter to analyze ───────────────
+// ── Keyboard shortcuts ─────────────────────────────────
 document.getElementById('question').addEventListener('keydown', (e) => {
   if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) runAnalysis();
 });
 document.getElementById('topic-input').addEventListener('keydown', (e) => {
   if (e.key === 'Enter') suggestQuestions();
 });
+
+// ── Demo Wizard ────────────────────────────────────────
+const demoSteps = [
+  {
+    target: 'demo-input-card',
+    title: 'Start with your question',
+    body: 'Type a specific, answerable research question here. Not sure where to begin? Use the "Start with a topic" link below the text box to get AI-generated question ideas at different scopes.',
+    position: 'below'
+  },
+  {
+    target: 'demo-preview-query',
+    title: 'Query Optimizer',
+    body: 'You\'ll get 4 ready-to-use search strings, optimized for Google or Google Scholar. Toggle between modes and copy any string directly into your search bar.',
+    position: 'right'
+  },
+  {
+    target: 'demo-preview-tiers',
+    title: 'Source Tier Guide',
+    body: 'A ranked breakdown of source credibility. Expand it to see which types of sources are strongest for academic work — from raw primary data down to news articles.',
+    position: 'right'
+  },
+  {
+    target: 'demo-preview-papers',
+    title: 'Research Papers',
+    body: 'Up to 12 peer-reviewed papers shown side by side. Each card shows citation count, whether the paper is open access, and journal credibility. Click "Explain in plain English" for a jargon-free summary.',
+    position: 'left'
+  },
+  {
+    target: 'demo-preview-method',
+    title: 'Methodology Suggestion',
+    body: 'The research design best suited to your question, explained in plain English. Great to share with your professor when planning your approach.',
+    position: 'right'
+  },
+  {
+    target: 'demo-preview-vars',
+    title: 'Suggested Variables',
+    body: 'Your independent variable (the cause), dependent variable (the effect), and confounders (things that could skew results). Knowing these helps you search more precisely.',
+    position: 'left'
+  },
+  {
+    target: 'demo-preview-datasets',
+    title: 'Datasets & Websites',
+    body: '5 free, reputable data sources relevant to your specific question. Click any name to visit the source directly.',
+    position: 'right'
+  },
+  {
+    target: 'demo-preview-framings',
+    title: 'Alternative Framings',
+    body: '3 reworded versions of your question. Click any to instantly run a fresh full analysis — useful if your question is too broad, too narrow, or you want a different angle.',
+    position: 'left'
+  },
+  {
+    target: 'demo-preview-export',
+    title: 'Export Your Brief',
+    body: 'When you\'re done, download a complete .txt research brief with everything in one place — search strings, papers, methodology, variables, and datasets. Great for office hours or a library appointment.',
+    position: 'right'
+  }
+];
+
+let demoCurrentStep = 0;
+
+function startDemo() {
+  // Make sure preview is visible
+  document.getElementById('preview-section').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  demoCurrentStep = 0;
+  document.getElementById('demo-overlay').classList.add('active');
+  renderDemoStep(demoCurrentStep);
+}
+
+function endDemo() {
+  document.getElementById('demo-overlay').classList.remove('active');
+}
+
+function demoStep(dir) {
+  demoCurrentStep = Math.max(0, Math.min(demoSteps.length - 1, demoCurrentStep + dir));
+  renderDemoStep(demoCurrentStep);
+}
+
+function renderDemoStep(idx) {
+  const step   = demoSteps[idx];
+  const target = document.getElementById(step.target);
+
+  // Dots
+  const dotsEl = document.getElementById('demo-dots');
+  dotsEl.innerHTML = demoSteps.map((_, i) =>
+    `<div class="demo-dot ${i === idx ? 'active' : ''}"></div>`
+  ).join('');
+
+  // Callout text
+  document.getElementById('demo-callout-step').textContent = `Step ${idx + 1} of ${demoSteps.length}`;
+  document.getElementById('demo-callout-title').textContent = step.title;
+  document.getElementById('demo-callout-body').textContent = step.body;
+  document.getElementById('demo-prev').style.visibility = idx === 0 ? 'hidden' : 'visible';
+  document.getElementById('demo-next').textContent = idx === demoSteps.length - 1 ? 'Finish ✓' : 'Next →';
+  if (idx === demoSteps.length - 1) {
+    document.getElementById('demo-next').onclick = endDemo;
+  } else {
+    document.getElementById('demo-next').onclick = () => demoStep(1);
+  }
+
+  if (!target) return;
+
+  // Scroll target into view
+  target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+  // Position spotlight after scroll settles
+  setTimeout(() => {
+    const rect     = target.getBoundingClientRect();
+    const pad      = 10;
+    const spotlight = document.getElementById('demo-spotlight');
+    spotlight.style.top    = (rect.top - pad) + 'px';
+    spotlight.style.left   = (rect.left - pad) + 'px';
+    spotlight.style.width  = (rect.width + pad * 2) + 'px';
+    spotlight.style.height = (rect.height + pad * 2) + 'px';
+
+    // Position callout
+    const callout  = document.getElementById('demo-callout');
+    const cw       = callout.offsetWidth || 360;
+    const ch       = callout.offsetHeight || 200;
+    const vw       = window.innerWidth;
+    const vh       = window.innerHeight;
+    let top, left;
+
+    if (rect.bottom + ch + 20 < vh) {
+      top = rect.bottom + pad + 10;
+    } else {
+      top = Math.max(10, rect.top - ch - 20);
+    }
+    if (rect.left + cw < vw - 20) {
+      left = rect.left;
+    } else {
+      left = Math.max(10, vw - cw - 20);
+    }
+    callout.style.top  = top + 'px';
+    callout.style.left = left + 'px';
+  }, 400);
+}
+
+// Close demo on Escape
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') endDemo(); });
 </script>
 </body>
 </html>
