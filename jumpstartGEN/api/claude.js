@@ -1,11 +1,14 @@
-// api/claude.js — Vercel serverless function
-// Streams Anthropic API responses to avoid proxy/edge timeout on slow generations.
-// The API key never touches the client.
+// api/claude.js — Vercel Edge Runtime
+// Runs at the CDN edge node, not a separate Lambda.
+// True streaming: bytes flow directly to the browser with no buffering layer.
+// API key never touches the client.
+
+export const config = { runtime: 'edge' };
 
 const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
 const MODEL             = 'claude-haiku-4-5-20251001';
 
-// ── Simple in-memory rate limiter ──────────────────────────────────────────
+// In-memory rate limiter (per isolate instance — good enough for low traffic)
 const rateLimitMap = new Map();
 const RATE_LIMIT   = 20;
 const WINDOW_MS    = 60 * 1000;
@@ -22,38 +25,44 @@ function checkRateLimit(ip) {
   return entry.count <= RATE_LIMIT;
 }
 
-// ── Handler ────────────────────────────────────────────────────────────────
-module.exports = async function handler(req, res) {
-  // CORS on every response
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+const CORS = {
+  'Access-Control-Allow-Origin':  '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+};
 
-  if (req.method === 'OPTIONS') return res.status(204).end();
-  if (req.method !== 'POST')    return res.status(405).json({ error: 'Method not allowed' });
+function jsonError(msg, status) {
+  return new Response(JSON.stringify({ error: msg }), {
+    status,
+    headers: { ...CORS, 'Content-Type': 'application/json' },
+  });
+}
+
+export default async function handler(req) {
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { status: 204, headers: CORS });
+  }
+  if (req.method !== 'POST') {
+    return jsonError('Method not allowed', 405);
+  }
 
   // Rate limit
-  const ip = req.headers['x-forwarded-for']?.split(',')[0].trim()
-             || req.socket?.remoteAddress
-             || 'unknown';
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'unknown';
   if (!checkRateLimit(ip)) {
-    return res.status(429).json({ error: 'Too many requests. Please wait a moment before trying again.' });
+    return jsonError('Too many requests. Please wait a moment before trying again.', 429);
   }
 
-  // Validate
-  const { prompt, maxTokens } = req.body || {};
-  if (!prompt || typeof prompt !== 'string') {
-    return res.status(400).json({ error: 'Missing or invalid prompt.' });
-  }
-  if (prompt.length > 20000) {
-    return res.status(400).json({ error: 'Prompt exceeds maximum length.' });
-  }
+  // Parse body
+  let body;
+  try { body = await req.json(); }
+  catch { return jsonError('Invalid request body.', 400); }
+
+  const { prompt, maxTokens } = body || {};
+  if (!prompt || typeof prompt !== 'string') return jsonError('Missing or invalid prompt.', 400);
+  if (prompt.length > 20000)                 return jsonError('Prompt exceeds maximum length.', 400);
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) {
-    console.error('ANTHROPIC_API_KEY not set.');
-    return res.status(500).json({ error: 'Server configuration error.' });
-  }
+  if (!apiKey) return jsonError('Server configuration error.', 500);
 
   try {
     const anthropicRes = await fetch(ANTHROPIC_API_URL, {
@@ -67,36 +76,29 @@ module.exports = async function handler(req, res) {
         model:      MODEL,
         max_tokens: Math.min(maxTokens || 1200, 2000),
         messages:   [{ role: 'user', content: prompt }],
-        stream:     true,   // ← enables token-by-token streaming
+        stream:     true,
       }),
     });
 
-    // If Anthropic itself errored before streaming started, relay the error as JSON
     if (!anthropicRes.ok) {
       const errData = await anthropicRes.json().catch(() => ({}));
       const msg = errData?.error?.message || `Anthropic API error ${anthropicRes.status}`;
-      return res.status(anthropicRes.status).json({ error: msg });
+      return jsonError(msg, anthropicRes.status);
     }
 
-    // Stream SSE back to client — bytes flow continuously, no proxy timeout
-    res.setHeader('Content-Type', 'text/event-stream');
-    res.setHeader('Cache-Control', 'no-cache');
-    res.setHeader('X-Accel-Buffering', 'no'); // disable nginx/edge buffering
-
-    const reader = anthropicRes.body.getReader();
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      res.write(value);
-    }
-    res.end();
+    // Pass the stream body straight through — edge runtime handles this natively,
+    // no buffering, bytes arrive at the browser as Anthropic produces them.
+    return new Response(anthropicRes.body, {
+      status: 200,
+      headers: {
+        ...CORS,
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+      },
+    });
 
   } catch (err) {
-    console.error('Streaming error:', err);
-    if (!res.headersSent) {
-      res.status(500).json({ error: 'Failed to reach AI service. Please try again.' });
-    } else {
-      res.end();
-    }
+    console.error('Edge function error:', err);
+    return jsonError('Failed to reach AI service. Please try again.', 500);
   }
-};
+}

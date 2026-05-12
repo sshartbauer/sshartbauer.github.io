@@ -3,7 +3,7 @@
   "outputDirectory": "jumpstartgen",
   "functions": {
     "api/claude.js": {
-      "maxDuration": 60
+      "runtime": "edge"
     }
   }
 }
