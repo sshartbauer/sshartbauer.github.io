@@ -78,7 +78,7 @@ module.exports = async function handler(req, res) {
       },
       body: JSON.stringify({
         model:      MODEL,
-        max_tokens: Math.min(maxTokens || 2000, 4000), // cap at 4k
+        max_tokens: Math.min(maxTokens || 1200, 2000), // cap at 2k to keep responses fast
         messages:   [{ role: 'user', content: prompt }],
       }),
     });

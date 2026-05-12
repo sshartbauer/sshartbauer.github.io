@@ -1447,15 +1447,28 @@ function escHtml(s) {
 }
 
 // ── Claude API call ────────────────────────────────────
-async function callClaude(prompt, maxTokens = 2000) {
-  const res = await fetch('/api/claude', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ prompt, maxTokens })
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data?.error || `API error ${res.status}`);
-  return data.text;
+async function callClaude(prompt, maxTokens = 1200, attempt = 1) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 40000); // 40s hard cutoff
+  try {
+    const res = await fetch('/api/claude', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt, maxTokens }),
+      signal: controller.signal
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data?.error || `API error ${res.status}`);
+    return data.text;
+  } catch (err) {
+    if (attempt === 1 && (err.name === 'AbortError' || err.message.includes('fetch'))) {
+      // Auto-retry once on network/timeout errors
+      return callClaude(prompt, maxTokens, 2);
+    }
+    throw err;
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 
 function parseJSON(text) {
@@ -1582,9 +1595,10 @@ Guidelines:
 - Synonyms: identify 2-3 key terms in the question and give their academic or alternate equivalents
 - Datasets: recommend the most relevant ones for THIS specific question
 - Methodology: recommend the most appropriate study design for this question
-- Keep all explanations friendly, clear, and free of jargon`;
+- Keep all explanations friendly, clear, and free of jargon
+- Be concise — every field should be as short as possible while still being useful`;
 
-  const raw = await callClaude(prompt, 2500);
+  const raw = await callClaude(prompt, 1600);
   return parseJSON(raw);
 }
 
