@@ -2,6 +2,9 @@
   "buildCommand": null,
   "outputDirectory": "jumpstartgen",
   "functions": {
-    "api/claude.js": { "runtime": "nodejs20.x" }
+    "api/claude.js": {
+      "runtime": "nodejs20.x",
+      "maxDuration": 60
+    }
   }
 }
