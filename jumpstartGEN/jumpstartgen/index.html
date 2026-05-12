@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>JumpstartGEN — General Research Tool</title>
+  <title>JumpstartGEN: General Research Tool</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
@@ -639,13 +639,7 @@
     }
     .citable-toggle-wrap:hover { border-color: var(--teal); color: var(--text); }
     .citable-toggle-wrap input[type="checkbox"] { accent-color: var(--teal); cursor: pointer; }
-    /* Two-column papers grid */
-    .papers-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.75rem;
-    }
-    @media (max-width: 680px) { .papers-grid { grid-template-columns: 1fr; } }
+    .papers-grid { display: flex; flex-direction: column; gap: 0.85rem; }
     .paper-card {
       background: var(--bg-card2);
       border: 1px solid var(--border);
@@ -659,7 +653,7 @@
     .paper-card:hover { border-color: var(--border-light); }
     .paper-title {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 1rem;
+      font-size: 1.05rem;
       font-weight: 600;
       color: var(--text);
       margin-bottom: 0.3rem;
@@ -667,6 +661,28 @@
     }
     .paper-title a { color: inherit; }
     .paper-title a:hover { color: var(--teal); }
+    .paper-field {
+      display: flex;
+      gap: 0.5rem;
+      align-items: baseline;
+      font-size: 0.8rem;
+      margin-bottom: 0.3rem;
+    }
+    .paper-field-label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      white-space: nowrap;
+      flex-shrink: 0;
+      min-width: 4.5rem;
+    }
+    .paper-field-value {
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+    .paper-field-value.truncate { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
     .paper-meta {
       font-size: 0.78rem;
       color: var(--text-muted);
@@ -1034,7 +1050,7 @@
 <div class="hero">
   <div class="hero-eyebrow">General Research Tool</div>
   <h1>Jump<span>start</span> your research</h1>
-  <p class="hero-sub">Enter a research question and get optimized search strings, relevant papers, dataset recommendations, methodology guidance, and an exportable research brief — all in one place.</p>
+  <p class="hero-sub">Enter a research question and get optimized search strings, relevant papers, dataset recommendations, methodology guidance, and an exportable research brief. All in one place.</p>
 </div>
 
 <!-- ══ MAIN ══ -->
@@ -1072,7 +1088,7 @@
   <!-- ══ PREVIEW SECTION ══ -->
   <div id="preview-section">
     <p class="preview-heading">What you'll get</p>
-    <p class="preview-sub">After you analyze your question, here's what appears — hover any card to learn more.</p>
+    <p class="preview-sub">After you analyze your question, here's what appears. Hover any card to learn more.</p>
     <div class="preview-grid">
       <div class="preview-card" id="demo-preview-query">
         <div class="preview-card-icon-wrap tint-teal">🔍</div>
@@ -1114,9 +1130,9 @@
         <div class="preview-card-icon-wrap tint-teal">📐</div>
         <div class="preview-card-title">Suggested Variables</div>
         <ul class="preview-bullets">
-          <li>Independent variable — the cause</li>
-          <li>Dependent variable — the effect</li>
-          <li>Confounders — things that could skew results</li>
+          <li>Independent variable: the cause</li>
+          <li>Dependent variable: the effect</li>
+          <li>Confounders: things that could skew results</li>
         </ul>
       </div>
       <div class="preview-card" id="demo-preview-datasets">
@@ -1195,35 +1211,35 @@
         </button>
       </div>
       <div class="section-body">
-        <p class="section-direction">Click "Show guide" above to expand a ranked breakdown of source credibility — use it to evaluate which sources are strong enough to cite in your paper.</p>
+        <p class="section-direction">Click "Show guide" above to expand a ranked breakdown of source credibility. Use it to evaluate which sources are strong enough to cite in your paper.</p>
         <div class="collapsible-body" id="tier-body">
           <div class="tier-list">
             <div class="tier-item">
               <span class="tier-num">1</span>
               <div class="tier-text">
                 <strong>Primary / Raw Data</strong>
-                <span>Original datasets you analyze yourself — government surveys, health registries, census data (e.g. NHANES, IPUMS, Census.gov). Highest credibility for quantitative work.</span>
+                <span>Original datasets you analyze yourself: government surveys, health registries, census data (e.g. NHANES, IPUMS, Census.gov). Highest credibility for quantitative work.</span>
               </div>
             </div>
             <div class="tier-item">
               <span class="tier-num">2</span>
               <div class="tier-text">
                 <strong>Peer-Reviewed Research</strong>
-                <span>Published studies vetted by experts in the field — the gold standard for citation. Prioritize primary research articles over review articles when possible.</span>
+                <span>Published studies vetted by experts in the field, and the gold standard for citation. Prioritize primary research articles over review articles when possible.</span>
               </div>
             </div>
             <div class="tier-item">
               <span class="tier-num">3</span>
               <div class="tier-text">
                 <strong>Government & Institutional Reports</strong>
-                <span>Reliable secondary sources — CDC reports, WHO white papers, Congressional Budget Office analyses. Good for context; not always peer-reviewed.</span>
+                <span>Reliable secondary sources like CDC reports, WHO white papers, and Congressional Budget Office analyses. Good for context; not always peer-reviewed.</span>
               </div>
             </div>
             <div class="tier-item">
               <span class="tier-num">4</span>
               <div class="tier-text">
                 <strong>News & General Web</strong>
-                <span>Useful for understanding the public conversation — not for citation in academic work. Always trace news stories back to their primary sources.</span>
+                <span>Useful for understanding the public conversation, but not for citation in academic work. Always trace news stories back to their primary sources.</span>
               </div>
             </div>
           </div>
@@ -1242,7 +1258,7 @@
           <span class="papers-count" id="papers-count"></span>
           <label class="citable-toggle-wrap">
             <input type="checkbox" id="citable-toggle" onchange="filterAndRenderPapers()" />
-            Easily citable only (open access)
+            Open access only (no paywall)
           </label>
           <div class="sort-wrap">
             Sort by:
@@ -1263,7 +1279,7 @@
         <h2><span class="icon">🔬</span> Methodology Suggestion</h2>
       </div>
       <div class="section-body">
-        <p class="section-direction">This is the research design best suited to your question, explained in plain English. Use it to frame how you'll approach collecting and analyzing data — and share it with your professor or advisor.</p>
+        <p class="section-direction">This is the research design best suited to your question, explained in plain English. Use it to frame how you'll approach collecting and analyzing data, and share it with your professor or advisor.</p>
         <div id="methodology-content"></div>
       </div>
     </div>
@@ -1285,7 +1301,7 @@
         <h2><span class="icon">🗄</span> Datasets & Websites</h2>
       </div>
       <div class="section-body">
-        <p class="section-direction">Click any dataset name below to visit the source directly. These are free, reputable sources relevant to your specific question — good for both background research and data collection.</p>
+        <p class="section-direction">Click any dataset name below to visit the source directly. These are free, reputable sources relevant to your specific question, good for both background research and data collection.</p>
         <div id="datasets-content"></div>
       </div>
     </div>
@@ -1296,7 +1312,7 @@
         <h2><span class="icon">🔄</span> Alternative Framings</h2>
       </div>
       <div class="section-body">
-        <p class="section-direction">Click any framing below to instantly run a fresh analysis on that version of your question — useful if your original is too broad, too narrow, or you want to try a different angle.</p>
+        <p class="section-direction">Click any framing below to instantly run a fresh analysis on that version of your question. Useful if your original is too broad, too narrow, or you want to try a different angle.</p>
         <div class="refinement-list" id="refinements-content"></div>
       </div>
     </div>
@@ -1307,7 +1323,7 @@
         <h2><span class="icon">📤</span> Export Your Research Brief</h2>
       </div>
       <div class="section-body">
-        <p class="section-direction">Download a complete .txt file with all your results — great for bringing to office hours, a library appointment, or sharing with a study group.</p>
+        <p class="section-direction">Download a complete .txt file with all your results. Great for bringing to office hours, a library appointment, or sharing with a study group.</p>
         <div class="export-row">
           <button class="btn-export" onclick="exportBrief()">⬇ Download .txt</button>
         </div>
@@ -1316,7 +1332,7 @@
 
     <!-- Disclaimer -->
     <div class="disclaimer">
-      Search terms and suggestions are AI-generated and should be verified. Paper results are pulled live from Semantic Scholar — availability may vary. This tool is a starting point, not a substitute for library resources or faculty guidance.
+      Search terms and suggestions are AI-generated and should be verified. Paper results are pulled live from Semantic Scholar; availability may vary. This tool is a starting point, not a substitute for library resources or faculty guidance.
     </div>
 
   </div><!-- /results-area -->
@@ -1614,8 +1630,8 @@ Return ONLY valid JSON (no markdown fences, no commentary) with this exact struc
   "synonyms": [{"term": "original term", "alternatives": ["synonym1", "synonym2"]},{"term": "another term", "alternatives": ["alt1", "alt2"]}],
   "methodology": {"recommended": "Method Name","definition": "One plain-English sentence defining what this method is.","alternatives": ["Alternative 1", "Alternative 2"]},
   "variables": {
-    "independent": {"name": "Variable name", "explanation": "The cause or predictor — what you're testing."},
-    "dependent": {"name": "Variable name", "explanation": "The outcome — what you're measuring."},
+    "independent": {"name": "Variable name", "explanation": "The cause or predictor: what you're testing."},
+    "dependent": {"name": "Variable name", "explanation": "The outcome: what you're measuring."},
     "confounders": [{"name": "Confounder 1", "explanation": "Why this could skew your results."},{"name": "Confounder 2", "explanation": "Why this could skew your results."},{"name": "Confounder 3", "explanation": "Why this could skew your results."}]
   },
   "datasets": [
@@ -1625,7 +1641,7 @@ Return ONLY valid JSON (no markdown fences, no commentary) with this exact struc
     {"name": "Dataset Name", "url": "https://...", "description": "One sentence about what data is here."},
     {"name": "Dataset Name", "url": "https://...", "description": "One sentence about what data is here."}
   ],
-  "refinements": ["A more specific version of the question that narrows scope","A comparative framing — e.g. comparing two groups or time periods","A broader or differently-angled version of the question"]
+  "refinements": ["A more specific version of the question that narrows scope","A comparative framing, such as comparing two groups or time periods","A broader or differently-angled version of the question"]
 }
 
 Guidelines:
@@ -1635,7 +1651,7 @@ Guidelines:
 - Datasets: recommend the most relevant ones for THIS specific question
 - Methodology: recommend the most appropriate study design for this question
 - Keep all explanations friendly, clear, and free of jargon
-- Be concise — every field should be as short as possible while still being useful`;
+- Be concise: every field should be as short as possible while still being useful`;
 
   const raw = await callClaude(prompt, 1600);
   return parseJSON(raw);
@@ -1763,21 +1779,35 @@ function renderPapersList(papers) {
       <div class="paper-title">
         ${doi ? `<a href="https://doi.org/${doi}" target="_blank" rel="noopener">${escHtml(title)}</a>` : escHtml(title)}
       </div>
-      <div class="paper-meta">
-        <span class="authors" title="${escHtml(authors)}">${escHtml(authors)}</span>
-        <span class="meta-sep">·</span>
-        <span>${year}</span>
-        ${journal ? `<span class="meta-sep">·</span><span style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(journal)}</span>` : ''}
-        <span class="citation-count">📊 ${citations}</span>
-        ${journal ? `<span class="journal-trust ${trustInfo.cls}" title="${escHtml(trustInfo.tooltip)}">${trustInfo.icon} ${escHtml(trustInfo.label)}</span>` : ''}
+      <div class="paper-field">
+        <span class="paper-field-label">Authors</span>
+        <span class="paper-field-value" title="${escHtml(authors)}">${escHtml(authors)}</span>
       </div>
+      <div class="paper-field">
+        <span class="paper-field-label">Year</span>
+        <span class="paper-field-value">${year}</span>
+        ${journal ? `
+        <span class="paper-field-label" style="margin-left:1rem">Journal</span>
+        <span class="paper-field-value truncate">${escHtml(journal)}</span>` : ''}
+        <span class="paper-field-label" style="margin-left:1rem">Citations</span>
+        <span class="paper-field-value"><span class="citation-count">📊 ${citations}</span></span>
+      </div>
+      ${journal ? `<div class="paper-field">
+        <span class="paper-field-label">Source</span>
+        <span class="paper-field-value"><span class="journal-trust ${trustInfo.cls}" title="${escHtml(trustInfo.tooltip)}">${trustInfo.icon} ${escHtml(trustInfo.label)}</span></span>
+      </div>` : ''}
       <div class="paper-checklist">
         <span class="check-item ${isPeerReviewed ? 'check-pass' : 'check-fail'}">${isPeerReviewed ? '✓' : '✗'} Peer-reviewed</span>
         <span class="check-item ${isRecent === null ? 'check-warn' : isRecent ? 'check-pass' : 'check-warn'}">${isRecent === false ? `⚠ ${year}` : '✓ Recent'}</span>
         <span class="check-item ${isPrimary ? 'check-pass' : 'check-warn'}">${isPrimary ? '✓ Primary' : '○ Review'}</span>
         <span class="check-item ${isOA ? 'check-pass' : 'check-fail'}">${isOA ? '✓ Open access' : '✗ Paywalled'}</span>
       </div>
-      <div class="paper-abstract" id="abstract-text-${idx}">${escHtml(abstract)}</div>
+      <div class="paper-field" style="margin-top:0.5rem">
+        <span class="paper-field-label">Abstract</span>
+        <span class="paper-field-value" style="flex:1">
+          <span class="paper-abstract" id="abstract-text-${idx}">${escHtml(abstract)}</span>
+        </span>
+      </div>
       <div class="abstract-expanded" id="abstract-exp-${idx}">
         <div class="exp-label">Plain-Language Summary</div>
         <div id="abstract-exp-text-${idx}"></div>
@@ -1920,9 +1950,9 @@ function buildBriefText() {
     }
     if (a.variables) {
       txt += `\nSUGGESTED VARIABLES\n${'-'.repeat(30)}\n`;
-      txt += `Independent: ${a.variables.independent?.name} — ${a.variables.independent?.explanation}\n`;
-      txt += `Dependent: ${a.variables.dependent?.name} — ${a.variables.dependent?.explanation}\n`;
-      (a.variables.confounders || []).forEach(c => { txt += `Confounder: ${c.name} — ${c.explanation}\n`; });
+      txt += `Independent: ${a.variables.independent?.name}: ${a.variables.independent?.explanation}\n`;
+      txt += `Dependent: ${a.variables.dependent?.name}: ${a.variables.dependent?.explanation}\n`;
+      (a.variables.confounders || []).forEach(c => { txt += `Confounder: ${c.name}: ${c.explanation}\n`; });
     }
     if (a.datasets?.length) {
       txt += `\nDATA SOURCES\n${'-'.repeat(30)}\n`;
@@ -2010,9 +2040,9 @@ const demoSteps = [
   {
     title: 'Suggested Variables',
     bullets: [
-      'Independent variable — the cause you\'re studying',
-      'Dependent variable — the effect you\'re measuring',
-      'Confounders — things that could skew your results'
+      'Independent variable: the cause you\'re studying',
+      'Dependent variable: the effect you\'re measuring',
+      'Confounders: things that could skew your results'
     ]
   },
   {
