@@ -1413,7 +1413,6 @@ function showLoading(show) {
 
 function clearResults() {
   document.getElementById('results-area').style.display = 'none';
-  document.getElementById('preview-section').style.display = 'block';
   document.getElementById('question').value = '';
   state.currentQuestion = '';
   state.analysisData = null;
@@ -1502,14 +1501,13 @@ async function callClaude(prompt, maxTokens = 1200, attempt = 1) {
         if (!line.startsWith('data: ')) continue;
         const raw = line.slice(6).trim();
         if (raw === '[DONE]') continue;
-        try {
-          const evt = JSON.parse(raw);
-          if (evt.type === 'content_block_delta' && evt.delta?.type === 'text_delta') {
-            fullText += evt.delta.text;
-          } else if (evt.type === 'error') {
-            throw new Error(evt.error?.message || 'Streaming error from AI service.');
-          }
-        } catch (parseErr) { /* skip malformed lines */ }
+        let evt;
+        try { evt = JSON.parse(raw); } catch { continue; } // skip malformed lines
+        if (evt.type === 'content_block_delta' && evt.delta?.type === 'text_delta') {
+          fullText += evt.delta.text;
+        } else if (evt.type === 'error') {
+          throw new Error(evt.error?.message || 'Streaming error from AI service.');
+        }
       }
     }
 
@@ -1586,7 +1584,8 @@ async function runAnalysis() {
   addToHistory(question);
 
   document.getElementById('results-area').style.display = 'none';
-  document.getElementById('preview-section').style.display = 'none';
+  const previewEl = document.getElementById('preview-section');
+  if (previewEl) previewEl.remove(); // gone for the session once first search runs
   showLoading(true);
 
   const btn = document.getElementById('btn-analyze');
@@ -1599,18 +1598,21 @@ async function runAnalysis() {
     state.analysisData = analysisData;
 
     setLoadingStep('Fetching papers from Semantic Scholar…');
-    const papers = await fetchPapers(analysisData.search_query_plain);
+    // Papers failing should not block the analysis from rendering
+    const papers = await fetchPapers(analysisData.search_query_plain).catch(() => []);
     state.papers = papers;
 
     setLoadingStep('Building your research brief…');
     renderResults(question, analysisData, papers);
   } catch (err) {
+    // Only the main analysis failing reaches here — show a clean error, no partial sections
     showLoading(false);
-    document.getElementById('preview-section').style.display = 'block';
-    document.getElementById('results-area').style.display = 'block';
-    document.getElementById('results-area').innerHTML =
-      `<div class="error-msg">⚠ ${escHtml(err.message)}</div>` +
-      document.getElementById('results-area').innerHTML;
+    const errDiv = document.createElement('div');
+    errDiv.className = 'error-msg';
+    errDiv.style.cssText = 'margin:2rem 0;';
+    errDiv.textContent = '⚠ ' + err.message;
+    document.querySelector('main').appendChild(errDiv);
+    setTimeout(() => errDiv.remove(), 8000);
   } finally {
     showLoading(false);
     btn.disabled = false;
@@ -1662,10 +1664,14 @@ Guidelines:
 async function fetchPapers(query) {
   const fields = 'title,authors,year,abstract,citationCount,isOpenAccess,openAccessPdf,journal,publicationTypes,externalIds';
   const url = `https://api.semanticscholar.org/graph/v1/paper/search?query=${encodeURIComponent(query)}&fields=${fields}&limit=12`;
-  const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
-  if (!res.ok) throw new Error(`Semantic Scholar returned ${res.status}. Try again in a moment.`);
-  const data = await res.json();
-  return (data.data || []).filter(p => p.title);
+  try {
+    const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    if (!res.ok) return [];
+    const data = await res.json();
+    return (data.data || []).filter(p => p.title);
+  } catch {
+    return [];
+  }
 }
 
 // ── Render Results ─────────────────────────────────────
