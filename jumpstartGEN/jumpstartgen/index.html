@@ -2086,7 +2086,6 @@ const demoSteps = [
 let demoCurrentStep = 0;
 
 function startDemo() {
-  document.getElementById('preview-section').style.display = 'block';
   demoCurrentStep = 0;
   document.getElementById('demo-overlay').classList.add('active');
   renderDemoStep(demoCurrentStep);
@@ -2120,8 +2119,7 @@ function renderDemoStep(idx) {
   nextBtn.onclick = idx === demoSteps.length - 1 ? endDemo : () => demoStep(1);
 }
 
-// Close demo on Escape
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') endDemo(); });
+// Close demo o
 </script>
 </body>
 </html>
