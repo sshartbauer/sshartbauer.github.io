@@ -477,7 +477,7 @@
     /* Directional text inside sections */
     .section-direction {
       font-size: 0.82rem;
-      color: var(--text-dim);
+      color: var(--text-muted);
       border-left: 2px solid var(--border-light);
       padding-left: 0.75rem;
       margin-bottom: 1rem;
@@ -673,7 +673,7 @@
       font-weight: 600;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: var(--text-dim);
+      color: var(--text-muted);
       white-space: nowrap;
       flex-shrink: 0;
       min-width: 4.5rem;
@@ -695,6 +695,7 @@
     .paper-meta .authors { max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .meta-sep { color: var(--text-dim); }
     .citation-count {
+      white-space: nowrap;
       background: rgba(57,92,107,0.3);
       border: 1px solid var(--blue-slate);
       color: var(--text-muted);
@@ -1813,7 +1814,7 @@ function renderPapersList(papers) {
         <div id="abstract-exp-text-${idx}"></div>
       </div>
       <div class="paper-actions">
-        <button class="btn-explain" id="explain-btn-${idx}" onclick="explainAbstract(${idx}, ${JSON.stringify(abstract).replace(/'/g,"\\'")})" ${!abstract || abstract === 'No abstract available.' ? 'disabled' : ''}>
+        <button class="btn-explain" id="explain-btn-${idx}" data-abstract="${escHtml(abstract)}" onclick="explainAbstract(${idx})" ${!abstract || abstract === 'No abstract available.' ? 'disabled' : ''}>
           💬 Explain in plain English
         </button>
         <button class="btn-expand-abstract" onclick="toggleAbstract(${idx})">Expand full abstract</button>
@@ -1843,8 +1844,9 @@ function assessJournalTrust(journal) {
 }
 
 // ── Abstract Explainer ─────────────────────────────────
-async function explainAbstract(idx, abstract) {
-  const btn = document.getElementById(`explain-btn-${idx}`);
+async function explainAbstract(idx) {
+  const btn      = document.getElementById(`explain-btn-${idx}`);
+  const abstract = btn.dataset.abstract;
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner" style="border-top-color:var(--teal);border-color:rgba(0,175,185,0.3)"></span> Explaining…';
   try {
@@ -1920,10 +1922,14 @@ function renderDatasets(datasets) {
 function renderRefinements(refinements) {
   if (!refinements || !refinements.length) { document.getElementById('refinements-content').innerHTML = ''; return; }
   document.getElementById('refinements-content').innerHTML = refinements.map((r, i) => `
-    <div class="refinement-item" onclick="loadRefinement(${JSON.stringify(r)})">
+    <div class="refinement-item" data-question="${escHtml(r)}" onclick="loadRefinementFromEl(this)">
       <div class="refinement-label">Alternative ${i + 1}</div>
       ${escHtml(r)}
     </div>`).join('');
+}
+
+function loadRefinementFromEl(el) {
+  loadRefinement(el.dataset.question);
 }
 
 function loadRefinement(question) {
