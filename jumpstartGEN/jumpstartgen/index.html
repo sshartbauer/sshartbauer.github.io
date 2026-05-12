@@ -381,7 +381,20 @@
       transition: border-color 0.2s;
     }
     .preview-card:hover { border-color: var(--border-light); }
-    .preview-card-icon { font-size: 1.2rem; margin-bottom: 0.4rem; }
+    .preview-card { text-align: center; }
+    .preview-card-icon-wrap {
+      width: 54px;
+      height: 54px;
+      border-radius: 14px;
+      margin: 0 auto 0.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.65rem;
+    }
+    .tint-teal  { background: rgba(0,175,185,0.1); }
+    .tint-peach { background: rgba(240,134,103,0.1); }
+    .tint-pink  { background: rgba(201,100,96,0.1); }
     .preview-card-title {
       font-family: 'Cormorant Garamond', serif;
       font-size: 1.1rem;
@@ -393,6 +406,25 @@
       font-size: 0.83rem;
       color: var(--text-muted);
       line-height: 1.6;
+    }
+    .preview-bullets {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      text-align: left;
+    }
+    .preview-bullets li {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      padding: 0.25rem 0 0.25rem 1.1em;
+      position: relative;
+      line-height: 1.45;
+    }
+    .preview-bullets li::before {
+      content: '·';
+      position: absolute;
+      left: 0;
+      color: var(--text-dim);
     }
     .preview-card-tip {
       font-size: 0.78rem;
@@ -889,55 +921,61 @@
       position: fixed;
       inset: 0;
       z-index: 1000;
-      pointer-events: none;
     }
-    #demo-overlay.active { display: block; }
+    #demo-overlay.active { display: flex; align-items: center; justify-content: center; }
     #demo-dim {
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.78);
+      background: rgba(0,0,0,0.72);
       z-index: 1001;
     }
-    #demo-spotlight {
-      position: fixed;
+    #demo-modal {
+      position: relative;
       z-index: 1002;
-      border-radius: 10px;
-      box-shadow: 0 0 0 9999px rgba(0,0,0,0.0);
-      pointer-events: none;
-      transition: top 0.45s cubic-bezier(0.4,0,0.2,1), left 0.45s cubic-bezier(0.4,0,0.2,1), width 0.45s cubic-bezier(0.4,0,0.2,1), height 0.45s cubic-bezier(0.4,0,0.2,1);
-    }
-    #demo-callout {
-      position: fixed;
-      z-index: 1003;
       background: var(--bg-card2);
-      border: 1px solid var(--teal);
+      border: 1px solid rgba(0,175,185,0.4);
       border-radius: var(--radius);
-      padding: 1.25rem 1.5rem;
-      max-width: 360px;
-      box-shadow: 0 8px 40px rgba(0,0,0,0.6);
-      pointer-events: all;
-      transition: top 0.45s cubic-bezier(0.4,0,0.2,1), left 0.45s cubic-bezier(0.4,0,0.2,1);
+      padding: 2rem 2rem 1.5rem;
+      width: 90%;
+      max-width: 480px;
+      box-shadow: 0 12px 60px rgba(0,0,0,0.7);
     }
-    #demo-callout-step {
+    #demo-modal-step {
       font-size: 0.7rem;
       text-transform: uppercase;
       letter-spacing: 0.1em;
       color: var(--teal);
       font-weight: 600;
-      margin-bottom: 0.4rem;
+      margin-bottom: 0.35rem;
     }
-    #demo-callout-title {
+    #demo-modal-title {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 1.3rem;
+      font-size: 1.55rem;
       font-weight: 600;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.75rem;
       color: var(--text);
     }
-    #demo-callout-body {
-      font-size: 0.86rem;
+    #demo-modal-body {
+      font-size: 0.88rem;
       color: var(--text-muted);
       line-height: 1.65;
-      margin-bottom: 1rem;
+      margin-bottom: 1.25rem;
+    }
+    #demo-modal-body ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    #demo-modal-body li {
+      padding: 0.3rem 0 0.3rem 1.2em;
+      position: relative;
+    }
+    #demo-modal-body li::before {
+      content: '·';
+      position: absolute;
+      left: 0;
+      color: var(--teal);
+      font-size: 1.1em;
     }
     .demo-actions { display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; }
     .btn-demo-prev { background: none; border: 1px solid var(--border-light); color: var(--text-muted); padding: 0.45rem 1rem; border-radius: 6px; font-size: 0.84rem; }
@@ -946,7 +984,7 @@
     .btn-demo-next:hover { background: #00c8d4; }
     .btn-demo-close { background: none; border: none; color: var(--text-dim); font-size: 0.8rem; margin-left: auto; text-decoration: underline; }
     .btn-demo-close:hover { color: var(--lobster-pink); }
-    .demo-dots { display: flex; gap: 5px; margin-bottom: 0.75rem; }
+    .demo-dots { display: flex; gap: 5px; margin-bottom: 1rem; }
     .demo-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border-light); transition: background 0.2s; }
     .demo-dot.active { background: var(--teal); }
 
@@ -962,7 +1000,7 @@
       .export-row { flex-direction: column; }
       .history-dropdown { width: calc(100vw - 2rem); right: -1rem; }
       .preview-grid { grid-template-columns: 1fr; }
-      #demo-callout { max-width: calc(100vw - 2rem); left: 1rem !important; }
+      #demo-modal { padding: 1.5rem 1.25rem 1.25rem; }
     }
   </style>
 </head>
@@ -1037,52 +1075,76 @@
     <p class="preview-sub">After you analyze your question, here's what appears — hover any card to learn more.</p>
     <div class="preview-grid">
       <div class="preview-card" id="demo-preview-query">
-        <div class="preview-card-icon">🔍</div>
+        <div class="preview-card-icon-wrap tint-teal">🔍</div>
         <div class="preview-card-title">Query Optimizer</div>
-        <div class="preview-card-desc">4 ready-to-use search strings tailored to your exact question — optimized for either Google or Google Scholar. Switch between modes with the toggle. Copy any string directly into your search bar to find sources.</div>
-        <div class="preview-card-tip">💡 Try Google Scholar strings first for peer-reviewed results.</div>
+        <ul class="preview-bullets">
+          <li>4 search strings, ready to copy</li>
+          <li>Toggle between Google and Google Scholar</li>
+          <li>Paste directly into your search bar</li>
+        </ul>
       </div>
       <div class="preview-card" id="demo-preview-tiers">
-        <div class="preview-card-icon">📊</div>
+        <div class="preview-card-icon-wrap tint-peach">📊</div>
         <div class="preview-card-title">Source Tier Guide</div>
-        <div class="preview-card-desc">A ranked breakdown of source credibility, from raw primary data down to news articles. Expand the guide to see which types of sources carry the most weight for academic citation.</div>
-        <div class="preview-card-tip">💡 Always aim for Tier 1 or 2 sources in a research paper.</div>
+        <ul class="preview-bullets">
+          <li>Ranks source types from strongest to weakest</li>
+          <li>Expand to see examples of each tier</li>
+          <li>Aim for Tier 1 or 2 in academic work</li>
+        </ul>
       </div>
       <div class="preview-card" id="demo-preview-papers">
-        <div class="preview-card-icon">📄</div>
+        <div class="preview-card-icon-wrap tint-teal">📄</div>
         <div class="preview-card-title">Research Papers</div>
-        <div class="preview-card-desc">Up to 12 peer-reviewed papers from Semantic Scholar, shown side by side. Each card shows citation count, journal credibility, and whether the paper is open access. Use "Explain in plain English" to get a jargon-free summary of any abstract.</div>
-        <div class="preview-card-tip">💡 Toggle "Easily citable only" to filter to papers you can access and cite without a library login.</div>
+        <ul class="preview-bullets">
+          <li>Up to 12 peer-reviewed papers from Semantic Scholar</li>
+          <li>Citation count, journal, and open access info on each card</li>
+          <li>"Explain in plain English" breaks down any abstract</li>
+        </ul>
       </div>
       <div class="preview-card" id="demo-preview-method">
-        <div class="preview-card-icon">🔬</div>
+        <div class="preview-card-icon-wrap tint-pink">🔬</div>
         <div class="preview-card-title">Methodology Suggestion</div>
-        <div class="preview-card-desc">The most appropriate research design for your question — explained in plain English with no statistics jargon. Also lists alternative methods worth considering.</div>
-        <div class="preview-card-tip">💡 Share this with your professor when discussing your research approach.</div>
+        <ul class="preview-bullets">
+          <li>Best research design for your question</li>
+          <li>Explained without statistics jargon</li>
+          <li>Lists alternative approaches too</li>
+        </ul>
       </div>
       <div class="preview-card" id="demo-preview-vars">
-        <div class="preview-card-icon">📐</div>
+        <div class="preview-card-icon-wrap tint-teal">📐</div>
         <div class="preview-card-title">Suggested Variables</div>
-        <div class="preview-card-desc">Your independent variable (the cause), dependent variable (the effect), and likely confounders (things that could skew your results). These are the building blocks of your study design and help you search more precisely.</div>
-        <div class="preview-card-tip">💡 Knowing your variables helps you build stronger search strings.</div>
+        <ul class="preview-bullets">
+          <li>Independent variable — the cause</li>
+          <li>Dependent variable — the effect</li>
+          <li>Confounders — things that could skew results</li>
+        </ul>
       </div>
       <div class="preview-card" id="demo-preview-datasets">
-        <div class="preview-card-icon">🗄</div>
+        <div class="preview-card-icon-wrap tint-peach">🗄</div>
         <div class="preview-card-title">Datasets & Websites</div>
-        <div class="preview-card-desc">5 free, reputable data sources relevant to your specific question — with direct links. These are real datasets from sources like the Census Bureau, ICPSR, Our World in Data, and others.</div>
-        <div class="preview-card-tip">💡 Click any name to go directly to the dataset.</div>
+        <ul class="preview-bullets">
+          <li>5 free, reputable data sources</li>
+          <li>Matched to your specific question</li>
+          <li>Click any name to visit directly</li>
+        </ul>
       </div>
       <div class="preview-card" id="demo-preview-framings">
-        <div class="preview-card-icon">🔄</div>
+        <div class="preview-card-icon-wrap tint-pink">🔄</div>
         <div class="preview-card-title">Alternative Framings</div>
-        <div class="preview-card-desc">3 reworded versions of your question at different scopes — narrower, comparative, or broader. Click any framing to instantly run a fresh full analysis on that version.</div>
-        <div class="preview-card-tip">💡 Use these if your original question is too broad or too narrow.</div>
+        <ul class="preview-bullets">
+          <li>3 reworded versions of your question</li>
+          <li>Click any to run a fresh full analysis</li>
+          <li>Useful if your scope is too broad or too narrow</li>
+        </ul>
       </div>
       <div class="preview-card" id="demo-preview-export">
-        <div class="preview-card-icon">📤</div>
+        <div class="preview-card-icon-wrap tint-teal">📤</div>
         <div class="preview-card-title">Export Your Brief</div>
-        <div class="preview-card-desc">Download a complete .txt research brief with all your results — search strings, papers, methodology, variables, and datasets — all in one file.</div>
-        <div class="preview-card-tip">💡 Great for bringing to office hours or a library appointment.</div>
+        <ul class="preview-bullets">
+          <li>Downloads a complete .txt file</li>
+          <li>Includes strings, papers, methods, and data</li>
+          <li>Great for office hours or library appointments</li>
+        </ul>
       </div>
     </div>
   </div>
@@ -1263,12 +1325,11 @@
 <!-- ══ DEMO WIZARD OVERLAY ══ -->
 <div id="demo-overlay">
   <div id="demo-dim" onclick="endDemo()"></div>
-  <div id="demo-spotlight"></div>
-  <div id="demo-callout">
+  <div id="demo-modal">
     <div class="demo-dots" id="demo-dots"></div>
-    <div id="demo-callout-step"></div>
-    <div id="demo-callout-title"></div>
-    <div id="demo-callout-body"></div>
+    <div id="demo-modal-step"></div>
+    <div id="demo-modal-title"></div>
+    <div id="demo-modal-body"></div>
     <div class="demo-actions">
       <button class="btn-demo-prev" id="demo-prev" onclick="demoStep(-1)">← Back</button>
       <button class="btn-demo-next" id="demo-next" onclick="demoStep(1)">Next →</button>
@@ -1854,67 +1915,83 @@ document.getElementById('topic-input').addEventListener('keydown', (e) => {
 // ── Demo Wizard ────────────────────────────────────────
 const demoSteps = [
   {
-    target: 'demo-input-card',
     title: 'Start with your question',
-    body: 'Type a specific, answerable research question here. Not sure where to begin? Use the "Start with a topic" link below the text box to get AI-generated question ideas at different scopes.',
-    position: 'below'
+    bullets: [
+      'Type a specific, answerable research question',
+      'Not sure where to begin? Use "Start with a topic" for AI-generated ideas',
+      'The more specific your question, the better your results'
+    ]
   },
   {
-    target: 'demo-preview-query',
     title: 'Query Optimizer',
-    body: 'You\'ll get 4 ready-to-use search strings, optimized for Google or Google Scholar. Toggle between modes and copy any string directly into your search bar.',
-    position: 'right'
+    bullets: [
+      '4 search strings, ready to copy and paste',
+      'Toggle between Google and Google Scholar modes',
+      'Google Scholar strings are best for peer-reviewed sources'
+    ]
   },
   {
-    target: 'demo-preview-tiers',
     title: 'Source Tier Guide',
-    body: 'A ranked breakdown of source credibility. Expand it to see which types of sources are strongest for academic work — from raw primary data down to news articles.',
-    position: 'right'
+    bullets: [
+      'Ranks source types from strongest to weakest',
+      'Expand it to see examples of each tier',
+      'Aim for Tier 1 or 2 sources in a research paper'
+    ]
   },
   {
-    target: 'demo-preview-papers',
     title: 'Research Papers',
-    body: 'Up to 12 peer-reviewed papers shown side by side. Each card shows citation count, whether the paper is open access, and journal credibility. Click "Explain in plain English" for a jargon-free summary.',
-    position: 'left'
+    bullets: [
+      'Up to 12 peer-reviewed papers from Semantic Scholar',
+      'Each card shows citation count, journal, and open access info',
+      '"Explain in plain English" gives a jargon-free summary of any abstract'
+    ]
   },
   {
-    target: 'demo-preview-method',
     title: 'Methodology Suggestion',
-    body: 'The research design best suited to your question, explained in plain English. Great to share with your professor when planning your approach.',
-    position: 'right'
+    bullets: [
+      'Recommends the best research design for your question',
+      'Explained without statistics jargon',
+      'Lists alternative approaches worth considering'
+    ]
   },
   {
-    target: 'demo-preview-vars',
     title: 'Suggested Variables',
-    body: 'Your independent variable (the cause), dependent variable (the effect), and confounders (things that could skew results). Knowing these helps you search more precisely.',
-    position: 'left'
+    bullets: [
+      'Independent variable — the cause you\'re studying',
+      'Dependent variable — the effect you\'re measuring',
+      'Confounders — things that could skew your results'
+    ]
   },
   {
-    target: 'demo-preview-datasets',
     title: 'Datasets & Websites',
-    body: '5 free, reputable data sources relevant to your specific question. Click any name to visit the source directly.',
-    position: 'right'
+    bullets: [
+      '5 free, reputable data sources matched to your question',
+      'Real sources: Census Bureau, ICPSR, Our World in Data, and more',
+      'Click any name to visit the source directly'
+    ]
   },
   {
-    target: 'demo-preview-framings',
     title: 'Alternative Framings',
-    body: '3 reworded versions of your question. Click any to instantly run a fresh full analysis — useful if your question is too broad, too narrow, or you want a different angle.',
-    position: 'left'
+    bullets: [
+      '3 reworded versions of your question at different scopes',
+      'Click any framing to instantly run a fresh full analysis',
+      'Helpful if your question is too broad, too narrow, or off-angle'
+    ]
   },
   {
-    target: 'demo-preview-export',
     title: 'Export Your Brief',
-    body: 'When you\'re done, download a complete .txt research brief with everything in one place — search strings, papers, methodology, variables, and datasets. Great for office hours or a library appointment.',
-    position: 'right'
+    bullets: [
+      'Downloads a complete .txt file with all your results',
+      'Includes search strings, papers, methodology, variables, and datasets',
+      'Great for office hours, library appointments, or study groups'
+    ]
   }
 ];
 
 let demoCurrentStep = 0;
 
 function startDemo() {
-  // Make sure preview is visible
   document.getElementById('preview-section').style.display = 'block';
-  window.scrollTo({ top: 0, behavior: 'smooth' });
   demoCurrentStep = 0;
   document.getElementById('demo-overlay').classList.add('active');
   renderDemoStep(demoCurrentStep);
@@ -1930,63 +2007,22 @@ function demoStep(dir) {
 }
 
 function renderDemoStep(idx) {
-  const step   = demoSteps[idx];
-  const target = document.getElementById(step.target);
+  const step = demoSteps[idx];
 
   // Dots
-  const dotsEl = document.getElementById('demo-dots');
-  dotsEl.innerHTML = demoSteps.map((_, i) =>
+  document.getElementById('demo-dots').innerHTML = demoSteps.map((_, i) =>
     `<div class="demo-dot ${i === idx ? 'active' : ''}"></div>`
   ).join('');
 
-  // Callout text
-  document.getElementById('demo-callout-step').textContent = `Step ${idx + 1} of ${demoSteps.length}`;
-  document.getElementById('demo-callout-title').textContent = step.title;
-  document.getElementById('demo-callout-body').textContent = step.body;
+  document.getElementById('demo-modal-step').textContent = `Step ${idx + 1} of ${demoSteps.length}`;
+  document.getElementById('demo-modal-title').textContent = step.title;
+  document.getElementById('demo-modal-body').innerHTML =
+    '<ul>' + step.bullets.map(b => `<li>${b}</li>`).join('') + '</ul>';
+
   document.getElementById('demo-prev').style.visibility = idx === 0 ? 'hidden' : 'visible';
-  document.getElementById('demo-next').textContent = idx === demoSteps.length - 1 ? 'Finish ✓' : 'Next →';
-  if (idx === demoSteps.length - 1) {
-    document.getElementById('demo-next').onclick = endDemo;
-  } else {
-    document.getElementById('demo-next').onclick = () => demoStep(1);
-  }
-
-  if (!target) return;
-
-  // Scroll target into view
-  target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-  // Position spotlight after scroll settles
-  setTimeout(() => {
-    const rect     = target.getBoundingClientRect();
-    const pad      = 10;
-    const spotlight = document.getElementById('demo-spotlight');
-    spotlight.style.top    = (rect.top - pad) + 'px';
-    spotlight.style.left   = (rect.left - pad) + 'px';
-    spotlight.style.width  = (rect.width + pad * 2) + 'px';
-    spotlight.style.height = (rect.height + pad * 2) + 'px';
-
-    // Position callout
-    const callout  = document.getElementById('demo-callout');
-    const cw       = callout.offsetWidth || 360;
-    const ch       = callout.offsetHeight || 200;
-    const vw       = window.innerWidth;
-    const vh       = window.innerHeight;
-    let top, left;
-
-    if (rect.bottom + ch + 20 < vh) {
-      top = rect.bottom + pad + 10;
-    } else {
-      top = Math.max(10, rect.top - ch - 20);
-    }
-    if (rect.left + cw < vw - 20) {
-      left = rect.left;
-    } else {
-      left = Math.max(10, vw - cw - 20);
-    }
-    callout.style.top  = top + 'px';
-    callout.style.left = left + 'px';
-  }, 400);
+  const nextBtn = document.getElementById('demo-next');
+  nextBtn.textContent = idx === demoSteps.length - 1 ? 'Finish ✓' : 'Next →';
+  nextBtn.onclick = idx === demoSteps.length - 1 ? endDemo : () => demoStep(1);
 }
 
 // Close demo on Escape
