@@ -30,7 +30,7 @@ function checkRateLimit(ip) {
 }
 
 // ── Handler ────────────────────────────────────────────────────────────────
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   // CORS headers on every response
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
