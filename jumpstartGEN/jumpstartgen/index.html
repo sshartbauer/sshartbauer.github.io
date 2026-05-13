@@ -644,44 +644,80 @@
       background: var(--bg-card2);
       border: 1px solid var(--border);
       border-radius: 9px;
-      padding: 0.9rem 1rem;
+      padding: 0.9rem 1rem 0.75rem;
       transition: border-color 0.2s;
       display: flex;
       flex-direction: column;
       gap: 0;
+      overflow: hidden;
     }
     .paper-card:hover { border-color: var(--border-light); }
+    .paper-meta-table { border-radius: 0 0 6px 6px; }
     .paper-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.05rem;
+      font-family: 'Jost', sans-serif;
+      font-size: 0.97rem;
       font-weight: 600;
-      color: var(--text);
-      margin-bottom: 0.3rem;
-      line-height: 1.3;
-    }
-    .paper-title a { color: inherit; }
-    .paper-title a:hover { color: var(--teal); }
-    .paper-field {
-      display: flex;
-      gap: 0.5rem;
-      align-items: baseline;
-      font-size: 0.8rem;
-      margin-bottom: 0.3rem;
-    }
-    .paper-field-label {
-      font-size: 0.68rem;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      white-space: nowrap;
-      flex-shrink: 0;
-      min-width: 4.5rem;
-    }
-    .paper-field-value {
-      color: var(--text-muted);
+      color: var(--cream);
+      background: rgba(253,252,220,0.05);
+      border-bottom: 1px solid var(--border);
+      padding: 0.65rem 0.85rem;
+      margin: -0.9rem -1rem 0;
+      border-radius: 8px 8px 0 0;
       line-height: 1.4;
     }
+    .paper-title a { color: inherit; text-decoration: none; }
+    .paper-title a:hover { color: var(--teal); }
+
+    /* ── Meta table (excel-cell style) ── */
+    .paper-meta-table {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-top: none;
+      border-radius: 0 0 0 0;
+      overflow: hidden;
+      font-size: 0.81rem;
+    }
+    .meta-row {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+    }
+    .meta-row:last-child { border-bottom: none; }
+    .meta-label {
+      width: 5.5rem;
+      flex-shrink: 0;
+      background: var(--bg-card2);
+      color: var(--text-muted);
+      font-size: 0.63rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      padding: 0.4rem 0.55rem;
+      border-right: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+    }
+    .meta-value {
+      flex: 1;
+      padding: 0.38rem 0.65rem;
+      color: var(--text);
+      background: var(--bg-input);
+      line-height: 1.45;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      min-width: 0;
+    }
+    .meta-value.abstract-cell {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+      padding: 0.5rem 0.65rem;
+    }
+    /* keep old names working for non-card uses */
+    .paper-field { display: flex; gap: 0.5rem; align-items: baseline; font-size: 0.8rem; margin-bottom: 0.3rem; }
+    .paper-field-label { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); white-space: nowrap; flex-shrink: 0; min-width: 4.5rem; }
+    .paper-field-value { color: var(--text-muted); line-height: 1.4; }
     .paper-field-value.truncate { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
     .paper-meta {
       font-size: 0.78rem;
@@ -751,6 +787,7 @@
     .check-pass { color: #3ecf8e; border-color: rgba(62,207,142,0.3); background: rgba(62,207,142,0.08); }
     .check-fail { color: var(--lobster-pink); border-color: rgba(201,100,96,0.3); background: rgba(201,100,96,0.08); }
     .check-warn { color: var(--burnt-peach); border-color: rgba(240,134,103,0.3); background: rgba(240,134,103,0.08); }
+    .check-na   { color: var(--text-dim); border-color: rgba(74,101,128,0.2); background: rgba(74,101,128,0.04); }
     .paper-actions {
       display: flex;
       flex-wrap: wrap;
@@ -762,11 +799,13 @@
       background: rgba(0,175,185,0.12);
       border: 1px solid rgba(0,175,185,0.35);
       color: var(--teal);
-      padding: 0.28rem 0.7rem;
-      border-radius: 6px;
-      font-size: 0.78rem;
+      padding: 0.35rem 0.6rem;
+      border-radius: var(--radius);
+      font-size: 0.75rem;
       font-weight: 500;
       transition: all 0.2s;
+      align-self: flex-start;
+      white-space: nowrap;
     }
     .btn-explain:hover { background: rgba(0,175,185,0.25); }
     .btn-explain:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -1753,19 +1792,33 @@ function renderPapers(papers) {
   // Error messaging is handled in runAnalysis where we know why papers is empty
 }
 
+function toTitleCase(str) {
+  const minor = new Set(['a','an','the','and','but','or','for','nor','on','at','to','by','in','of','up','as','is','its','via','with','from']);
+  return str.split(' ').map((word, i, arr) => {
+    const letters = word.replace(/[^a-zA-Z]/g, '');
+    if (letters.length > 1 && letters === letters.toUpperCase()) return word; // preserve acronyms
+    const lower = word.toLowerCase();
+    if (i === 0 || i === arr.length - 1 || !minor.has(lower.replace(/[^a-z]/g, ''))) {
+      return lower.charAt(0).toUpperCase() + lower.slice(1);
+    }
+    return lower;
+  }).join(' ');
+}
+
 function renderPapersList(papers) {
   const container = document.getElementById('papers-list');
   const currentYear = new Date().getFullYear();
   if (papers.length === 0) {
-    container.innerHTML = '<p style="color:var(--text-dim);font-size:0.88rem;grid-column:1/-1">No papers match this filter.</p>';
+    container.innerHTML = '<p style="color:var(--text-dim);font-size:0.88rem">No papers match this filter.</p>';
     return;
   }
   container.innerHTML = papers.map((p, idx) => {
-    const title     = p.title || 'Untitled';
+    const title     = toTitleCase(p.title || 'Untitled');
     const year      = p.year || 'n.d.';
     const authors   = (p.authors || []).map(a => a.name).join(', ') || 'Unknown authors';
     const citations = p.citationCount != null ? p.citationCount : '—';
-    const abstract  = p.abstract || 'No abstract available.';
+    const hasAbstract = p.abstract && p.abstract.trim().length > 0;
+    const abstract  = hasAbstract ? p.abstract : 'No abstract available.';
     const journal   = p.journal?.name || '';
     const pdfUrl    = p.openAccessPdf?.url || null;
     const isOA      = p.isOpenAccess;
@@ -1778,51 +1831,65 @@ function renderPapersList(papers) {
     const isPrimary      = !isReview;
     const trustInfo      = assessJournalTrust(journal);
 
+    const tagPeer = isPeerReviewed
+      ? `<span class="check-item check-pass">✓ Peer-reviewed</span>`
+      : `<span class="check-item check-na">✗ Peer-reviewed</span>`;
+    const tagRecent = isRecent === null
+      ? `<span class="check-item check-na">— Date unknown</span>`
+      : isRecent
+        ? `<span class="check-item check-pass">✓ Recent</span>`
+        : `<span class="check-item check-na">○ ${year}</span>`;
+    const tagType = isPrimary
+      ? `<span class="check-item check-pass">✓ Primary</span>`
+      : `<span class="check-item check-warn">○ Review / Meta</span>`;
+    const tagOA = isOA
+      ? `<span class="check-item check-pass">✓ Open access</span>`
+      : `<span class="check-item check-na">✗ Paywalled</span>`;
+
     return `
     <div class="paper-card" id="paper-${idx}">
       <div class="paper-title">
         ${doi ? `<a href="https://doi.org/${doi}" target="_blank" rel="noopener">${escHtml(title)}</a>` : escHtml(title)}
       </div>
-      <div class="paper-field">
-        <span class="paper-field-label">Authors</span>
-        <span class="paper-field-value" title="${escHtml(authors)}">${escHtml(authors)}</span>
-      </div>
-      <div class="paper-field">
-        <span class="paper-field-label">Year</span>
-        <span class="paper-field-value">${year}</span>
-        ${journal ? `
-        <span class="paper-field-label" style="margin-left:1rem">Journal</span>
-        <span class="paper-field-value truncate">${escHtml(journal)}</span>` : ''}
-        <span class="paper-field-label" style="margin-left:1rem">Citations</span>
-        <span class="paper-field-value"><span class="citation-count">📊 ${citations}</span></span>
-      </div>
-      ${journal ? `<div class="paper-field">
-        <span class="paper-field-label">Source</span>
-        <span class="paper-field-value"><span class="journal-trust ${trustInfo.cls}" title="${escHtml(trustInfo.tooltip)}">${trustInfo.icon} ${escHtml(trustInfo.label)}</span></span>
-      </div>` : ''}
-      <div class="paper-checklist">
-        <span class="check-item ${isPeerReviewed ? 'check-pass' : 'check-fail'}">${isPeerReviewed ? '✓' : '✗'} Peer-reviewed</span>
-        <span class="check-item ${isRecent === null ? 'check-warn' : isRecent ? 'check-pass' : 'check-warn'}">${isRecent === false ? `⚠ ${year}` : '✓ Recent'}</span>
-        <span class="check-item ${isPrimary ? 'check-pass' : 'check-warn'}">${isPrimary ? '✓ Primary' : '○ Review'}</span>
-        <span class="check-item ${isOA ? 'check-pass' : 'check-fail'}">${isOA ? '✓ Open access' : '✗ Paywalled'}</span>
-      </div>
-      <div class="paper-field" style="margin-top:0.5rem">
-        <span class="paper-field-label">Abstract</span>
-        <span class="paper-field-value" style="flex:1">
-          <span class="paper-abstract" id="abstract-text-${idx}">${escHtml(abstract)}</span>
-        </span>
+      <div class="paper-meta-table">
+        <div class="meta-row">
+          <span class="meta-label">Authors</span>
+          <span class="meta-value" title="${escHtml(authors)}">${escHtml(authors)}</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Year</span>
+          <span class="meta-value">${year}</span>
+        </div>
+        ${journal ? `<div class="meta-row">
+          <span class="meta-label">Journal</span>
+          <span class="meta-value">${escHtml(journal)}</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Source</span>
+          <span class="meta-value"><span class="journal-trust ${trustInfo.cls}" title="${escHtml(trustInfo.tooltip)}">${trustInfo.icon} ${escHtml(trustInfo.label)}</span></span>
+        </div>` : ''}
+        <div class="meta-row">
+          <span class="meta-label">Citations</span>
+          <span class="meta-value"><span class="citation-count">📊 ${citations}</span></span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Quality</span>
+          <span class="meta-value">${tagPeer}${tagRecent}${tagType}${tagOA}</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Abstract</span>
+          <span class="meta-value abstract-cell">
+            ${hasAbstract ? `<button class="btn-explain" id="explain-btn-${idx}" data-abstract="${escHtml(abstract)}" onclick="explainAbstract(${idx})">💬 Plain English</button>` : ''}
+            <span class="paper-abstract" id="abstract-text-${idx}">${escHtml(abstract)}</span>
+            ${hasAbstract ? `<button class="btn-expand-abstract" onclick="toggleAbstract(${idx})">Expand full abstract</button>` : ''}
+          </span>
+        </div>
       </div>
       <div class="abstract-expanded" id="abstract-exp-${idx}">
         <div class="exp-label">Plain-Language Summary</div>
         <div id="abstract-exp-text-${idx}"></div>
       </div>
-      <div class="paper-actions">
-        <button class="btn-explain" id="explain-btn-${idx}" data-abstract="${escHtml(abstract)}" onclick="explainAbstract(${idx})" ${!abstract || abstract === 'No abstract available.' ? 'disabled' : ''}>
-          💬 Explain in plain English
-        </button>
-        <button class="btn-expand-abstract" onclick="toggleAbstract(${idx})">Expand full abstract</button>
-        ${pdfUrl ? `<a class="btn-pdf" href="${escHtml(pdfUrl)}" target="_blank" rel="noopener">📄 PDF</a>` : ''}
-      </div>
+      ${pdfUrl ? `<div style="padding:0.5rem 0 0"><a class="btn-pdf" href="${escHtml(pdfUrl)}" target="_blank" rel="noopener">📄 Open PDF</a></div>` : ''}
     </div>`;
   }).join('');
 }
