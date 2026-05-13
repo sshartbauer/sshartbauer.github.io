@@ -1599,8 +1599,17 @@ async function runAnalysis() {
 
     setLoadingStep('Fetching papers from Semantic Scholar…');
     // Papers failing should not block the analysis from rendering
-    const papers = await fetchPapers(analysisData.search_query_plain).catch(() => []);
+    let papersError = false;
+    const papers = await fetchPapers(analysisData.search_query_plain).catch(() => { papersError = true; return []; });
     state.papers = papers;
+    if (papersError || papers.length === 0) {
+      document.getElementById('papers-error').textContent = papersError
+        ? 'Semantic Scholar is temporarily unavailable. Try again in a moment, or paste a search string from the Query Optimizer into Google Scholar directly.'
+        : 'No papers found for this query. Try a different search string from the Query Optimizer above.';
+      document.getElementById('papers-error').style.display = 'block';
+    } else {
+      document.getElementById('papers-error').style.display = 'none';
+    }
 
     setLoadingStep('Building your research brief…');
     renderResults(question, analysisData, papers);
@@ -1747,13 +1756,7 @@ function renderPapers(papers) {
     papers.length > 0 ? `${papers.length} papers found` : 'No papers found for this query.';
   const sorted = [...papers].sort((a, b) => (b.citationCount || 0) - (a.citationCount || 0));
   renderPapersList(sorted);
-  if (papers.length === 0) {
-    document.getElementById('papers-error').style.display = 'block';
-    document.getElementById('papers-error').textContent =
-      'No results from Semantic Scholar. Try a different search string from the Query Optimizer above.';
-  } else {
-    document.getElementById('papers-error').style.display = 'none';
-  }
+  // Error messaging is handled in runAnalysis where we know why papers is empty
 }
 
 function renderPapersList(papers) {
