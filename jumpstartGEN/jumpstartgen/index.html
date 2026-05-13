@@ -1671,16 +1671,10 @@ Guidelines:
 
 // ── Semantic Scholar API ───────────────────────────────
 async function fetchPapers(query) {
-  const fields = 'title,authors,year,abstract,citationCount,isOpenAccess,openAccessPdf,journal,publicationTypes,externalIds';
-  const url = `https://api.semanticscholar.org/graph/v1/paper/search?query=${encodeURIComponent(query)}&fields=${fields}&limit=12`;
-  try {
-    const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
-    if (!res.ok) return [];
-    const data = await res.json();
-    return (data.data || []).filter(p => p.title);
-  } catch {
-    return [];
-  }
+  const res = await fetch(`/api/papers?query=${encodeURIComponent(query)}`);
+  if (!res.ok) throw new Error(`papers_api_${res.status}`);
+  const data = await res.json();
+  return (data.data || []).filter(p => p.title);
 }
 
 // ── Render Results ─────────────────────────────────────
