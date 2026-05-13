@@ -28,7 +28,13 @@ export default async function handler(req) {
   const url = `${SS_BASE}?query=${encodeURIComponent(query)}&fields=${FIELDS}&limit=12`;
 
   try {
-    const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    const ssKey = process.env.SEMANTIC_SCHOLAR_API_KEY;
+    const res = await fetch(url, {
+      headers: {
+        'Accept': 'application/json',
+        ...(ssKey ? { 'x-api-key': ssKey } : {}),
+      },
+    });
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
       return jsonError(body?.message || `Semantic Scholar error ${res.status}`, res.status);

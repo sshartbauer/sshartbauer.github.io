@@ -1809,7 +1809,10 @@ function renderPapersList(papers) {
   const container = document.getElementById('papers-list');
   const currentYear = new Date().getFullYear();
   if (papers.length === 0) {
-    container.innerHTML = '<p style="color:var(--text-dim);font-size:0.88rem">No papers match this filter.</p>';
+    const citableOn = document.getElementById('citable-toggle')?.checked;
+    container.innerHTML = citableOn
+      ? '<p style="color:var(--text-dim);font-size:0.88rem">No open-access papers match this filter.</p>'
+      : '';
     return;
   }
   container.innerHTML = papers.map((p, idx) => {
