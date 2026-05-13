@@ -47,12 +47,19 @@
 
     body {
       background: var(--navy);
+      background-image: radial-gradient(circle, rgba(0,175,185,0.09) 1px, transparent 1px);
+      background-size: 28px 28px;
       color: var(--text);
       font-family: 'Jost', sans-serif;
       font-weight: 300;
       line-height: 1.7;
       min-height: 100vh;
       transition: background 0.3s, color 0.3s;
+    }
+
+    body.hc {
+      background-image: radial-gradient(circle, rgba(255,255,255,0.07) 1px, transparent 1px);
+      background-size: 28px 28px;
     }
 
     body::before {
@@ -450,7 +457,7 @@
 <body>
 
   <nav>
-    <a class="nav-name" href="#">S. Hartbauer</a>
+    <a class="nav-name" href="#">S. S. Hartbauer</a>
     <div class="nav-right">
       <ul class="nav-links">
         <li><a href="#research">Research</a></li>
