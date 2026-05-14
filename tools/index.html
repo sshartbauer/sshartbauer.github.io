@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tools — S. S. Hartbauer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --navy:         #111b2e;
+      --navy-mid:     #192338;
+      --navy-light:   #243358;
+      --slate:        #395C6B;
+      --teal:         #00AFB9;
+      --teal-dim:     rgba(0,175,185,0.55);
+      --peach:        #F08667;
+      --lobster:      #C96460;
+      --cream:        #FDFCDC;
+      --accent:       #00AFB9;
+      --accent-muted: rgba(0,175,185,0.45);
+      --text:         #e8e4dc;
+      --text-muted:   #8fa3ba;
+      --text-dim:     #546e87;
+      --rule:         rgba(0,175,185,0.15);
+      --card:         rgba(255,255,255,0.04);
+    }
+
+    body.hc {
+      --navy:         #000000;
+      --navy-mid:     #0a0a0a;
+      --navy-light:   #111111;
+      --accent:       #FDFCDC;
+      --accent-muted: rgba(253,252,220,0.6);
+      --teal:         #FDFCDC;
+      --teal-dim:     rgba(253,252,220,0.5);
+      --text:         #ffffff;
+      --text-muted:   #cccccc;
+      --text-dim:     #999999;
+      --rule:         rgba(255,255,255,0.25);
+      --card:         rgba(255,255,255,0.06);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--navy);
+      color: var(--text);
+      font-family: 'Jost', sans-serif;
+      font-weight: 300;
+      line-height: 1.7;
+      min-height: 100vh;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.5;
+    }
+
+    body.hc::before { opacity: 0; }
+
+    /* ── Nav ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: rgba(17,27,46,0.93);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--rule);
+      padding: 0 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 58px;
+      gap: 16px;
+      transition: background 0.3s;
+    }
+
+    body.hc nav { background: rgba(0,0,0,0.97); }
+
+    .nav-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 17px;
+      font-weight: 400;
+      letter-spacing: 1.5px;
+      color: var(--text);
+      text-decoration: none;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 28px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      transition: color 0.2s;
+      white-space: nowrap;
+    }
+
+    .nav-links a:hover { color: var(--accent); }
+    .nav-links a.active { color: var(--teal); }
+
+    .hc-toggle {
+      background: none;
+      border: 1px solid var(--rule);
+      border-radius: 3px;
+      color: var(--text-muted);
+      font-family: 'Jost', sans-serif;
+      font-size: 10px;
+      font-weight: 400;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 5px 10px;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: color 0.2s, border-color 0.2s, background 0.2s;
+    }
+
+    .hc-toggle:hover { color: var(--accent); border-color: var(--accent-muted); }
+    body.hc .hc-toggle { color: var(--cream); border-color: rgba(253,252,220,0.5); background: rgba(253,252,220,0.08); }
+
+    /* ── Page layout ── */
+    .page-hero {
+      position: relative;
+      z-index: 1;
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 130px 40px 70px;
+    }
+
+    .hero-eyebrow {
+      font-size: 11px;
+      letter-spacing: 3.5px;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 20px;
+    }
+
+    .page-hero h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(38px, 6vw, 60px);
+      font-weight: 300;
+      line-height: 1.1;
+      color: var(--text);
+      margin-bottom: 24px;
+    }
+
+    .page-hero h1 em { font-style: italic; color: var(--teal); }
+
+    .page-hero p {
+      font-size: 16px;
+      color: var(--text-muted);
+      max-width: 540px;
+      line-height: 1.8;
+    }
+
+    /* ── Tool grid ── */
+    .tools-section {
+      position: relative;
+      z-index: 1;
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 0 40px 80px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .tool-tile {
+      display: flex;
+      flex-direction: column;
+      background: var(--card);
+      border: 1px solid var(--rule);
+      border-radius: 6px;
+      padding: 32px 36px;
+      text-decoration: none;
+      transition: border-color 0.25s, background 0.25s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tool-tile::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 3px;
+      height: 100%;
+    }
+
+    .tool-tile.teal::before   { background: var(--teal); }
+    .tool-tile.peach::before  { background: var(--peach); }
+    .tool-tile.lobster::before { background: var(--lobster); }
+
+    .tool-tile:hover {
+      background: rgba(255,255,255,0.06);
+      border-color: rgba(255,255,255,0.15);
+    }
+
+    .tool-meta {
+      font-size: 10px;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      font-weight: 500;
+      margin-bottom: 10px;
+    }
+
+    .tool-tile.teal   .tool-meta { color: var(--teal); }
+    .tool-tile.peach  .tool-meta { color: var(--peach); }
+    .tool-tile.lobster .tool-meta { color: var(--lobster); }
+
+    .tool-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 26px;
+      font-weight: 400;
+      color: var(--text);
+      margin-bottom: 12px;
+      line-height: 1.2;
+    }
+
+    .tool-desc {
+      font-size: 14.5px;
+      color: var(--text-muted);
+      line-height: 1.8;
+      max-width: 580px;
+    }
+
+    .tool-link {
+      margin-top: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-weight: 500;
+      transition: gap 0.2s;
+    }
+
+    .tool-tile.teal   .tool-link { color: var(--teal); }
+    .tool-tile.peach  .tool-link { color: var(--peach); }
+    .tool-tile.lobster .tool-link { color: var(--lobster); }
+
+    .tool-tile:hover .tool-link { gap: 10px; }
+
+    .tool-status {
+      position: absolute;
+      top: 20px;
+      right: 24px;
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      border: 1px solid var(--rule);
+      border-radius: 99px;
+      padding: 3px 10px;
+    }
+
+    /* ── Footer ── */
+    footer {
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid var(--rule);
+      padding: 28px 40px;
+      max-width: 820px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    footer p { font-size: 11px; letter-spacing: 1px; color: var(--text-dim); }
+    footer a { font-size: 11px; color: var(--text-dim); text-decoration: none; letter-spacing: 1px; transition: color 0.2s; }
+    footer a:hover { color: var(--teal); }
+
+    @media (max-width: 640px) {
+      nav { padding: 0 18px; height: 54px; }
+      .nav-links { display: none; }
+      .page-hero { padding: 100px 20px 50px; }
+      .tools-section { padding: 0 20px 60px; }
+      .tool-tile { padding: 24px 22px; }
+      footer { padding: 24px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a class="nav-name" href="/">S. S. Hartbauer</a>
+    <div class="nav-right">
+      <ul class="nav-links">
+        <li><a href="/#research">Research</a></li>
+        <li><a href="/#clinical">Clinical</a></li>
+        <li><a href="/tools/" class="active">Tools</a></li>
+        <li><a href="/integrity/">AI Policy</a></li>
+        <li><a href="/#contact">Contact</a></li>
+      </ul>
+      <button class="hc-toggle" onclick="document.body.classList.toggle('hc')" aria-label="Toggle high contrast">High Contrast</button>
+    </div>
+  </nav>
+
+  <div class="page-hero">
+    <div class="hero-eyebrow">Built Along the Way</div>
+    <h1>Tools <em>&amp; Apps</em></h1>
+    <p>Small tools built for clinical learning and academic study. Each one started as a personal need and grew from there.</p>
+  </div>
+
+  <div class="tools-section">
+
+    <a class="tool-tile teal" href="https://sshartbauer.github.io/espanol/hospital-spanish.html" target="_blank">
+      <span class="tool-status">Live</span>
+      <div class="tool-meta">Clinical Language</div>
+      <div class="tool-title">Hospital Spanish Phrase Guide</div>
+      <div class="tool-desc">A clinical communication reference organized by situation: assessment, vitals, movement, consent, discharge, and emergency. Full phrases are written in informal tu form with pronunciation guides, built for students preparing for clinical rotations or working in multilingual care environments.</div>
+      <span class="tool-link">Open tool &rarr;</span>
+    </a>
+
+    <a class="tool-tile peach" href="https://sshartbauer.github.io/ochem/" target="_blank">
+      <span class="tool-status">Live</span>
+      <div class="tool-meta">Academic Study</div>
+      <div class="tool-title">Organic Chemistry Flashcard App</div>
+      <div class="tool-desc">An interactive study tool for organic chemistry concepts, reactions, and mechanisms. Built to make the visual and pattern-recognition side of orgo more accessible, especially for students without a strong prior chemistry background.</div>
+      <span class="tool-link">Open tool &rarr;</span>
+    </a>
+
+    <a class="tool-tile lobster" href="https://jumpstartgen.vercel.app" target="_blank">
+      <span class="tool-status">Live</span>
+      <div class="tool-meta">Research</div>
+      <div class="tool-title">JumpstartGEN: General Research Tool</div>
+      <div class="tool-desc">A research assistant built for first-generation college students tackling their first academic papers. Enter a research question and get optimized search strings, relevant peer-reviewed papers, methodology guidance, variable identification, dataset recommendations, and alternative framings of your question. Designed to give you a structured head start without doing the thinking for you.</div>
+      <span class="tool-link">Open tool &rarr;</span>
+    </a>
+
+  </div>
+
+  <footer>
+    <p>© 2026 Seanna Hartbauer · Los Medanos College</p>
+    <a href="https://github.com/sshartbauer" target="_blank">github.com/sshartbauer</a>
+  </footer>
+
+  <script>
+    if (sessionStorage.getItem('hc') === '1') document.body.classList.add('hc');
+    document.querySelector('.hc-toggle').addEventListener('click', () => {
+      const on = document.body.classList.contains('hc');
+      sessionStorage.setItem('hc', on ? '1' : '0');
+    });
+  </script>
+
+</body>
+</html>
