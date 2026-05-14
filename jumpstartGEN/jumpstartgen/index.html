@@ -652,21 +652,35 @@
       overflow: hidden;
     }
     .paper-card:hover { border-color: var(--border-light); }
-    .paper-meta-table { border-radius: 0 0 6px 6px; }
+    .paper-meta-table { border-radius: 6px; margin-top: 0.6rem; border: 1px solid var(--border); }
     .paper-title {
       font-family: 'Jost', sans-serif;
       font-size: 0.97rem;
       font-weight: 600;
       color: var(--cream);
       background: rgba(253,252,220,0.05);
-      border-bottom: 1px solid var(--border);
-      padding: 0.65rem 0.85rem;
-      margin: -0.9rem -1rem 0;
-      border-radius: 8px 8px 0 0;
+      border: 1px solid var(--border);
+      padding: 0.6rem 0.75rem;
+      border-radius: 7px;
       line-height: 1.4;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
     }
     .paper-title a { color: inherit; text-decoration: none; }
     .paper-title a:hover { color: var(--teal); }
+    .paper-num {
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--teal);
+      background: rgba(0,175,185,0.12);
+      border: 1px solid rgba(0,175,185,0.3);
+      border-radius: 99px;
+      padding: 0.1rem 0.5rem;
+      flex-shrink: 0;
+      margin-top: 0.15rem;
+      white-space: nowrap;
+    }
 
     /* ── Meta table (excel-cell style) ── */
     .paper-meta-table {
@@ -1834,14 +1848,14 @@ function renderPapersList(papers) {
     const isPrimary      = !isReview;
     const trustInfo      = assessJournalTrust(journal);
 
+    const tagYear = isRecent === null
+      ? `<span class="check-item check-na">— Date unknown</span>`
+      : isRecent
+        ? `<span class="check-item check-pass">✓ Recent (${year})</span>`
+        : `<span class="check-item check-na">○ Older (${year})</span>`;
     const tagPeer = isPeerReviewed
       ? `<span class="check-item check-pass">✓ Peer-reviewed</span>`
       : `<span class="check-item check-na">✗ Peer-reviewed</span>`;
-    const tagRecent = isRecent === null
-      ? `<span class="check-item check-na">— Date unknown</span>`
-      : isRecent
-        ? `<span class="check-item check-pass">✓ Recent</span>`
-        : `<span class="check-item check-na">○ ${year}</span>`;
     const tagType = isPrimary
       ? `<span class="check-item check-pass">✓ Primary</span>`
       : `<span class="check-item check-warn">○ Review / Meta</span>`;
@@ -1852,7 +1866,8 @@ function renderPapersList(papers) {
     return `
     <div class="paper-card" id="paper-${idx}">
       <div class="paper-title">
-        ${doi ? `<a href="https://doi.org/${doi}" target="_blank" rel="noopener">${escHtml(title)}</a>` : escHtml(title)}
+        <span class="paper-num">${idx + 1}</span>
+        <span>${doi ? `<a href="https://doi.org/${doi}" target="_blank" rel="noopener">${escHtml(title)}</a>` : escHtml(title)}</span>
       </div>
       <div class="paper-meta-table">
         <div class="meta-row">
@@ -1861,7 +1876,7 @@ function renderPapersList(papers) {
         </div>
         <div class="meta-row">
           <span class="meta-label">Year</span>
-          <span class="meta-value">${year}</span>
+          <span class="meta-value">${tagYear}</span>
         </div>
         ${journal ? `<div class="meta-row">
           <span class="meta-label">Journal</span>
@@ -1877,7 +1892,7 @@ function renderPapersList(papers) {
         </div>
         <div class="meta-row">
           <span class="meta-label">Quality</span>
-          <span class="meta-value">${tagPeer}${tagRecent}${tagType}${tagOA}</span>
+          <span class="meta-value">${tagPeer}${tagType}${tagOA}</span>
         </div>
         <div class="meta-row">
           <span class="meta-label">Abstract</span>
