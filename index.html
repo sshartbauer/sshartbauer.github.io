@@ -161,6 +161,8 @@
       position: relative;
       z-index: 1;
       min-height: 100vh;
+      min-height: 100dvh;
+      overflow: hidden;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -198,10 +200,12 @@
       color: var(--text-muted);
       max-width: 560px;
       line-height: 1.8;
-      margin-bottom: 48px;
+      margin-bottom: 0;
       opacity: 0;
       animation: fadeUp 0.7s ease forwards 0.4s;
     }
+
+    #research { border-top: none; }
 
     .hero-tags {
       display: flex;
@@ -483,13 +487,6 @@
         <li>independent research work where I learn how to use <a href="https://www.r-project.org/" target="_blank" rel="noopener" style="color: var(--teal); text-decoration: none; border-bottom: 1px solid rgba(0,175,185,0.3); padding-bottom: 1px;">R</a> and synthesize data into usable sets</li>
       </ul>
       I'm also a parent of children and animals, a spouse, a daughter, a sister, una estudiante de español, a BIG fan of the oxford comma, and <em>beside myself</em> excited to go to medical school one day. Seriously it's like I'm 6 years old counting down to Disneyland before it got too expensive.
-    </div>
-    <div class="hero-tags">
-      <span class="tag teal">Molecular &amp; Cell Biology</span>
-      <span class="tag peach">Pathology</span>
-      <span class="tag slate">Clinical Volunteering</span>
-      <span class="tag lobster">Health Disparities</span>
-      <span class="tag teal">Parasitology</span>
     </div>
     <div class="hero-rule">Scroll to explore</div>
   </div>
