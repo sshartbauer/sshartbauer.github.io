@@ -208,9 +208,10 @@
       height: 100%;
     }
 
-    .tool-tile.teal::before   { background: var(--teal); }
-    .tool-tile.peach::before  { background: var(--peach); }
+    .tool-tile.teal::before    { background: var(--teal); }
+    .tool-tile.peach::before   { background: var(--peach); }
     .tool-tile.lobster::before { background: var(--lobster); }
+    .tool-tile.slate::before   { background: var(--slate); }
 
     .tool-tile:hover {
       background: rgba(255,255,255,0.06);
@@ -225,9 +226,10 @@
       margin-bottom: 10px;
     }
 
-    .tool-tile.teal   .tool-meta { color: var(--teal); }
-    .tool-tile.peach  .tool-meta { color: var(--peach); }
+    .tool-tile.teal    .tool-meta { color: var(--teal); }
+    .tool-tile.peach   .tool-meta { color: var(--peach); }
     .tool-tile.lobster .tool-meta { color: var(--lobster); }
+    .tool-tile.slate   .tool-meta { color: #6a93a3; }
 
     .tool-title {
       font-family: 'Cormorant Garamond', serif;
@@ -257,9 +259,10 @@
       transition: gap 0.2s;
     }
 
-    .tool-tile.teal   .tool-link { color: var(--teal); }
-    .tool-tile.peach  .tool-link { color: var(--peach); }
+    .tool-tile.teal    .tool-link { color: var(--teal); }
+    .tool-tile.peach   .tool-link { color: var(--peach); }
     .tool-tile.lobster .tool-link { color: var(--lobster); }
+    .tool-tile.slate   .tool-link { color: #6a93a3; }
 
     .tool-tile:hover .tool-link { gap: 10px; }
 
@@ -342,6 +345,14 @@
       <div class="tool-meta">Academic Study</div>
       <div class="tool-title">Organic Chemistry Flashcard App</div>
       <div class="tool-desc">An interactive study tool for organic chemistry concepts, reactions, and mechanisms. Built to make the visual and pattern-recognition side of orgo more accessible, especially for students without a strong prior chemistry background.</div>
+      <span class="tool-link">Open tool &rarr;</span>
+    </a>
+
+    <a class="tool-tile slate" href="https://sshartbauer.github.io/ochem-game/" target="_blank">
+      <span class="tool-status">Live</span>
+      <div class="tool-meta">Academic Study</div>
+      <div class="tool-title">Organic Chemistry Reaction Game</div>
+      <div class="tool-desc">A companion to the flashcards: a visual reaction-tree game where you start from a molecule and pick the right reagents to navigate forward through synthesis pathways. Built to drill the pattern-recognition side of mechanisms — Markovnikov vs anti-Markovnikov, oxidation states, leaving groups — in a low-stakes way.</div>
       <span class="tool-link">Open tool &rarr;</span>
     </a>
 
