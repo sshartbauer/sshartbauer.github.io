@@ -23,6 +23,7 @@
       --text-dim:     #546e87;
       --rule:         rgba(0,175,185,0.15);
       --card:         rgba(255,255,255,0.04);
+      --card-hover:   rgba(255,255,255,0.065);
     }
 
     body.hc {
@@ -38,6 +39,7 @@
       --text-dim:     #999999;
       --rule:         rgba(255,255,255,0.25);
       --card:         rgba(255,255,255,0.06);
+      --card-hover:   rgba(255,255,255,0.12);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -45,6 +47,8 @@
 
     body {
       background: var(--navy);
+      background-image: radial-gradient(circle, rgba(0,175,185,0.08) 1px, transparent 1px);
+      background-size: 28px 28px;
       color: var(--text);
       font-family: 'Jost', sans-serif;
       font-weight: 300;
@@ -53,179 +57,138 @@
       transition: background 0.3s, color 0.3s;
     }
 
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-      pointer-events: none;
-      z-index: 0;
-      opacity: 0.5;
+    body.hc {
+      background-image: radial-gradient(circle, rgba(255,255,255,0.07) 1px, transparent 1px);
     }
 
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0; opacity: 0.5;
+    }
     body.hc::before { opacity: 0; }
 
     /* ── Nav ── */
     nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
+      position: fixed; top: 0; left: 0; right: 0;
       z-index: 100;
       background: rgba(17,27,46,0.93);
       backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--rule);
       padding: 0 40px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      height: 58px;
-      gap: 16px;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 58px; gap: 16px;
       transition: background 0.3s;
     }
-
     body.hc nav { background: rgba(0,0,0,0.97); }
 
     .nav-name {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 17px;
-      font-weight: 400;
-      letter-spacing: 1.5px;
-      color: var(--text);
-      text-decoration: none;
-      white-space: nowrap;
-      flex-shrink: 0;
+      font-size: 17px; font-weight: 400; letter-spacing: 1.5px;
+      color: var(--text); text-decoration: none;
+      white-space: nowrap; flex-shrink: 0;
     }
-
-    .nav-right {
-      display: flex;
-      align-items: center;
-      gap: 28px;
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 28px;
-      list-style: none;
-    }
-
+    .nav-right { display: flex; align-items: center; gap: 28px; }
+    .nav-links { display: flex; gap: 28px; list-style: none; }
     .nav-links a {
-      color: var(--text-muted);
-      text-decoration: none;
-      font-size: 11px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      transition: color 0.2s;
-      white-space: nowrap;
+      color: var(--text-muted); text-decoration: none;
+      font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+      transition: color 0.2s; white-space: nowrap;
     }
-
     .nav-links a:hover { color: var(--accent); }
     .nav-links a.active { color: var(--teal); }
 
     .hc-toggle {
-      background: none;
-      border: 1px solid var(--rule);
-      border-radius: 3px;
-      color: var(--text-muted);
-      font-family: 'Jost', sans-serif;
-      font-size: 10px;
-      font-weight: 400;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      padding: 5px 10px;
-      cursor: pointer;
-      white-space: nowrap;
-      flex-shrink: 0;
+      background: none; border: 1px solid var(--rule); border-radius: 3px;
+      color: var(--text-muted); font-family: 'Jost', sans-serif;
+      font-size: 10px; font-weight: 400; letter-spacing: 1.5px; text-transform: uppercase;
+      padding: 5px 10px; cursor: pointer; white-space: nowrap; flex-shrink: 0;
       transition: color 0.2s, border-color 0.2s, background 0.2s;
     }
-
     .hc-toggle:hover { color: var(--accent); border-color: var(--accent-muted); }
     body.hc .hc-toggle { color: var(--cream); border-color: rgba(253,252,220,0.5); background: rgba(253,252,220,0.08); }
 
-    /* ── Page layout ── */
+    /* ── Page header ── */
     .page-hero {
-      position: relative;
-      z-index: 1;
-      max-width: 820px;
-      margin: 0 auto;
-      padding: 130px 40px 70px;
+      position: relative; z-index: 1;
+      max-width: 1020px; margin: 0 auto;
+      padding: 130px 40px 60px;
     }
-
     .hero-eyebrow {
-      font-size: 11px;
-      letter-spacing: 3.5px;
-      text-transform: uppercase;
-      color: var(--teal);
-      margin-bottom: 20px;
+      font-size: 11px; letter-spacing: 3.5px; text-transform: uppercase;
+      color: var(--teal); margin-bottom: 18px;
     }
-
     .page-hero h1 {
       font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(38px, 6vw, 60px);
-      font-weight: 300;
-      line-height: 1.1;
-      color: var(--text);
-      margin-bottom: 24px;
+      font-size: clamp(38px, 6vw, 60px); font-weight: 300; line-height: 1.1;
+      color: var(--text); margin-bottom: 20px;
     }
-
     .page-hero h1 em { font-style: italic; color: var(--teal); }
-
     .page-hero p {
-      font-size: 16px;
-      color: var(--text-muted);
-      max-width: 540px;
-      line-height: 1.8;
+      font-size: 15.5px; color: var(--text-muted);
+      max-width: 560px; line-height: 1.8;
     }
 
     /* ── Tool grid ── */
     .tools-section {
-      position: relative;
-      z-index: 1;
-      max-width: 820px;
-      margin: 0 auto;
+      position: relative; z-index: 1;
+      max-width: 1020px; margin: 0 auto;
       padding: 0 40px 80px;
-      display: flex;
-      flex-direction: column;
-      gap: 28px;
+    }
+
+    .tool-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
     }
 
     .tool-tile {
-      display: flex;
-      flex-direction: column;
+      display: flex; flex-direction: column;
       background: var(--card);
       border: 1px solid var(--rule);
       border-radius: 6px;
-      padding: 32px 36px;
+      padding: 28px 30px 24px;
       text-decoration: none;
-      transition: border-color 0.25s, background 0.25s;
-      position: relative;
-      overflow: hidden;
+      transition: border-color 0.22s, background 0.22s, transform 0.18s;
+      position: relative; overflow: hidden;
+      color: var(--text);
     }
-
     .tool-tile::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0;
-      width: 3px;
-      height: 100%;
+      content: ''; position: absolute; top: 0; left: 0;
+      width: 3px; height: 100%;
     }
-
     .tool-tile.teal::before    { background: var(--teal); }
     .tool-tile.peach::before   { background: var(--peach); }
     .tool-tile.lobster::before { background: var(--lobster); }
-    .tool-tile.slate::before   { background: var(--slate); }
+    .tool-tile.slate::before   { background: #6a93a3; }
 
     .tool-tile:hover {
-      background: rgba(255,255,255,0.06);
-      border-color: rgba(255,255,255,0.15);
+      background: var(--card-hover);
+      border-color: rgba(255,255,255,0.14);
+      transform: translateY(-2px);
+    }
+
+    .tool-status {
+      position: absolute; top: 18px; right: 20px;
+      font-size: 9.5px; letter-spacing: 1.5px; text-transform: uppercase;
+      color: var(--text-dim); border: 1px solid var(--rule);
+      border-radius: 99px; padding: 3px 10px;
+    }
+    .tool-status.live {
+      color: var(--teal); border-color: rgba(0,175,185,0.4);
+      background: rgba(0,175,185,0.07);
+    }
+
+    .tool-icon {
+      font-size: 26px; margin-bottom: 14px; line-height: 1;
+      display: block;
     }
 
     .tool-meta {
-      font-size: 10px;
-      letter-spacing: 2.5px;
-      text-transform: uppercase;
-      font-weight: 500;
-      margin-bottom: 10px;
+      font-size: 10px; letter-spacing: 2.5px; text-transform: uppercase;
+      font-weight: 500; margin-bottom: 8px;
     }
-
     .tool-tile.teal    .tool-meta { color: var(--teal); }
     .tool-tile.peach   .tool-meta { color: var(--peach); }
     .tool-tile.lobster .tool-meta { color: var(--lobster); }
@@ -233,78 +196,133 @@
 
     .tool-title {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 26px;
-      font-weight: 400;
-      color: var(--text);
-      margin-bottom: 12px;
-      line-height: 1.2;
+      font-size: 22px; font-weight: 400; color: var(--text);
+      margin-bottom: 10px; line-height: 1.25;
     }
 
     .tool-desc {
-      font-size: 14.5px;
-      color: var(--text-muted);
-      line-height: 1.8;
-      max-width: 580px;
+      font-size: 13.5px; color: var(--text-muted);
+      line-height: 1.75; flex: 1;
+    }
+
+    .tool-tags {
+      display: flex; flex-wrap: wrap; gap: 6px;
+      margin-top: 16px;
+    }
+    .tool-tag {
+      font-size: 10px; letter-spacing: 1px; text-transform: uppercase;
+      padding: 3px 9px; border-radius: 2px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--rule);
+      color: var(--text-dim);
     }
 
     .tool-link {
-      margin-top: 20px;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 11px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      font-weight: 500;
-      transition: gap 0.2s;
+      margin-top: 18px;
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+      font-weight: 500; transition: gap 0.2s;
     }
-
     .tool-tile.teal    .tool-link { color: var(--teal); }
     .tool-tile.peach   .tool-link { color: var(--peach); }
     .tool-tile.lobster .tool-link { color: var(--lobster); }
     .tool-tile.slate   .tool-link { color: #6a93a3; }
-
     .tool-tile:hover .tool-link { gap: 10px; }
 
-    .tool-status {
-      position: absolute;
-      top: 20px;
-      right: 24px;
-      font-size: 10px;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      color: var(--text-dim);
+    /* ── Human contributions section ── */
+    .human-section {
+      position: relative; z-index: 1;
+      max-width: 1020px; margin: 0 auto;
+      padding: 0 40px 100px;
+    }
+
+    .section-rule {
+      display: flex; align-items: center; gap: 20px;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 30px; font-weight: 300;
+      color: var(--teal); margin-bottom: 16px;
+    }
+    .section-rule::after {
+      content: ''; flex: 1; height: 1px; background: var(--rule);
+    }
+
+    .human-intro {
+      font-size: 14.5px; color: var(--text-muted);
+      max-width: 640px; line-height: 1.85;
+      margin-bottom: 36px;
+    }
+    .human-intro a {
+      color: var(--teal); text-decoration: none;
+      border-bottom: 1px solid rgba(0,175,185,0.3);
+      padding-bottom: 1px; transition: border-color 0.2s;
+    }
+    .human-intro a:hover { border-color: var(--teal); }
+
+    .contrib-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    .contrib-card {
+      background: var(--card);
       border: 1px solid var(--rule);
-      border-radius: 99px;
-      padding: 3px 10px;
+      border-left: 3px solid;
+      border-radius: 4px;
+      padding: 20px 22px;
+    }
+    .contrib-card.teal    { border-left-color: var(--teal); }
+    .contrib-card.peach   { border-left-color: var(--peach); }
+    .contrib-card.lobster { border-left-color: var(--lobster); }
+    .contrib-card.slate   { border-left-color: #6a93a3; }
+
+    .contrib-label {
+      font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+      font-weight: 500; margin-bottom: 8px;
+    }
+    .contrib-card.teal    .contrib-label { color: var(--teal); }
+    .contrib-card.peach   .contrib-label { color: var(--peach); }
+    .contrib-card.lobster .contrib-label { color: var(--lobster); }
+    .contrib-card.slate   .contrib-label { color: #6a93a3; }
+
+    .contrib-list {
+      list-style: none; padding: 0; margin: 0;
+      display: flex; flex-direction: column; gap: 5px;
+    }
+    .contrib-list li {
+      font-size: 13.5px; color: var(--text-muted);
+      line-height: 1.6;
+      padding-left: 14px; position: relative;
+    }
+    .contrib-list li::before {
+      content: '—'; position: absolute; left: 0;
+      color: var(--text-dim);
     }
 
     /* ── Footer ── */
     footer {
-      position: relative;
-      z-index: 1;
+      position: relative; z-index: 1;
       border-top: 1px solid var(--rule);
-      padding: 28px 40px;
-      max-width: 820px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 12px;
+      padding: 28px 40px; max-width: 1020px; margin: 0 auto;
+      display: flex; justify-content: space-between;
+      align-items: center; flex-wrap: wrap; gap: 12px;
     }
-
     footer p { font-size: 11px; letter-spacing: 1px; color: var(--text-dim); }
     footer a { font-size: 11px; color: var(--text-dim); text-decoration: none; letter-spacing: 1px; transition: color 0.2s; }
     footer a:hover { color: var(--teal); }
 
+    @media (max-width: 760px) {
+      .tool-grid { grid-template-columns: 1fr; }
+      .contrib-grid { grid-template-columns: 1fr; }
+    }
     @media (max-width: 640px) {
       nav { padding: 0 18px; height: 54px; }
       .nav-links { display: none; }
       .page-hero { padding: 100px 20px 50px; }
       .tools-section { padding: 0 20px 60px; }
-      .tool-tile { padding: 24px 22px; }
-      footer { padding: 24px 20px; }
+      .human-section { padding: 0 20px 70px; }
+      .tool-tile { padding: 22px 20px 20px; }
+      footer { padding: 24px 20px; flex-direction: column; align-items: flex-start; }
     }
   </style>
 </head>
@@ -327,53 +345,135 @@
   <div class="page-hero">
     <div class="hero-eyebrow">Built Along the Way</div>
     <h1>Tools <em>&amp; Apps</em></h1>
-    <p>Small tools built for clinical learning and academic study. Each one started as a personal need and grew from there.</p>
+    <p>Small tools built for clinical learning and academic study. Each one started as a personal need — a gap in how I was studying, a phrase I kept forgetting, a mechanism that wouldn't stick — and grew from there.</p>
   </div>
 
   <div class="tools-section">
+    <div class="tool-grid">
 
-    <a class="tool-tile teal" href="https://sshartbauer.github.io/espanol/hospital-spanish.html" target="_blank">
-      <span class="tool-status">Live</span>
-      <div class="tool-meta">Clinical Language</div>
-      <div class="tool-title">Hospital Spanish Phrase Guide</div>
-      <div class="tool-desc">A clinical communication reference organized by situation: assessment, vitals, movement, consent, discharge, and emergency. Full phrases are written in informal tu form with pronunciation guides, built for students preparing for clinical rotations or working in multilingual care environments.</div>
-      <span class="tool-link">Open tool &rarr;</span>
-    </a>
+      <a class="tool-tile teal" href="https://sshartbauer.github.io/espanol/hospital-spanish.html" target="_blank" rel="noopener">
+        <span class="tool-status live">Live</span>
+        <span class="tool-icon">🏥</span>
+        <div class="tool-meta">Clinical Language</div>
+        <div class="tool-title">Hospital Spanish Phrase Guide</div>
+        <div class="tool-desc">A clinical communication reference organized by situation — assessment, vitals, movement, consent, discharge, and emergency. Full phrases in informal <em>tú</em> form with pronunciation guides, built for students in multilingual care settings.</div>
+        <div class="tool-tags">
+          <span class="tool-tag">Spanish</span>
+          <span class="tool-tag">Patient Communication</span>
+          <span class="tool-tag">Clinical Rotations</span>
+        </div>
+        <span class="tool-link">Open tool &rarr;</span>
+      </a>
 
-    <a class="tool-tile peach" href="https://sshartbauer.github.io/ochem_cards/" target="_blank">
-      <span class="tool-status">Live</span>
-      <div class="tool-meta">Academic Study</div>
-      <div class="tool-title">Organic Chemistry Flashcard App</div>
-      <div class="tool-desc">An interactive study tool for organic chemistry concepts, reactions, and mechanisms. Built to make the visual and pattern-recognition side of orgo more accessible, especially for students without a strong prior chemistry background.</div>
-      <span class="tool-link">Open tool &rarr;</span>
-    </a>
+      <a class="tool-tile peach" href="https://sshartbauer.github.io/ochem_cards/" target="_blank" rel="noopener">
+        <span class="tool-status live">Live</span>
+        <span class="tool-icon">⚗️</span>
+        <div class="tool-meta">Academic Study · Orgo I &amp; II</div>
+        <div class="tool-title">Organic Chemistry Flashcard App</div>
+        <div class="tool-desc">Interactive study tool for functional groups, reaction types, and mechanisms. Flip-card format with a quiz mode that tracks what you know vs. what still needs work. Organized by the same chapter structure used in Orgo coursework.</div>
+        <div class="tool-tags">
+          <span class="tool-tag">Org Chem</span>
+          <span class="tool-tag">Functional Groups</span>
+          <span class="tool-tag">Flashcards</span>
+        </div>
+        <span class="tool-link">Open tool &rarr;</span>
+      </a>
 
-    <a class="tool-tile slate" href="https://sshartbauer.github.io/ochem_reactions/" target="_blank">
-      <span class="tool-status">Live</span>
-      <div class="tool-meta">Academic Study</div>
-      <div class="tool-title">Organic Chemistry Reaction Game</div>
-      <div class="tool-desc">A companion to the flashcards: a visual reaction-tree game where you start from a molecule and pick the right reagents to navigate forward through synthesis pathways. Built to drill the pattern-recognition side of mechanisms — Markovnikov vs anti-Markovnikov, oxidation states, leaving groups — in a low-stakes way.</div>
-      <span class="tool-link">Open tool &rarr;</span>
-    </a>
+      <a class="tool-tile lobster" href="https://sshartbauer.github.io/ochem_reactions/" target="_blank" rel="noopener">
+        <span class="tool-status live">Live</span>
+        <span class="tool-icon">🧪</span>
+        <div class="tool-meta">Academic Study · Orgo I &amp; II</div>
+        <div class="tool-title">Organic Chemistry Reaction Game</div>
+        <div class="tool-desc">Two modes: Reaction Building (pick the missing piece — sometimes product, sometimes reagent, sometimes substrate) and Reaction Tree (work through every reaction a functional class can do, laid out as a sun diagram). Includes an electron currency, tiered hints, and step-by-step mechanism walkthroughs.</div>
+        <div class="tool-tags">
+          <span class="tool-tag">Org Chem</span>
+          <span class="tool-tag">Mechanisms</span>
+          <span class="tool-tag">Game-Based Learning</span>
+        </div>
+        <span class="tool-link">Open tool &rarr;</span>
+      </a>
 
-    <a class="tool-tile lobster" href="https://jumpstartgen.vercel.app" target="_blank">
-      <span class="tool-status">Live</span>
-      <div class="tool-meta">Research</div>
-      <div class="tool-title">JumpstartGEN: General Research Tool</div>
-      <div class="tool-desc">A research assistant built for first-generation college students tackling their first academic papers. Enter a research question and get optimized search strings, relevant peer-reviewed papers, methodology guidance, variable identification, dataset recommendations, and alternative framings of your question. Designed to give you a structured head start without doing the thinking for you.</div>
-      <span class="tool-link">Open tool &rarr;</span>
-    </a>
+      <a class="tool-tile slate" href="https://jumpstartgen.vercel.app" target="_blank" rel="noopener">
+        <span class="tool-status live">Live</span>
+        <span class="tool-icon">📖</span>
+        <div class="tool-meta">Research Tools · First-Gen</div>
+        <div class="tool-title">JumpstartGEN</div>
+        <div class="tool-desc">A research assistant built specifically for first-generation college students tackling their first academic papers. Enter a research question and get optimized search strings, dataset recommendations, methodology framing, variable identification, and alternative angles on your topic.</div>
+        <div class="tool-tags">
+          <span class="tool-tag">Academic Research</span>
+          <span class="tool-tag">First-Gen Students</span>
+          <span class="tool-tag">Literature Review</span>
+        </div>
+        <span class="tool-link">Open tool &rarr;</span>
+      </a>
 
+    </div>
+  </div>
+
+  <!-- Human contributions section -->
+  <div class="human-section">
+    <div class="section-rule">What I Actually Did</div>
+    <p class="human-intro">
+      These tools were built with significant AI assistance — I'm transparent about that on my <a href="/integrity/">AI policy page</a>. But AI doesn't have clinical experience, organic chemistry coursework, or a reason to care whether a first-gen student can parse a research question at midnight. Here's what I brought to each of these.
+    </p>
+
+    <div class="contrib-grid">
+
+      <div class="contrib-card teal">
+        <div class="contrib-label">Clinical Knowledge &amp; Language</div>
+        <ul class="contrib-list">
+          <li>All phrase content drawn from real patient interaction at Martinez Regional Center</li>
+          <li>Chose which situations actually come up most in med-surg (not a textbook list)</li>
+          <li>Validated informal <em>tú</em> register as appropriate for clinical context</li>
+          <li>Identified pronunciation pain points from my own Spanish learning experience</li>
+          <li>Ongoing: testing phrases in actual patient encounters and revising</li>
+        </ul>
+      </div>
+
+      <div class="contrib-card peach">
+        <div class="contrib-label">Organic Chemistry Content</div>
+        <ul class="contrib-list">
+          <li>Selected all reactions, functional groups, and mechanisms from real coursework</li>
+          <li>Curated distractor answers that reflect actual common student mistakes</li>
+          <li>Wrote mechanism walkthroughs and wrong-answer explanations from a student POV</li>
+          <li>Aligned chapter structure to OpenStax OChem so it maps to class</li>
+          <li>Tested every card against my own gaps and revised accordingly</li>
+        </ul>
+      </div>
+
+      <div class="contrib-card lobster">
+        <div class="contrib-label">Game Design &amp; Pedagogy</div>
+        <ul class="contrib-list">
+          <li>Designed the reaction tree concept — work through all reactions a substrate can do</li>
+          <li>Chose electron currency mechanic to make correct answers feel meaningful</li>
+          <li>Specified the hint tiers based on what I actually wish I had while studying</li>
+          <li>Decided to rotate missing piece (product / reagent / substrate) to prevent pattern-matching shortcuts</li>
+          <li>Iterative testing every build as a real student under real exam pressure</li>
+        </ul>
+      </div>
+
+      <div class="contrib-card slate">
+        <div class="contrib-label">Research &amp; Portfolio</div>
+        <ul class="contrib-list">
+          <li>All research questions formulated from genuine clinical observations</li>
+          <li>Dataset selection and sourcing (CA HCAI, CMS, NHANES, SEER, BRFSS, CDC)</li>
+          <li>All data cleaning and analysis in R once underway</li>
+          <li>JumpstartGEN's framing born from watching peers struggle with their first papers</li>
+          <li>Every word on this site written, edited, and revised by me</li>
+        </ul>
+      </div>
+
+    </div>
   </div>
 
   <footer>
     <p>© 2026 Seanna Hartbauer · Los Medanos College</p>
-    <a href="https://github.com/sshartbauer" target="_blank">github.com/sshartbauer</a>
+    <a href="https://github.com/sshartbauer" target="_blank" rel="noopener">github.com/sshartbauer</a>
   </footer>
 
   <script>
     if (sessionStorage.getItem('hc') === '1') document.body.classList.add('hc');
-    document.querySelector('.hc-toggle').addEventListener('click', () => {
+    document.querySelector('.hc-toggle').addEventListener('click', function () {
       const on = document.body.classList.contains('hc');
       sessionStorage.setItem('hc', on ? '1' : '0');
     });
