@@ -32,11 +32,34 @@ function reactionMatchesMechs(r, selMechs) {
   }
   return false;
 }
-function filterReactions(selGroups, selMechs) {
-  return REACTIONS.filter(r =>
-    reactionMatchesMechs(r, selMechs) &&
-    r.groups.some(g => selGroups.includes(g))
-  );
+
+/* Extract OpenStax chapter number from the source field (e.g. '§11.2' → 11) */
+function getChapter(r) {
+  if (!r.source) return 0;
+  const m = r.source.match(/§(\d+)/);
+  return m ? parseInt(m[1], 10) : 0;
+}
+
+/* Deterministic shuffle with an arbitrary seed string */
+function shuffleWithSeed(arr, seedStr) {
+  let seed = 0;
+  for (const c of seedStr) seed = (seed * 31 + c.charCodeAt(0)) >>> 0;
+  const rand = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function filterReactions(selGroups, selMechs, selChapters) {
+  return REACTIONS.filter(r => {
+    const ch = getChapter(r);
+    return reactionMatchesMechs(r, selMechs) &&
+      r.groups.some(g => selGroups.includes(g)) &&
+      (selChapters.length === 0 || ch === 0 || selChapters.includes(ch));
+  });
 }
 
 function shuffleAnswers(rxn) {
@@ -52,7 +75,7 @@ function shuffleAnswers(rxn) {
   return arr;
 }
 
-// ── Top-bar wallet + chips ────────────────────────────────
+// ── Top-bar wallet + chips ─────────────────────────────────
 function Wallet({ electrons, flash, spent }) {
   const cls = `wallet${flash ? ' flash' : ''}${spent ? ' spent' : ''}`;
   return (
@@ -83,13 +106,13 @@ function CurrencyChips({ streak, level }) {
 
 // ── Sidebar (Reaction Building mode) ──────────────────────
 function GameSidebar({
-  groups, mechs,
-  selGroups, selMechs,
-  onToggleGroup, onToggleMech,
+  groups, mechs, chapters,
+  selGroups, selMechs, selChapters,
+  onToggleGroup, onToggleMech, onToggleChapter,
   onAllGroups, onClearGroups,
   onAllMechs, onClearMechs,
+  onAllChapters, onClearChapters,
   level, xp, deckSize, solved,
-  onShowTutorial,
 }) {
   const xpInfo = xpProgress(xp);
   return (
@@ -138,9 +161,30 @@ function GameSidebar({
           ))}
         </div>
 
-        <button className="sidebar-tut-btn" onClick={onShowTutorial}>
-          📖 Show tutorial again
-        </button>
+        {chapters.length > 0 && (
+          <>
+            <div className="sidebar-section-hdr" style={{ marginTop: 14 }}>
+              <span>OpenStax Ch.</span>
+              <div className="sidebar-acts">
+                <button className="btn-xs" onClick={onAllChapters}>All</button>
+                <button className="btn-xs" onClick={onClearChapters}>None</button>
+              </div>
+            </div>
+            <div className="chapter-scroll-wrap">
+              <div className="chapter-grid">
+                {chapters.map(ch => (
+                  <button key={ch}
+                    className={`ch-btn${selChapters.includes(ch) ? ' on' : ''}`}
+                    onClick={() => onToggleChapter(ch)}
+                  >
+                    {String(ch).padStart(2, '0')}
+                  </button>
+                ))}
+              </div>
+              <div className="chapter-scroll-fade" />
+            </div>
+          </>
+        )}
       </div>
 
       <div className="prog-panel">
@@ -169,15 +213,15 @@ function GameSidebar({
   );
 }
 
-// ── Tree-mode sidebar (a slim variant) ────────────────────
-function TreeSidebar({ onShowTutorial }) {
+// ── Tree-mode sidebar (slim) ───────────────────────────────
+function TreeSidebar() {
   const trees = window.TREES || {};
   return (
     <div className="sidebar tree-sidebar">
       <div className="sidebar-hdr"><span>Reaction Tree</span></div>
       <div className="sidebar-body">
         <div className="tree-side-blurb">
-          Pick a substrate from the dropdown above the tree. Each branch is a reagent / set of conditions. Click the leaf to choose the product.
+          Pick a substrate from the dropdown. Each ray is a reagent. Complete one branch at a time.
         </div>
         <div className="tree-side-list">
           {Object.values(trees).map(t => (
@@ -187,15 +231,12 @@ function TreeSidebar({ onShowTutorial }) {
             </div>
           ))}
         </div>
-        <button className="sidebar-tut-btn" onClick={onShowTutorial}>
-          📖 Show tutorial again
-        </button>
       </div>
     </div>
   );
 }
 
-// ── Hint shop (now with prominent wallet) ─────────────────
+// ── Hint shop ──────────────────────────────────────────────
 function HintShop({ electrons, bought, onBuy, hints, locked, flashE }) {
   const tiers = [
     { id: 'class', klass: '', name: 'Reaction class',
@@ -262,7 +303,7 @@ function HintShop({ electrons, bought, onBuy, hints, locked, flashE }) {
   );
 }
 
-// ── Wrong-answer panel ────────────────────────────────────
+// ── Wrong-answer panel ─────────────────────────────────────
 function WrongPanel({ pickedName, reason }) {
   return (
     <div className="wrong-panel">
@@ -278,7 +319,7 @@ function WrongPanel({ pickedName, reason }) {
   );
 }
 
-// ── Correct-answer mechanism panel (numbered steps) ───────
+// ── Correct-answer mechanism panel ─────────────────────────
 function MechanismStepsPanel({ rxn, onWalkthrough }) {
   const steps = rxn.walkthrough || [];
   return (
@@ -314,66 +355,110 @@ function MechanismStepsPanel({ rxn, onWalkthrough }) {
   );
 }
 
-// ── Reactant frame (substrate + arrow in their own box) ───
-function ReactantFrame({ rxn, highlightBondKey }) {
-  const subGroup = window.groupForMolecule
-    ? window.groupForMolecule(rxn.substrate)
-    : 'default';
-  const groupPat = (window.GROUP_PATTERNS || {})[subGroup] || (window.GROUP_PATTERNS || {}).default || { color: '#6fa0af', css: 'none' };
-  // The frame's background is the substrate's group pattern,
-  // tinted a little brighter so it reads as "the reactants area".
-  const frameStyle = {
-    backgroundColor: `${groupPat.color}10`,
-    backgroundImage: groupPat.css,
-    borderColor: `${groupPat.color}66`,
-  };
+// ── Legend panel — always-visible pattern key ──────────────
+function LegendPanel() {
+  const patterns = window.GROUP_PATTERNS || {};
+  const order = ['alkane','alkene','alkyne','alcohol','halide','aromatic','ketone',
+                 'aldehyde','acid','ester','amine','amide','ether','nitro','diene'];
   return (
-    <div className="reactant-frame" style={frameStyle}>
-      <div className="reactant-frame-label">
-        <span className="reactant-frame-dot" style={{ background: groupPat.color }}></span>
-        {window.GROUP_PATTERNS?.[subGroup]?.legendLabel || 'Substrate'}
-      </div>
-      <div className="reactant-frame-body">
-        <div className="rxn-slot">
-          <div className="rxn-slot-label">Substrate</div>
-          <MoleculeSVG id={rxn.substrate} highlightBondKey={highlightBondKey} scale={1.7} />
-          <div className="rxn-slot-name">{MOLECULES[rxn.substrate]?.name}</div>
-        </div>
-        <ReactionArrow reagent={rxn.reagent} conditions={rxn.conditions} />
+    <div className="legend-panel">
+      <div className="legend-panel-hdr">Key</div>
+      <div className="legend-scroll">
+        {order.filter(id => patterns[id]).map(id => {
+          const p = patterns[id];
+          return (
+            <div key={id} className="legend-row">
+              <div className="legend-swatch" style={{
+                backgroundColor: `${p.color}14`,
+                backgroundImage: p.css === 'none' ? 'none' : p.css,
+                borderColor: `${p.color}60`,
+              }} />
+              <div className="legend-label">{p.legendLabel}</div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
 }
 
-// ── Reaction puzzle board ─────────────────────────────────
-function ReactionBoard({ rxn, highlightBondKey, choices, wrongPicks, correctIdx, locked, lastWrongIdx, onPick }) {
+// ── Reaction puzzle board ──────────────────────────────────
+function ReactionBoard({ rxn, highlightBondKey, choices, wrongPicks, correctIdx, locked, lastWrongIdx, onPick, questionSlot }) {
+  const promptMap = {
+    product:   'Predict the major product',
+    reagent:   'Predict the reagent & conditions',
+    substrate: 'Predict the starting material',
+  };
+
+  const subGroup  = window.groupForMolecule ? window.groupForMolecule(rxn.substrate) : 'default';
+  const groupPat  = (window.GROUP_PATTERNS || {})[subGroup]  || { color: '#6fa0af', legendLabel: 'Substrate' };
+  const prodGroup = window.groupForMolecule ? window.groupForMolecule(rxn.product)   : 'default';
+  const prodPat   = (window.GROUP_PATTERNS || {})[prodGroup] || { color: '#6fa0af', legendLabel: 'Product' };
+
   return (
     <div className="rxn-board">
-      <div className="rxn-prompt">Predict the major product</div>
+      <div className="rxn-prompt">{promptMap[questionSlot] || 'Predict the major product'}</div>
 
       <div className="rxn-equation">
-        <ReactantFrame rxn={rxn} highlightBondKey={highlightBondKey} />
 
-        <div className="rxn-slot rxn-product-slot">
-          <div className="rxn-slot-label">Product</div>
-          {locked ? (
+        {/* ── Substrate slot ── */}
+        <div className="rxn-slot">
+          <div className="rxn-slot-label">Substrate</div>
+          {questionSlot === 'substrate' && !locked ? (
+            <div className="rxn-q-card">?</div>
+          ) : (
             <>
-              <MoleculeSVG id={rxn.product} scale={1.7} />
-              <div className="rxn-slot-name" style={{ color: 'var(--known)' }}>
-                {MOLECULES[rxn.product]?.name}
+              <div className="rxn-group-tag" style={{ color: groupPat.color, borderColor: `${groupPat.color}55` }}>
+                <span className="rxn-group-dot" style={{ background: groupPat.color }} />
+                {groupPat.legendLabel}
+              </div>
+              <MoleculeSVG
+                id={rxn.substrate}
+                highlightBondKey={questionSlot !== 'substrate' ? highlightBondKey : null}
+                scale={1.7}
+              />
+              <div className="rxn-slot-name" style={locked && questionSlot === 'substrate' ? { color: 'var(--known)' } : {}}>
+                {MOLECULES[rxn.substrate]?.name}
               </div>
             </>
-          ) : (
+          )}
+        </div>
+
+        {/* ── Reagent arrow ── */}
+        {questionSlot === 'reagent' && !locked ? (
+          <div className="rxn-slot">
+            <div className="rxn-slot-label">Reagent</div>
+            <div className="rxn-q-card rxn-q-reagent">?</div>
+          </div>
+        ) : (
+          <ReactionArrow reagent={rxn.reagent} conditions={rxn.conditions} />
+        )}
+
+        {/* ── Product slot ── */}
+        <div className="rxn-slot rxn-product-slot">
+          <div className="rxn-slot-label">Product</div>
+          {questionSlot === 'product' && !locked ? (
             <>
               <div className="rxn-q-card">?</div>
               <div className="rxn-slot-name">choose below</div>
+            </>
+          ) : (
+            <>
+              <div className="rxn-group-tag" style={{ color: prodPat.color, borderColor: `${prodPat.color}55` }}>
+                <span className="rxn-group-dot" style={{ background: prodPat.color }} />
+                {prodPat.legendLabel}
+              </div>
+              <MoleculeSVG id={rxn.product} scale={1.7} />
+              <div className="rxn-slot-name" style={locked && questionSlot === 'product' ? { color: 'var(--known)' } : {}}>
+                {MOLECULES[rxn.product]?.name}
+              </div>
             </>
           )}
         </div>
       </div>
 
       <div className="answer-grid">
-        {choices.map((molId, i) => {
+        {choices.map((choice, i) => {
           const isCorrect = i === correctIdx;
           const isWrong   = wrongPicks.has(i);
           let cls = 'ans-card';
@@ -381,6 +466,7 @@ function ReactionBoard({ rxn, highlightBondKey, choices, wrongPicks, correctIdx,
           else if (isWrong) cls += ' wrong';
           else if (locked) cls += ' dim';
           if (i === lastWrongIdx) cls += ' shake';
+          const isText = questionSlot === 'reagent';
           return (
             <button key={i}
               className={cls}
@@ -388,8 +474,16 @@ function ReactionBoard({ rxn, highlightBondKey, choices, wrongPicks, correctIdx,
               onClick={() => onPick(i)}
             >
               <span className="ans-letter">{String.fromCharCode(65 + i)}</span>
-              <MoleculeSVG id={molId} scale={1.3} />
-              <div className="ans-name">{MOLECULES[molId]?.name || molId}</div>
+              {isText ? (
+                <div className="ans-reagent-label">
+                  {choice.split('\n').map((line, j) => (
+                    <div key={j} className={j === 0 ? 'ans-reagent-main' : 'ans-reagent-cond'}>{line}</div>
+                  ))}
+                </div>
+              ) : (
+                <MoleculeSVG id={choice} scale={1.3} />
+              )}
+              {!isText && <div className="ans-name">{MOLECULES[choice]?.name || choice}</div>}
             </button>
           );
         })}
@@ -398,7 +492,7 @@ function ReactionBoard({ rxn, highlightBondKey, choices, wrongPicks, correctIdx,
   );
 }
 
-// ── Walkthrough panel (existing) ──────────────────────────
+// ── Walkthrough panel ──────────────────────────────────────
 function WalkthroughPanel({ rxn, steps, idx, onStep, onClose }) {
   const step = steps[idx] || {};
   return (
@@ -447,7 +541,7 @@ function WalkthroughPanel({ rxn, steps, idx, onStep, onClose }) {
   );
 }
 
-// ── Reaction Building (the existing game) ─────────────────
+// ── Reaction Building (the game) ───────────────────────────
 function ReactionBuildingMode({
   electrons, setElectrons,
   streak, setStreak,
@@ -459,6 +553,16 @@ function ReactionBuildingMode({
   const [selGroups, setSelGroups] = useState(() => GROUPS.map(g => g.id));
   const [selMechs,  setSelMechs]  = useState(() => MECHANISMS.map(m => m.id));
 
+  // Chapters derived from REACTIONS data
+  const allChapters = useMemo(() => {
+    const set = new Set(REACTIONS.map(r => getChapter(r)).filter(n => n > 0));
+    return [...set].sort((a, b) => a - b);
+  }, []);
+  const [selChapters, setSelChapters] = useState(() => {
+    const set = new Set(REACTIONS.map(r => getChapter(r)).filter(n => n > 0));
+    return [...set].sort((a, b) => a - b);
+  });
+
   const [rxnIdx, setRxnIdx] = useState(0);
   const [bought, setBought] = useState(() => new Set());
   const [wrongPicks, setWrongPicks] = useState(() => new Set());
@@ -467,7 +571,11 @@ function ReactionBuildingMode({
   const [walkthroughIdx, setWalkthroughIdx] = useState(null);
   const [lastReward, setLastReward] = useState(null);
 
-  const deck = useMemo(() => filterReactions(selGroups, selMechs), [selGroups, selMechs]);
+  // Tracks how many times each reaction has been correctly answered →
+  // rotates which slot is the unknown (product → reagent → substrate → …)
+  const [seenCounts, setSeenCounts] = useState(() => ({}));
+
+  const deck = useMemo(() => filterReactions(selGroups, selMechs, selChapters), [selGroups, selMechs, selChapters]);
 
   useEffect(() => {
     if (deck.length === 0) setRxnIdx(0);
@@ -475,8 +583,50 @@ function ReactionBuildingMode({
   }, [deck.length]);
 
   const rxn = deck[rxnIdx] || null;
-  const choices = useMemo(() => rxn ? shuffleAnswers(rxn) : [], [rxn?.id]);
-  const correctIdx = useMemo(() => rxn ? choices.indexOf(rxn.product) : -1, [rxn?.id, choices]);
+
+  // Which slot is missing this round?
+  const questionSlot = useMemo(() => {
+    const n = seenCounts[rxn?.id] || 0;
+    return ['product', 'reagent', 'substrate'][n % 3];
+  }, [rxn?.id, seenCounts]);
+
+  // Reagent choices (text strings) when reagent is the unknown
+  const reagentChoices = useMemo(() => {
+    if (!rxn || questionSlot !== 'reagent') return [];
+    const correctLabel = rxn.reagent + (rxn.conditions ? '\n' + rxn.conditions : '');
+    const pool = deck.filter(r => r.id !== rxn.id)
+      .map(r => r.reagent + (r.conditions ? '\n' + r.conditions : ''));
+    const unique = [...new Set(pool)].filter(s => s !== correctLabel);
+    const distractors = shuffleWithSeed(unique, rxn.id + 'r').slice(0, 3);
+    return shuffleWithSeed([correctLabel, ...distractors], rxn.id + 'rs');
+  }, [rxn?.id, questionSlot, deck]);
+
+  // Substrate choices (mol ids) when substrate is the unknown
+  const substrateChoices = useMemo(() => {
+    if (!rxn || questionSlot !== 'substrate') return [];
+    const pool = deck.filter(r => r.id !== rxn.id && r.substrate !== rxn.substrate)
+      .map(r => r.substrate);
+    const unique = [...new Set(pool)];
+    const distractors = shuffleWithSeed(unique, rxn.id + 'sub').slice(0, 3);
+    return shuffleWithSeed([rxn.substrate, ...distractors], rxn.id + 'subs');
+  }, [rxn?.id, questionSlot, deck]);
+
+  const choices = useMemo(() => {
+    if (!rxn) return [];
+    if (questionSlot === 'reagent')   return reagentChoices;
+    if (questionSlot === 'substrate') return substrateChoices;
+    return shuffleAnswers(rxn);
+  }, [rxn?.id, questionSlot, reagentChoices, substrateChoices]);
+
+  const correctIdx = useMemo(() => {
+    if (!rxn || choices.length === 0) return -1;
+    if (questionSlot === 'reagent') {
+      const correctLabel = rxn.reagent + (rxn.conditions ? '\n' + rxn.conditions : '');
+      return choices.indexOf(correctLabel);
+    }
+    if (questionSlot === 'substrate') return choices.indexOf(rxn.substrate);
+    return choices.indexOf(rxn.product);
+  }, [rxn?.id, questionSlot, choices]);
 
   useEffect(() => {
     setBought(new Set()); setWrongPicks(new Set());
@@ -486,6 +636,8 @@ function ReactionBuildingMode({
 
   function toggleGroup(id) { setSelGroups(g => g.includes(id) ? g.filter(x => x !== id) : [...g, id]); }
   function toggleMech(id)  { setSelMechs(m => m.includes(id) ? m.filter(x => x !== id) : [...m, id]); }
+  function toggleChapter(ch) { setSelChapters(c => c.includes(ch) ? c.filter(x => x !== ch) : [...c, ch]); }
+
   function buyHint(tier) {
     if (locked || bought.has(tier)) return;
     const cost = HINT_COSTS[tier];
@@ -494,6 +646,7 @@ function ReactionBuildingMode({
     setBought(b => new Set([...b, tier]));
     setFlashE('spend'); setTimeout(() => setFlashE(false), 600);
   }
+
   function pickAnswer(i) {
     if (locked || wrongPicks.has(i)) return;
     const isCorrect = i === correctIdx;
@@ -522,8 +675,11 @@ function ReactionBuildingMode({
       setFlashE('spend'); setTimeout(() => setFlashE(false), 600);
     }
   }
+
   function nextReaction() {
     if (deck.length === 0) return;
+    // Increment seen count so the question type rotates on next visit
+    if (locked && rxn) setSeenCounts(c => ({ ...c, [rxn.id]: (c[rxn.id] || 0) + 1 }));
     setRxnIdx(i => (i + 1) % deck.length);
   }
   function prevReaction() {
@@ -552,20 +708,31 @@ function ReactionBuildingMode({
   const walkthroughStep = walkthroughIdx !== null ? rxn?.walkthrough?.[walkthroughIdx] : null;
   const highlightBondKey = walkthroughStep?.highlightBondKey || siteHintBondKey;
 
+  // Wrong panel content varies by question type
+  const wrongPanelName = questionSlot === 'reagent'
+    ? (lastWrongIdx !== null ? choices[lastWrongIdx]?.split('\n')[0] : '')
+    : (MOLECULES[choices[lastWrongIdx]]?.name || choices[lastWrongIdx]);
+  const wrongPanelReason = questionSlot === 'reagent'
+    ? 'Those conditions lead to a different outcome — check the substrate functional group and the revealed product, then think about which mechanism connects them.'
+    : (rxn?.distractorWhy?.[choices[lastWrongIdx]] || 'Not the major product here — the conditions favor a different pathway.');
+
   return (
     <div className="building-layout">
       <GameSidebar
-        groups={GROUPS} mechs={MECHANISMS}
-        selGroups={selGroups} selMechs={selMechs}
-        onToggleGroup={toggleGroup} onToggleMech={toggleMech}
+        groups={GROUPS} mechs={MECHANISMS} chapters={allChapters}
+        selGroups={selGroups} selMechs={selMechs} selChapters={selChapters}
+        onToggleGroup={toggleGroup} onToggleMech={toggleMech} onToggleChapter={toggleChapter}
         onAllGroups={() => setSelGroups(GROUPS.map(g => g.id))}
         onClearGroups={() => setSelGroups([])}
         onAllMechs={() => setSelMechs(MECHANISMS.map(m => m.id))}
         onClearMechs={() => setSelMechs([])}
+        onAllChapters={() => setSelChapters([...allChapters])}
+        onClearChapters={() => setSelChapters([])}
         level={level} xp={xp}
         deckSize={deck.length} solved={solvedIds.size}
-        onShowTutorial={() => window.__openTutorial?.()}
       />
+
+      <LegendPanel />
 
       <div className="content">
         <DeviceNotice>
@@ -576,8 +743,7 @@ function ReactionBuildingMode({
           <div className="empty-state">
             <div className="empty-state-icon">{'\u{1F9EA}'}</div>
             <div className="empty-state-text">
-              No reactions match your filters. Toggle a few more groups or
-              mechanisms on the left to load some puzzles.
+              No reactions match your filters. Toggle groups, mechanisms, or chapters to load puzzles.
             </div>
           </div>
         )}
@@ -602,7 +768,6 @@ function ReactionBuildingMode({
               </div>
             </div>
 
-            {/* Hint shop is now ABOVE the reaction board */}
             <HintShop
               electrons={electrons}
               bought={bought}
@@ -621,9 +786,9 @@ function ReactionBuildingMode({
               correctIdx={correctIdx}
               locked={locked}
               onPick={pickAnswer}
+              questionSlot={questionSlot}
             />
 
-            {/* Green mechanism-steps panel below reaction box on correct */}
             {locked && (
               <MechanismStepsPanel
                 rxn={rxn}
@@ -631,11 +796,10 @@ function ReactionBuildingMode({
               />
             )}
 
-            {/* Wrong-answer "why not?" panel */}
             {!locked && lastWrongIdx !== null && (
               <WrongPanel
-                pickedName={MOLECULES[choices[lastWrongIdx]]?.name || choices[lastWrongIdx]}
-                reason={rxn.distractorWhy?.[choices[lastWrongIdx]] || 'Not the major product here — the conditions favor a different pathway.'}
+                pickedName={wrongPanelName}
+                reason={wrongPanelReason}
               />
             )}
 
@@ -669,7 +833,7 @@ function ReactionBuildingMode({
   );
 }
 
-// ── Root App ──────────────────────────────────────────────
+// ── Root App ───────────────────────────────────────────────
 function App() {
   const [electrons, setElectrons] = useState(STARTING_ELECTRONS);
   const [streak, setStreak] = useState(0);
@@ -686,19 +850,13 @@ function App() {
 
   useEffect(() => {
     if (level > prevLevelRef.current) {
-      setLevelToast(`Level ${level} \u2014 you levelled up!`);
+      setLevelToast(`Level ${level} — you levelled up!`);
       const t = setTimeout(() => setLevelToast(null), 2000);
       prevLevelRef.current = level;
       return () => clearTimeout(t);
     }
     prevLevelRef.current = level;
   }, [level]);
-
-  // Expose the tutorial trigger on window for the sidebar buttons to call.
-  useEffect(() => {
-    window.__openTutorial = () => setShowTutorial(true);
-    return () => { delete window.__openTutorial; };
-  }, []);
 
   function resetProgress() {
     setElectrons(STARTING_ELECTRONS);
@@ -720,6 +878,7 @@ function App() {
   return (
     <>
       <TopBar icon={'\u{1F9EA}'} title="OChem Reaction Game" backTo="../">
+        <button className="tut-topbar-btn" onClick={() => setShowTutorial(true)}>💡 Tutorial</button>
         <div className="mode-toggle">
           <button
             className={`mode-btn${mode === 'building' ? ' active' : ''}`}
@@ -732,7 +891,7 @@ function App() {
         </div>
         <CurrencyChips streak={streak} level={level} />
         <Wallet electrons={electrons} flash={flashE === 'gain'} spent={flashE === 'spend'} />
-        <ResetButton onClick={resetProgress} label={'\u21BA Reset run'} />
+        <ResetButton onClick={resetProgress} label={'↺ Reset run'} />
       </TopBar>
 
       <div className="main">
@@ -748,7 +907,8 @@ function App() {
         )}
         {mode === 'tree' && (
           <>
-            <TreeSidebar onShowTutorial={() => setShowTutorial(true)} />
+            <TreeSidebar />
+            <LegendPanel />
             <div className="content tree-content">
               <ReactionTreeMode
                 electrons={electrons}
@@ -761,7 +921,7 @@ function App() {
 
       {levelToast && (
         <div className="level-toast">
-          <span>{'\u2728'}</span><span>{levelToast}</span>
+          <span>{'✨'}</span><span>{levelToast}</span>
         </div>
       )}
 

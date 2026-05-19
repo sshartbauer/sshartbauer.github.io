@@ -680,8 +680,8 @@
 .tut-list-tips li { border-left-color: var(--peach); }
 .tut-list-tips li::before { color: var(--peach); }
 .tut-note {
-  margin-top: 10px; font-size: 0.78rem; color: var(--muted);
-  font-style: italic;
+  margin-top: 10px; font-size: 0.88rem; color: #c9dae0;
+  font-style: normal; line-height: 1.6;
 }
 .tut-legend {
   display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -728,7 +728,23 @@
   font-family: monospace; color: var(--peach);
 }
 
-/* ── "Show tutorial again" sidebar button ─────────────────── */
+/* ── Tutorial button in topbar ────────────────────────────── */
+.tut-topbar-btn {
+  padding: 6px 13px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surf2);
+  color: var(--muted);
+  font-size: 0.72rem; font-weight: 600;
+  cursor: pointer; transition: all 0.15s;
+  font-family: inherit; white-space: nowrap;
+}
+.tut-topbar-btn:hover {
+  border-color: var(--teal); color: var(--teal);
+  background: rgba(0,175,185,0.06);
+}
+
+/* ── "Show tutorial again" sidebar button (kept for fallback) ─ */
 .sidebar-tut-btn {
   margin: 14px 0 4px;
   padding: 7px 12px;
@@ -1268,4 +1284,139 @@
 @media (max-width: 760px) {
   .reactant-frame-body { flex-direction: column; gap: 6px; }
   .tree-picker-bar { flex-direction: column; align-items: stretch; }
+}
+
+/* ── Group tag above molecule slots ──────────────────────── */
+.rxn-group-tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 0.56rem; font-weight: 800;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--muted);
+}
+.rxn-group-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  display: inline-block; flex-shrink: 0;
+}
+
+/* ── Reagent question card (missing-reagent slot) ─────────── */
+.rxn-q-reagent {
+  min-width: 110px; padding: 10px 16px;
+  border: 1.5px dashed var(--border); border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.6rem; font-weight: 800; color: var(--peach);
+  background: rgba(240,134,103,0.05);
+}
+
+/* ── Reagent answer cards (text-only) ────────────────────── */
+.ans-reagent-label {
+  display: flex; flex-direction: column; align-items: flex-start;
+  gap: 3px; padding: 4px 2px;
+  justify-content: center; width: 100%;
+}
+.ans-reagent-main {
+  font-size: 0.88rem; font-weight: 700; color: var(--text);
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  line-height: 1.2; white-space: pre-wrap;
+}
+.ans-reagent-cond {
+  font-size: 0.72rem; color: var(--muted); font-style: italic;
+}
+.ans-card.correct .ans-reagent-main { color: var(--known); }
+.ans-card.wrong   .ans-reagent-main { color: var(--unknown); }
+
+/* ── Legend panel (always-visible functional group key) ──── */
+.legend-panel {
+  width: 158px; flex-shrink: 0;
+  display: flex; flex-direction: column;
+  background: var(--surf);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  align-self: flex-start;
+  position: sticky; top: 0;
+}
+.legend-panel-hdr {
+  font-size: 0.55rem; font-weight: 800;
+  text-transform: uppercase; letter-spacing: 0.12em;
+  color: var(--muted);
+  padding: 10px 12px 8px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.legend-scroll {
+  overflow-y: auto; flex: 1;
+  padding: 6px 8px;
+}
+.legend-scroll::-webkit-scrollbar { width: 3px; }
+.legend-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.legend-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 4px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.legend-row:last-child { border-bottom: none; }
+.legend-swatch {
+  width: 26px; height: 26px;
+  border-radius: 5px; flex-shrink: 0;
+  border: 1.5px solid;
+}
+.legend-label {
+  font-size: 0.67rem; color: var(--text);
+  line-height: 1.25; font-weight: 500;
+}
+
+/* ── Chapter selector ────────────────────────────────────── */
+.chapter-scroll-wrap {
+  position: relative;
+  overflow: hidden;
+}
+.chapter-grid {
+  display: flex; flex-wrap: wrap; gap: 5px;
+  padding: 4px 0 10px;
+  max-height: 112px;
+  overflow-y: auto;
+}
+.chapter-grid::-webkit-scrollbar { width: 3px; }
+.chapter-grid::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.ch-btn {
+  padding: 4px 8px; border-radius: 5px;
+  border: 1px solid var(--border); background: var(--surf2);
+  color: var(--muted); font-size: 0.7rem; font-weight: 700;
+  cursor: pointer; transition: all 0.15s;
+  font-family: 'SF Mono', monospace;
+  font-variant-numeric: tabular-nums;
+}
+.ch-btn:hover { border-color: var(--teal); color: var(--teal); }
+.ch-btn.on {
+  border-color: var(--teal); color: var(--teal);
+  background: rgba(0,175,185,0.10);
+}
+.chapter-scroll-fade {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 22px;
+  background: linear-gradient(transparent, var(--surf));
+  pointer-events: none;
+}
+
+/* ── Sun diagram ─────────────────────────────────────────── */
+.sun-wrap {
+  width: 100%;
+  background: radial-gradient(ellipse at center, #0d2035 0%, #06101a 72%);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  aspect-ratio: 1 / 1;
+  max-height: 640px;
+  align-self: center;
+}
+.sun-svg {
+  width: 100%; height: 100%;
+  display: block;
+}
+.sun-branch-active {
+  animation: sunBranchPulse 1.8s ease-in-out infinite;
+}
+@keyframes sunBranchPulse {
+  0%,  100% { filter: drop-shadow(0 0 4px rgba(240,134,103,0.28)); }
+  50%        { filter: drop-shadow(0 0 14px rgba(240,134,103,0.72)); }
 }

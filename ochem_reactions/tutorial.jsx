@@ -1,5 +1,5 @@
 /* Tutorial overlay — one-time on first visit; "Show tutorial again"
-   button in the sidebar reopens it. Stores seen flag in localStorage.
+   button in the topbar reopens it. Stores seen flag in localStorage.
    Multi-page slideshow with skip button.
 */
 
@@ -36,20 +36,23 @@ function buildLegendSwatches() {
 
 const TUTORIAL_PAGES = [
   {
-    title: 'Welcome to the OChem Reaction Game',
+    title: 'Organic Chemistry Reaction Game - Tutorial',
     body: (
       <>
-        <p>You’ve got two modes: <b>Reaction Building</b> (a flashcard-style puzzle game) and <b>Reaction Tree</b> (pick a substrate, work through every reaction it can do).</p>
-        <p>This tutorial covers everything you need to know. It only shows once — but there’s a <em>Show tutorial again</em> button in the sidebar if you want it back.</p>
+        <p>There are two modes to play in:</p>
+        <ul className="tut-list">
+          <li><b>Reaction Building</b>, where you complete reactions by choosing the correct missing molecule</li>
+          <li><b>Reaction Tree</b>, where you complete reactions in sequential order</li>
+        </ul>
       </>
     ),
-    icon: '🧪',
+    icon: '💡',
   },
   {
     title: 'The reaction puzzle',
     body: (
       <>
-        <p>In <b>Reaction Building</b>, you’re given a substrate, a reagent, and conditions. Your job: pick the major product from four choices.</p>
+        <p>In <b>Reaction Building</b>, one piece of each reaction is missing — sometimes the product, sometimes the reagent, sometimes the starting material. Your job: pick the right answer from four choices.</p>
         <ul className="tut-list">
           <li>Click an answer card to lock it in.</li>
           <li>Or press <kbd>1</kbd>–<kbd>4</kbd> to pick with the keyboard.</li>
@@ -58,22 +61,22 @@ const TUTORIAL_PAGES = [
         </ul>
       </>
     ),
-    icon: '🎯',
+    icon: '💡',
   },
   {
     title: 'Reading the substrate background',
     body: (
       <>
-        <p>Every molecule sits on a background that tells you what <b>functional class</b> it is. Memorize these and you’ll read reactions faster.</p>
+        <p>Every molecule sits on a background that tells you what <b>functional class</b> it is. Memorize these and you'll read reactions faster.</p>
         <div className="tut-legend">
           {buildLegendSwatches().map(s => (
             <PatternSwatch key={s.id} pattern={s} label={s.legendLabel} />
           ))}
         </div>
-        <p className="tut-note">Different colors within the same pattern just distinguish individual molecules in the same class.</p>
+        <p className="tut-note">Patterns are unique to functional-group families. Colors vary between individual molecules in the same family. A permanent key is always visible to the left of the play area.</p>
       </>
     ),
-    icon: '🎨',
+    icon: '💡',
   },
   {
     title: 'Electrons (e⁻) — the in-game currency',
@@ -82,15 +85,15 @@ const TUTORIAL_PAGES = [
         <p>You start with <b>15 e⁻</b>. Spend them on hints; earn them by answering correctly.</p>
         <ul className="tut-list">
           <li><b>+6 e⁻</b> for a clean solve (no hints, no wrong picks)</li>
-          <li><b>+3 e⁻</b> if you bought any hint</li>
-          <li><b>+1 e⁻</b> after a wrong pick</li>
-          <li><b>+1 e⁻</b> streak bonus every 3 in a row</li>
-          <li><b>–1 e⁻</b> for each wrong pick (streak resets)</li>
+          <li><b>+3 e⁻</b> if you used hints</li>
+          <li><b>+1 e⁻</b> if you had any wrong picks (reduced reward)</li>
+          <li><b>+1 e⁻</b> streak bonus every 3 correct in a row</li>
+          <li><b>–1 e⁻</b> penalty per wrong pick (streak resets to 0)</li>
         </ul>
         <p>Your balance lives in the top-right of the window — keep an eye on it.</p>
       </>
     ),
-    icon: '⚡',
+    icon: '💡',
   },
   {
     title: 'The hint shop',
@@ -113,38 +116,38 @@ const TUTORIAL_PAGES = [
       <>
         <p>Every answer gives you something to study:</p>
         <ul className="tut-list">
-          <li><b>Wrong pick</b> — a red box explains <em>why that product doesn’t fit</em>. Often more useful than the right answer.</li>
+          <li><b>Wrong pick</b> — a red box explains <em>why that answer doesn't fit</em>. Often more useful than the right answer.</li>
           <li><b>Right pick</b> — a green box steps through the <em>mechanism</em> in numbered steps.</li>
           <li>The <b>Walk through this reaction</b> button gives you a 4–5-step deep dive.</li>
         </ul>
       </>
     ),
-    icon: '✓',
+    icon: '💡',
   },
   {
     title: 'Reaction Tree mode',
     body: (
       <>
-        <p>Pick a substrate class from a dropdown (alkene, alcohol, aldehyde…). The substrate goes at the top of a tree; each <b>branch</b> is a reagent.</p>
-        <p>Branches reveal <b>one at a time</b>. Pick the right product from multiple choice to grow the next branch. Work through every reaction the substrate can do.</p>
+        <p>Pick a substrate class from a dropdown (alkene, alcohol, aldehyde…). The substrate goes at the center of a sun diagram; each <b>ray</b> is a reagent.</p>
+        <p>Rays reveal <b>one at a time</b>. Pick the right product from multiple choice to complete each branch. Work through every reaction the substrate can do.</p>
         <p>Great for sweep-style review before an exam.</p>
       </>
     ),
-    icon: '🌳',
+    icon: '💡',
   },
   {
     title: 'Study tips',
     body: (
       <ul className="tut-list tut-list-tips">
-        <li><b>Use hint 1 (reaction class) liberally.</b> Knowing it’s an EAS or an aldol cuts the answer space in half before you even look at the products.</li>
+        <li><b>Use hint 1 (reaction class) liberally.</b> Knowing it's an EAS or an aldol cuts the answer space in half before you even look at the products.</li>
         <li><b>Spot the leaving group first.</b> In substitution / elimination problems, the carbon attached to the LG is where everything happens.</li>
         <li><b>Markovnikov = the more stable cation wins.</b> When in doubt about an addition, draw both possible cations and pick the better one.</li>
         <li><b>For acyl substitution, rank reactivity: acid Cl &gt; anhydride &gt; ester &gt; amide.</b> Going down the list is easy; up is hard.</li>
         <li><b>Read the conditions, not just the reagent.</b> NaOH + heat is elimination; NaOH at 0 °C is substitution.</li>
-        <li><b>If you don’t recognize a reagent, look it up before guessing.</b> The walkthroughs are your friend.</li>
+        <li><b>If you don't recognize a reagent, look it up before guessing.</b> The walkthroughs are your friend.</li>
       </ul>
     ),
-    icon: '📚',
+    icon: '💡',
   },
 ];
 
