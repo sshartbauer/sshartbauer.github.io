@@ -1,0 +1,42 @@
+name: Update war updates feed
+
+on:
+  schedule:
+    - cron: '0 12 * * *'   # daily at 12:00 UTC; change to whatever time you like
+  workflow_dispatch: {}    # adds a "Run workflow" button so you can trigger it manually to test
+
+permissions:
+  contents: write
+
+jobs:
+  update-feed:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # NOTE: the path below assumes this project lives at
+      # "uarfwarupdates/UA/RF War Updates" relative to the repo root,
+      # matching the local folder structure it was built in. Confirm
+      # this matches where you actually keep it in the repo, and update
+      # all three paths below (install, fetch, and git add) if not.
+      - name: Install dependencies
+        run: pip install -r "uarfwarupdates/UA/RF War Updates/requirements.txt"
+
+      - name: Fetch latest articles
+        env:
+          GNEWS_API_KEY: ${{ secrets.GNEWS_API_KEY }}
+        run: python "uarfwarupdates/UA/RF War Updates/scripts/fetch_feed.py"
+
+      - name: Commit updated feed if it changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add "uarfwarupdates/UA/RF War Updates/data/articles.json"
+          git diff --staged --quiet || git commit -m "Update war updates feed"
+          git push

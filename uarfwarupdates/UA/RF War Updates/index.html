@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ukraine–Russia War: Live Update Resources | S. S. Hartbauer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+
+  /* ========================================================
+     PROTOTYPE NOTE: fonts/colors below are a best-guess match
+     to the live portfolio site (I couldn't pull its exact
+     stylesheet). Everything here, palette, type, spacing,
+     card shapes, is a CSS variable and easy to retune once
+     you've picked at it. Nothing here is final.
+     ======================================================== */
+
+  :root {
+    --paper: #faf8f2;
+    --paper-alt: #f1eee3;
+    --ink: #262420;
+    --ink-soft: #5c584f;
+    --border: #e2ddce;
+    --accent: #3b5973;       /* muted slate blue, used for links and the primary accent */
+    --accent-soft: #eef2f5;
+    --tier-live: #b3441e;    /* real-time */
+    --tier-live-bg: #fbeee7;
+    --tier-daily: #3b5973;   /* daily */
+    --tier-daily-bg: #eaf0f4;
+    --tier-periodic: #5c6b4f; /* periodic */
+    --tier-periodic-bg: #eef1e8;
+    --radius: 6px;
+    --serif: 'Fraunces', Georgia, serif;
+    --sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+
+  body.high-contrast {
+    --paper: #ffffff;
+    --paper-alt: #f0f0f0;
+    --ink: #000000;
+    --ink-soft: #1a1a1a;
+    --border: #000000;
+    --accent: #10386b;
+    --accent-soft: #e4ecf6;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-weight: 400;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { color: var(--accent); }
+
+  .wrap {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 0 28px;
+  }
+
+  /* ---------- NAV (mirrors main site) ---------- */
+  header.site-nav {
+    border-bottom: 1px solid var(--border);
+    background: var(--paper);
+    position: sticky;
+    top: 0;
+    z-index: 20;
+  }
+  .nav-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 0;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .site-name {
+    font-family: var(--serif);
+    font-size: 1.15rem;
+    font-weight: 500;
+    text-decoration: none;
+    color: var(--ink);
+    letter-spacing: 0.01em;
+  }
+  nav.links {
+    display: flex;
+    gap: 22px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  nav.links a {
+    text-decoration: none;
+    color: var(--ink-soft);
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+  nav.links a:hover { color: var(--accent); }
+  nav.links a.current { color: var(--ink); border-bottom: 2px solid var(--accent); padding-bottom: 3px; }
+  .hc-toggle {
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: 1px solid var(--border);
+    background: var(--paper-alt);
+    padding: 6px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    color: var(--ink-soft);
+  }
+  .hc-toggle:hover { color: var(--ink); }
+
+  .breadcrumb {
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+    padding: 10px 0 0;
+  }
+  .breadcrumb a { color: var(--ink-soft); text-decoration: none; }
+  .breadcrumb a:hover { color: var(--accent); }
+
+  /* ---------- HERO / FRAMING ---------- */
+  .hero {
+    padding: 46px 0 30px;
+    border-bottom: 1px solid var(--border);
+  }
+  .eyebrow {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  h1.page-title {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 2.4rem;
+    line-height: 1.15;
+    margin: 0 0 18px;
+    max-width: 16ch;
+  }
+  h1.page-title em { font-style: italic; font-weight: 400; color: var(--accent); }
+
+  .framing {
+    max-width: 68ch;
+    font-size: 1rem;
+    color: var(--ink-soft);
+  }
+  .framing p { margin: 0 0 14px; }
+
+  .edit-flag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 10px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #8a5a10;
+    background: #fbf1de;
+    border: 1px dashed #d9b475;
+    padding: 5px 10px;
+    border-radius: 20px;
+  }
+
+  .meta-row {
+    display: flex;
+    gap: 18px;
+    flex-wrap: wrap;
+    margin-top: 22px;
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+  }
+  .meta-row span { display: flex; align-items: center; gap: 6px; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--tier-live); display: inline-block; }
+  .dot.pulse { box-shadow: 0 0 0 0 rgba(179,68,30,0.5); animation: pulse 2s infinite; }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(179,68,30,0.4); }
+    70% { box-shadow: 0 0 0 6px rgba(179,68,30,0); }
+    100% { box-shadow: 0 0 0 0 rgba(179,68,30,0); }
+  }
+
+  /* ---------- TIER SECTIONS ---------- */
+  section.tier {
+    padding: 40px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  section.tier:last-of-type { border-bottom: none; }
+
+  .tier-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 14px;
+    padding: 16px 22px;
+    border-radius: var(--radius);
+    border-left: 4px solid var(--tier-color, var(--accent));
+    background: var(--tier-bg, var(--paper-alt));
+  }
+  .tier-head.live { --tier-color: var(--tier-live); --tier-bg: var(--tier-live-bg); }
+  .tier-head.daily { --tier-color: var(--tier-daily); --tier-bg: var(--tier-daily-bg); }
+  .tier-head.periodic { --tier-color: var(--tier-periodic); --tier-bg: var(--tier-periodic-bg); }
+  .tier-head h2 {
+    font-family: var(--serif);
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--tier-color, var(--ink));
+  }
+  .tier-badge {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: var(--paper);
+    color: var(--tier-color, var(--ink-soft));
+  }
+
+  .tier-sub {
+    font-size: 0.88rem;
+    color: var(--ink-soft);
+    max-width: 60ch;
+    margin: 0 0 26px;
+  }
+
+  /* ---------- CARD GRID (source cards, tools-page style) ---------- */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 18px;
+  }
+  .card {
+    background: var(--paper-alt);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .card-icon { font-size: 1.3rem; }
+  .status-pill {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 3px 8px;
+    border-radius: 20px;
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+  .card h3 {
+    font-family: var(--serif);
+    font-size: 1.05rem;
+    font-weight: 500;
+    margin: 0;
+  }
+  .card p.desc {
+    font-size: 0.87rem;
+    color: var(--ink-soft);
+    margin: 0;
+    flex-grow: 1;
+  }
+  .tag-row { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tag {
+    font-size: 0.7rem;
+    color: var(--ink-soft);
+    background: var(--paper);
+    border: 1px solid var(--border);
+    padding: 3px 9px;
+    border-radius: 20px;
+  }
+  .card a.open {
+    font-size: 0.83rem;
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--accent);
+    margin-top: 4px;
+  }
+  .card a.open:hover { text-decoration: underline; }
+
+  /* ---------- ARTICLE FEED CARDS (daily tier) ---------- */
+  .feed-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+  .feed-card {
+    display: flex;
+    gap: 16px;
+    padding: 16px 18px;
+    background: var(--paper-alt);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    align-items: flex-start;
+  }
+  .feed-source {
+    flex-shrink: 0;
+    width: 108px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--accent);
+    padding-top: 2px;
+  }
+  .feed-body { flex-grow: 1; }
+  .feed-body h4 {
+    margin: 0 0 4px;
+    font-size: 0.96rem;
+    font-weight: 600;
+    font-family: var(--sans);
+  }
+  .feed-body h4 a { color: var(--ink); text-decoration: none; }
+  .feed-body h4 a:hover { color: var(--accent); }
+  .feed-excerpt { font-size: 0.85rem; color: var(--ink-soft); margin: 0 0 6px; }
+  .feed-date { font-size: 0.72rem; color: var(--ink-soft); opacity: 0.8; }
+
+  .placeholder-note {
+    font-size: 0.72rem;
+    color: var(--ink-soft);
+    font-style: italic;
+    padding: 10px 0 0;
+  }
+
+  .feed-meta-note {
+    text-transform: none;
+    letter-spacing: normal;
+    font-weight: 400;
+    font-style: italic;
+    opacity: 0.85;
+  }
+
+  .subhead-label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-soft);
+    font-weight: 600;
+    margin: 30px 0 12px;
+  }
+
+  /* ---------- FOOTER ---------- */
+  footer.site-footer {
+    padding: 40px 0 60px;
+    text-align: center;
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+  }
+  footer.site-footer a { color: var(--ink-soft); }
+
+  /* ---------- DEV BANNER (remove when real) ---------- */
+  .dev-banner {
+    background: #262420;
+    color: #f1eee3;
+    text-align: center;
+    font-size: 0.78rem;
+    padding: 8px 12px;
+    letter-spacing: 0.02em;
+  }
+  .dev-banner strong { color: #f4bf75; }
+
+  @media (max-width: 640px) {
+    h1.page-title { font-size: 1.9rem; }
+    .feed-card { flex-direction: column; gap: 4px; }
+    .feed-source { width: auto; }
+  }
+</style>
+</head>
+<body>
+
+<div class="dev-banner">PROTOTYPE: layout final, backend wiring in progress. <strong>See SETUP.md</strong> for the one-time setup that turns on live data.</div>
+
+<header class="site-nav">
+  <div class="wrap">
+    <div class="nav-row">
+      <a class="site-name" href="#">S. S. Hartbauer</a>
+      <nav class="links">
+        <a href="#">Research</a>
+        <a href="#">Clinical</a>
+        <a href="#" class="current">Tools</a>
+        <a href="#">AI Policy</a>
+        <a href="#">Contact</a>
+        <button class="hc-toggle" onclick="document.body.classList.toggle('high-contrast')">High Contrast</button>
+      </nav>
+    </div>
+    <div class="breadcrumb"><a href="#">Tools</a> / Ukraine–Russia War Updates</div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="hero">
+    <div class="eyebrow">Live Resource · Built Along the Way</div>
+    <h1 class="page-title">Ukraine–Russia War: <em>Live</em> Update Resources</h1>
+
+    <div class="framing">
+      <p>I kept finding war coverage the same way most people do: an article here, a headline there, with no sense of the bigger picture. It was making my brain parts hurt to try to piece all of it together. I engineered this page to pull together the sources I trust most, organized by how often they actually update, so I can check one place instead of chasing links and trying to build mind maps from them.</p>
+      <p>Every card links out to the original reporting instead of republishing it in full. Sources were chosen for a track record of accuracy over speed, and I've noted editorial leanings where I believe they're worth knowing.</p>
+      <p>Please visit the <a href="https://sshartbauer.github.io/integrity/">AI policy page</a> for notes on how I manage AI use.</p>
+    </div>
+
+    <div class="meta-row">
+      <span><span class="dot pulse"></span> Real-time sources active</span>
+      <span>Daily digest refreshes each morning</span>
+      <span>9 sources tracked</span>
+    </div>
+  </section>
+
+  <!-- ============ REAL-TIME TIER ============ -->
+  <section class="tier">
+    <div class="tier-head live">
+      <h2>Real-Time <span class="tier-badge live">Live</span></h2>
+    </div>
+    <p class="tier-sub">Incident-level updates as they happen. Good for geography and immediacy; verify specific claims independently.</p>
+
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-top">
+          <span class="card-icon">🗺️</span>
+          <span class="status-pill">Live map</span>
+        </div>
+        <h3>Liveuamap</h3>
+        <p class="desc">Crowd-sourced incident map plotting strikes, troop movements, and reports as they're filed.</p>
+        <div class="tag-row"><span class="tag">Map/Tracker</span><span class="tag">Crowd-sourced</span></div>
+        <a class="open" href="https://liveuamap.com/">Open map →</a>
+      </div>
+
+      <div class="card">
+        <div class="card-top">
+          <span class="card-icon">📍</span>
+          <span class="status-pill">Daily map</span>
+        </div>
+        <h3>ISW Interactive Frontline Map</h3>
+        <p class="desc">Institute for the Study of War's control-of-terrain map, updated alongside their daily assessment.</p>
+        <div class="tag-row"><span class="tag">Map/Tracker</span><span class="tag">Analysis</span></div>
+        <a class="open" href="https://www.understandingwar.org/">Open map →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ DAILY TIER ============ -->
+  <section class="tier">
+    <div class="tier-head daily">
+      <h2>Daily</h2>
+    </div>
+    <p class="tier-sub">Written assessments and news coverage, refreshed once a day. This is the core habit: one ISW read plus a wire-service check.</p>
+
+    <div class="subhead-label">Latest headlines <span class="feed-meta-note" id="feed-generated-note">(placeholder, backend not yet connected)</span></div>
+    <div class="feed-list" id="feed-list">
+      <div class="feed-card">
+        <div class="feed-source">ISW</div>
+        <div class="feed-body">
+          <h4><a href="#">Russian Offensive Campaign Assessment (placeholder headline)</a></h4>
+          <p class="feed-excerpt">One-line excerpt summarizing the day's frontline assessment will render here once the feed is live.</p>
+          <div class="feed-date">Placeholder date · 6 min read</div>
+        </div>
+      </div>
+      <div class="feed-card">
+        <div class="feed-source">Kyiv Independent</div>
+        <div class="feed-body">
+          <h4><a href="#">Ground-level report headline (placeholder)</a></h4>
+          <p class="feed-excerpt">Excerpt text pulled from RSS will populate this space automatically once the backend is built.</p>
+          <div class="feed-date">Placeholder date · 4 min read</div>
+        </div>
+      </div>
+      <div class="feed-card">
+        <div class="feed-source">Wire Service</div>
+        <div class="feed-body">
+          <h4><a href="#">Wire-service headline (placeholder)</a></h4>
+          <p class="feed-excerpt">Only appears if you add a free GNews API key. Skipped entirely otherwise.</p>
+          <div class="feed-date">Placeholder date · 3 min read</div>
+        </div>
+      </div>
+    </div>
+    <p class="placeholder-note" id="feed-fallback-note">This section fills in automatically once the daily fetch runs for the first time. See SETUP.md for the one-time setup.</p>
+
+    <div class="subhead-label">Other daily sources</div>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-top">
+          <span class="card-icon">🎖️</span>
+          <span class="status-pill">Official</span>
+        </div>
+        <h3>UK MoD Defence Intelligence</h3>
+        <p class="desc">Short, concise daily assessments from the UK Ministry of Defence.</p>
+        <div class="tag-row"><span class="tag">Official</span><span class="tag">Concise</span></div>
+        <a class="open" href="#">Open source →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PERIODIC TIER ============ -->
+  <section class="tier">
+    <div class="tier-head periodic">
+      <h2>Periodic</h2>
+    </div>
+    <p class="tier-sub">Deeper analysis and coverage that doesn't run on a daily clock. Worth checking in on weekly.</p>
+
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-top">
+          <span class="card-icon">📰</span>
+          <span class="status-pill">In exile</span>
+        </div>
+        <h3>Meduza</h3>
+        <p class="desc">Independent Russian outlet operating in exile, offering a useful window into domestic Russian coverage and sentiment.</p>
+        <div class="tag-row"><span class="tag">Inside Russia</span><span class="tag">Anti-Kremlin lean</span></div>
+        <a class="open" href="https://meduza.io/en">Open source →</a>
+      </div>
+      <div class="card">
+        <div class="card-top">
+          <span class="card-icon">🌐</span>
+          <span class="status-pill">Wire</span>
+        </div>
+        <h3>AFP</h3>
+        <p class="desc">French wire service with neutral, minimal-spin coverage; useful as a cross-check against other sources.</p>
+        <div class="tag-row"><span class="tag">Wire service</span><span class="tag">Neutral</span></div>
+        <a class="open" href="#">Open source →</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>© 2026 Seanna Hartbauer · Los Medanos College</p>
+    <p><a href="https://github.com/sshartbauer">github.com/sshartbauer</a></p>
+  </div>
+</footer>
+
+<script>
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str == null ? '' : String(str);
+    return div.innerHTML;
+  }
+
+  function formatTimestamp(iso) {
+    try {
+      const d = new Date(iso);
+      return d.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
+    } catch (e) {
+      return iso;
+    }
+  }
+
+  async function loadFeed() {
+    const listEl = document.getElementById('feed-list');
+    const noteEl = document.getElementById('feed-generated-note');
+    const fallbackEl = document.getElementById('feed-fallback-note');
+
+    try {
+      const res = await fetch('data/articles.json', { cache: 'no-store' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+
+      if (!data.articles || !data.articles.length) {
+        throw new Error('Feed has no articles yet');
+      }
+
+      listEl.innerHTML = data.articles.map(a => `
+        <div class="feed-card">
+          <div class="feed-source">${escapeHtml(a.source)}</div>
+          <div class="feed-body">
+            <h4><a href="${escapeHtml(a.url)}" target="_blank" rel="noopener">${escapeHtml(a.headline)}</a></h4>
+            <p class="feed-excerpt">${escapeHtml(a.excerpt || '')}</p>
+            <div class="feed-date">${escapeHtml(a.date || '')}</div>
+          </div>
+        </div>
+      `).join('');
+
+      if (noteEl) {
+        noteEl.textContent = data.generated_at
+          ? '(updated ' + formatTimestamp(data.generated_at) + ')'
+          : '';
+      }
+      if (fallbackEl) fallbackEl.style.display = 'none';
+    } catch (err) {
+      // Feed not published yet, or being viewed locally before the first
+      // Action run. Leave the placeholder cards already in the HTML as-is.
+      console.warn('Live feed not loaded, showing placeholder content:', err.message);
+      if (noteEl) noteEl.textContent = '(placeholder, backend not yet connected)';
+      if (fallbackEl) fallbackEl.textContent = 'Live feed unavailable right now, showing placeholder content. See SETUP.md.';
+    }
+  }
+
+  loadFeed();
+</script>
+
+</body>
+</html>

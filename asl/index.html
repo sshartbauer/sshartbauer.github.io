@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ASL Flashcards</title>
+  <style>
+    :root {
+      --bg: #0f0f13;
+      --surface: #1a1a24;
+      --surface2: #22223a;
+      --border: #2e2e4a;
+      --accent: #7c6af7;
+      --accent2: #a78bfa;
+      --accent3: #38bdf8;
+      --green: #34d399;
+      --text: #e8e8f0;
+      --muted: #8888aa;
+      --front-bg: #1a1a2e;
+      --back-bg: #16213e;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 48px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, var(--accent2), var(--accent3));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    header p {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-top: 4px;
+    }
+
+    /* Group filter tabs */
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 24px;
+    }
+
+    .tab {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 6px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.82rem;
+      font-weight: 600;
+      transition: all 0.2s;
+      letter-spacing: 0.3px;
+    }
+
+    .tab:hover { border-color: var(--accent); color: var(--accent2); }
+    .tab.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    /* Progress bar */
+    .progress-wrap {
+      width: 100%;
+      max-width: 580px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .progress-bar {
+      flex: 1;
+      height: 5px;
+      background: var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent3));
+      border-radius: 10px;
+      transition: width 0.35s ease;
+    }
+
+    .counter {
+      font-size: 0.8rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    /* Card scene */
+    .scene {
+      width: 100%;
+      max-width: 560px;
+      height: 360px;
+      perspective: 1200px;
+      cursor: pointer;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.55s cubic-bezier(0.4, 0.2, 0.2, 1);
+    }
+
+    .card.flipped { transform: rotateY(180deg); }
+
+    .card-face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* FRONT */
+    .card-front {
+      background: radial-gradient(ellipse at 30% 30%, #1e1b4b 0%, #0f0f1a 70%);
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .card-front .group-label {
+      position: absolute;
+      top: 16px;
+      left: 20px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--accent);
+      opacity: 0.7;
+    }
+
+    .card-front .hint {
+      position: absolute;
+      bottom: 16px;
+      color: var(--muted);
+      font-size: 0.75rem;
+    }
+
+    .card-front .main-word {
+      font-size: 7rem;
+      font-weight: 900;
+      letter-spacing: -4px;
+      line-height: 1;
+      background: linear-gradient(135deg, #fff 30%, var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      user-select: none;
+    }
+
+    .card-front .sub-label {
+      font-size: 1rem;
+      color: var(--muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+
+    /* BACK */
+    .card-back {
+      background: radial-gradient(ellipse at 70% 20%, #0c1a3a 0%, #0a0a14 80%);
+      transform: rotateY(180deg);
+      flex-direction: column;
+    }
+
+    .back-top {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 24px 12px;
+      border-bottom: 1px solid var(--border);
+      text-align: center;
+      gap: 6px;
+    }
+
+    .back-top .section-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .back-top .handshape-text {
+      font-size: 1rem;
+      line-height: 1.5;
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .back-bottom {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      height: 130px;
+      flex-shrink: 0;
+    }
+
+    .back-cell {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 12px;
+      text-align: center;
+      gap: 5px;
+    }
+
+    .back-cell + .back-cell {
+      border-left: 1px solid var(--border);
+    }
+
+    .back-cell .cell-label {
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    .back-cell.location .cell-label  { color: var(--green); }
+    .back-cell.movement .cell-label  { color: var(--accent3); }
+    .back-cell.facial .cell-label    { color: #f9a8d4; }
+
+    .back-cell .cell-text {
+      font-size: 0.82rem;
+      color: var(--text);
+      line-height: 1.4;
+      opacity: 0.9;
+    }
+
+    /* Controls */
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .btn {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 10px 22px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 0.88rem;
+      font-weight: 600;
+      transition: all 0.18s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn:hover { border-color: var(--accent); color: var(--accent2); transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+    .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .btn.primary:hover { background: var(--accent2); border-color: var(--accent2); color: #fff; }
+    .btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+
+    /* Quiz mode */
+    .quiz-area {
+      width: 100%;
+      max-width: 560px;
+      display: none;
+    }
+
+    .quiz-area.active { display: block; }
+
+    .quiz-prompt {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px 24px;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .quiz-prompt .q-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+
+    .quiz-prompt .q-word {
+      font-size: 4rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #fff, var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .quiz-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .quiz-opt {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      line-height: 1.4;
+      transition: all 0.18s;
+      color: var(--text);
+      text-align: left;
+    }
+
+    .quiz-opt:hover { border-color: var(--accent); }
+    .quiz-opt.correct { border-color: var(--green); background: rgba(52,211,153,0.12); color: var(--green); }
+    .quiz-opt.wrong   { border-color: #f87171; background: rgba(248,113,113,0.1); color: #f87171; }
+
+    .quiz-score {
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+
+    /* Mode toggle */
+    .mode-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .mode-btn {
+      flex: 1;
+      max-width: 140px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 8px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-align: center;
+      transition: all 0.18s;
+    }
+
+    .mode-btn.active { background: var(--surface2); border-color: var(--accent); color: var(--accent2); }
+
+    /* Keyboard hint */
+    .key-hints {
+      color: var(--muted);
+      font-size: 0.74rem;
+      text-align: center;
+      margin-top: 6px;
+    }
+
+    .key-hints kbd {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1px 5px;
+      font-family: inherit;
+      font-size: 0.72rem;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>ASL Flashcards</h1>
+  <p>Alphabet · Numbers · Week by Week</p>
+</header>
+
+<!-- Mode toggle -->
+<div class="mode-row">
+  <div class="mode-btn active" id="modeStudy" onclick="setMode('study')">📖 Study</div>
+  <div class="mode-btn" id="modeQuiz" onclick="setMode('quiz')">🎯 Quiz</div>
+</div>
+
+<!-- Group tabs -->
+<div class="tabs" id="tabs"></div>
+
+<!-- Progress bar -->
+<div class="progress-wrap">
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="counter" id="counter">1 / 1</div>
+</div>
+
+<!-- Study mode card -->
+<div class="scene" id="scene" onclick="flipCard()">
+  <div class="card" id="card">
+    <!-- Front -->
+    <div class="card-face card-front">
+      <span class="group-label" id="frontGroup"></span>
+      <div class="main-word" id="frontWord"></div>
+      <div class="sub-label" id="frontSub"></div>
+      <span class="hint">tap to flip</span>
+    </div>
+    <!-- Back -->
+    <div class="card-face card-back">
+      <div class="back-top">
+        <div class="section-label">Handshape</div>
+        <div class="handshape-text" id="backHandshape"></div>
+      </div>
+      <div class="back-bottom">
+        <div class="back-cell location">
+          <div class="cell-label">Location</div>
+          <div class="cell-text" id="backLocation"></div>
+        </div>
+        <div class="back-cell movement">
+          <div class="cell-label">Movement</div>
+          <div class="cell-text" id="backMovement"></div>
+        </div>
+        <div class="back-cell facial">
+          <div class="cell-label">Facial Expr.</div>
+          <div class="cell-text" id="backFacial"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Study controls -->
+<div class="controls" id="studyControls">
+  <button class="btn" id="prevBtn" onclick="navigate(-1)">← Prev</button>
+  <button class="btn primary" onclick="shuffleCards()">⇄ Shuffle</button>
+  <button class="btn" id="nextBtn" onclick="navigate(1)">Next →</button>
+</div>
+
+<div class="key-hints" id="studyHints">
+  <kbd>←</kbd> <kbd>→</kbd> navigate &nbsp;·&nbsp; <kbd>Space</kbd> flip
+</div>
+
+<!-- Quiz mode -->
+<div class="quiz-area" id="quizArea">
+  <div class="quiz-prompt">
+    <div class="q-label">What is the handshape for…</div>
+    <div class="q-word" id="quizWord"></div>
+  </div>
+  <div class="quiz-options" id="quizOptions"></div>
+  <div class="quiz-score" id="quizScore"></div>
+  <div style="display:flex;gap:10px;justify-content:center">
+    <button class="btn primary" onclick="nextQuiz()">Next Question →</button>
+    <button class="btn" onclick="resetQuizScore()">Reset Score</button>
+  </div>
+</div>
+
+<script>
+// ─── DATA ─────────────────────────────────────────────────────────────────────
+const signs = [
+  // Alphabet
+  { id:'A', front:'A', group:'Alphabet',
+    handshape:'Closed fist — thumb rests alongside the fingers (not tucked over)',
+    location:'Dominant hand at shoulder height, knuckles facing forward',
+    movement:'Stationary',
+    facial:'Neutral' },
+  { id:'B', front:'B', group:'Alphabet',
+    handshape:'Four fingers extended straight up and held together; thumb tucked across palm. Palm faces outward.',
+    location:'Dominant hand, mid-level, palm out',
+    movement:'Stationary',
+    facial:'Neutral' },
+  { id:'C', front:'C', group:'Alphabet',
+    handshape:'Hand curved in a "C" shape — fingers and thumb form a wide open arc',
+    location:'Dominant hand, mid-level',
+    movement:'Stationary',
+    facial:'Neutral' },
+  { id:'D', front:'D', group:'Alphabet',
+    handshape:'Index finger points straight up; middle, ring, and pinky curve to touch the tip of the thumb',
+    location:'Dominant hand, palm faces forward',
+    movement:'Stationary',
+    facial:'Neutral' },
+  { id:'E', front:'E', group:'Alphabet',
+    handshape:'All four fingers bent/curled toward the palm; thumb tucked snugly under the bent fingertips',
+    location:'Dominant hand, palm faces forward',
+    movement:'Stationary',
+    facial:'Neutral' },
+  { id:'F', front:'F', group:'Alphabet',
+    handshape:'Index finger and thumb touch at tips forming a circle; middle, ring, and pinky fingers extend upward',
+    location:'Dominant hand, palm faces forward',
+    movement:'Stationary',
+    facial:'Neutral' },
+  { id:'G', front:'G', group:'Alphabet',
+    handshape:'Index finger and thumb point horizontally to the side; other fingers curl in. Like pointing sideways.',
+    location:'Dominant hand, thumb side up',
+    movement:'Stationary',
+    facial:'Neutral' },
+  { id:'H', front:'H', group:'Alphabet',
+    handshape:'Index and middle fingers extended together, pointing sideways; other fingers curled. Palm faces down.',
+    location:'Dominant hand, palm facing down',
+    movement:'Stationary',
+    facial:'Neutral' },
+  { id:'I', front:'I', group:'Alphabet',
+    handshape:'Only the pinky finger extends straight up; all other fingers curl into a fist',
+    location:'Dominant hand, mid-level',
+    movement:'Stationary',
+    facial:'Neutral' },
+  { id:'J', front:'J', group:'Alphabet',
+    handshape:'Only the pinky finger extended',
+    location:'Dominant hand, starts high',
+    movement:'Trace a "J" shape — draw down then curl left at the base',
+    facial:'Neutral' },
+  { id:'K', front:'K', group:'Alphabet',
+    handshape:'Index finger points up, middle finger angles out diagonally, thumb rests between them. Palm out.',
+    location:'Dominant hand, palm facing forward',
+    movement:'Stationary',
+    facial:'Neutral' },
+  { id:'L', front:'L', group:'Alphabet',
+    handshape:'Index finger points straight up, thumb extends horizontally — forming a clear "L" shape',
+    location:'Dominant hand, palm faces out',
+    movement:'Stationary',
+    facial:'Neutral' },
+  { id:'M', front:'M', group:'Alphabet',
+    handshape:'Three fingers (index, middle, ring) fold down over the tucked thumb; pinky curls in',
+    location:'Dominant hand, palm faces down',
+    movement:'Stationary',
+    facial:'Neutral' },
+  { id:'N', front:'N', group:'Alphabet',
+    handshape:'Two fingers (index and middle) fold down over the tucked thumb; ring and pinky curl in',
+    location:'Dominant hand, palm faces down',
+    movement:'Stationary',
+    facial:'Neutral' },
+  { id:'O', front:'O', group:'Alphabet',
+    handshape:'All fingers and thumb curve inward and touch at the tips, forming a rounded O',
+    location:'Dominant hand, mid-level',
+    movement:'Stationary',
+    facial:'Neutral' },
+  { id:'P', front:'P', group:'Alphabet',
+    handshape:'Like K rotated downward — index finger points down, middle angles out, thumb between them',
+    location:'Dominant hand, pointing downward',
+    movement:'Stationary',
+    facial:'Neutral' },
+  { id:'Q', front:'Q', group:'Alphabet',
+    handshape:'Like G rotated downward — index finger and thumb both point down',
+    location:'Dominant hand, pointing downward',
+    movement:'Stationary',
+    facial:'Neutral' },
+  { id:'R', front:'R', group:'Alphabet',
+    handshape:'Index and middle fingers extended and crossed over each other; other fingers curled in',
+    location:'Dominant hand, palm faces out',
+    movement:'Stationary',
+    facial:'Neutral' },
+  { id:'S', front:'S', group:'Alphabet',
+    handshape:'Closed fist with thumb resting across (over) the bent fingers',
+    location:'Dominant hand, knuckles facing forward',
+    movement:'Stationary',
+    facial:'Neutral' },
+  { id:'T', front:'T', group:'Alphabet',
+    handshape:'Thumb tucked between the index and middle fingers; other fingers curled into a fist',
+    location:'Dominant hand',
+    movement:'Stationary',
+    facial:'Neutral' },
+  { id:'U', front:'U', group:'Alphabet',
+    handshape:'Index and middle fingers extended together pointing straight up; other fingers curled. Palm faces out.',
+    location:'Dominant hand, palm faces out',
+    movement:'Stationary',
+    facial:'Neutral' },
+  { id:'V', front:'V', group:'Alphabet',
+    handshape:'Index and middle fingers spread apart in a "V" or peace-sign shape; other fingers curled',
+    location:'Dominant hand, palm faces out',
+    movement:'Stationary',
+    facial:'Neutral' },
+  { id:'W', front:'W', group:'Alphabet',
+    handshape:'Index, middle, and ring fingers spread wide and extended; pinky curled in, thumb tucked',
+    location:'Dominant hand, palm faces out',
+    movement:'Stationary',
+    facial:'Neutral' },
+  { id:'X', front:'X', group:'Alphabet',
+    handshape:'Index finger bent into a hook shape; all other fingers curled in. Like beckoning.',
+    location:'Dominant hand',
+    movement:'Stationary',
+    facial:'Neutral' },
+  { id:'Y', front:'Y', group:'Alphabet',
+    handshape:'Thumb and pinky extended out; middle three fingers curled in — "shaka" or hang-loose shape',
+    location:'Dominant hand',
+    movement:'Stationary',
+    facial:'Neutral' },
+  { id:'Z', front:'Z', group:'Alphabet',
+    handshape:'Index finger extended',
+    location:'Dominant hand, starts upper left',
+    movement:'Trace a "Z" in the air: move right, then diagonally down-left, then right again',
+    facial:'Neutral' },
+
+  // Numbers 2–5 (palm in)
+  { id:'2', front:'2', group:'Numbers 2–5',
+    handshape:'Index and middle fingers extended and spread apart; thumb extended; ring and pinky curled in',
+    location:'Dominant hand, mid-level',
+    movement:'Stationary — palm faces inward toward signer',
+    facial:'Neutral' },
+  { id:'3', front:'3', group:'Numbers 2–5',
+    handshape:'Thumb, index, and middle fingers extended; ring and pinky curled in',
+    location:'Dominant hand, mid-level',
+    movement:'Stationary — palm faces inward toward signer',
+    facial:'Neutral' },
+  { id:'4', front:'4', group:'Numbers 2–5',
+    handshape:'All four fingers extended and spread; thumb tucked across palm',
+    location:'Dominant hand, mid-level',
+    movement:'Stationary — palm faces inward toward signer',
+    facial:'Neutral' },
+  { id:'5', front:'5', group:'Numbers 2–5',
+    handshape:'All five fingers extended and spread wide open',
+    location:'Dominant hand, mid-level',
+    movement:'Stationary — palm faces inward toward signer',
+    facial:'Neutral' },
+
+  // Numbers 6–9 (palm out, tap)
+  { id:'6', front:'6', group:'Numbers 6–9',
+    handshape:'Pinky and thumb touch at tips; index, middle, and ring fingers extended and separated',
+    location:'Dominant hand, palm faces outward away from signer',
+    movement:'Tap pinky and thumb together twice. Fingers and thumb do NOT overlap.',
+    facial:'Neutral' },
+  { id:'7', front:'7', group:'Numbers 6–9',
+    handshape:'Ring finger and thumb touch at tips; index, middle, and pinky fingers extended',
+    location:'Dominant hand, palm faces outward away from signer',
+    movement:'Tap ring finger and thumb together twice. Fingers and thumb do NOT overlap.',
+    facial:'Neutral' },
+  { id:'8', front:'8', group:'Numbers 6–9',
+    handshape:'Middle finger and thumb touch at tips; index, ring, and pinky fingers extended',
+    location:'Dominant hand, palm faces outward away from signer',
+    movement:'Tap middle finger and thumb together twice. Fingers and thumb do NOT overlap.',
+    facial:'Neutral' },
+  { id:'9', front:'9', group:'Numbers 6–9',
+    handshape:'Index finger and thumb touch at tips (like "OK" sign); middle, ring, and pinky extended',
+    location:'Dominant hand, palm faces outward away from signer',
+    movement:'Tap index finger and thumb together twice. Fingers and thumb do NOT overlap.',
+    facial:'Neutral' },
+
+  // Number 10
+  { id:'10', front:'10', group:'Number 10',
+    handshape:'Thumb extended straight up from a loosely closed fist — like a "thumbs up"',
+    location:'Dominant hand, mid-level',
+    movement:'Gently rock the hand side to side with a slight wrist twist',
+    facial:'Neutral' },
+];
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+const groups = ['All', ...[ ...new Set(signs.map(s => s.group)) ]];
+let activeGroup = 'All';
+let filtered = [...signs];
+let idx = 0;
+let isFlipped = false;
+let mode = 'study'; // 'study' | 'quiz'
+let quizCorrect = 0, quizTotal = 0;
+let quizAnswered = false;
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+function init() {
+  buildTabs();
+  setGroup('All');
+}
+
+function buildTabs() {
+  const el = document.getElementById('tabs');
+  el.innerHTML = '';
+  groups.forEach(g => {
+    const d = document.createElement('div');
+    d.className = 'tab' + (g === activeGroup ? ' active' : '');
+    d.textContent = g === 'All' ? `All (${signs.length})` : `${g} (${signs.filter(s=>s.group===g).length})`;
+    d.onclick = () => setGroup(g);
+    el.appendChild(d);
+  });
+}
+
+function setGroup(g) {
+  activeGroup = g;
+  filtered = g === 'All' ? [...signs] : signs.filter(s => s.group === g);
+  idx = 0;
+  isFlipped = false;
+  document.getElementById('card').classList.remove('flipped');
+  buildTabs();
+  render();
+  if (mode === 'quiz') startQuiz();
+}
+
+// ─── STUDY MODE ───────────────────────────────────────────────────────────────
+function render() {
+  const s = filtered[idx];
+  document.getElementById('frontGroup').textContent = s.group;
+  document.getElementById('frontWord').textContent = s.front;
+
+  // Sub-label
+  let sub = '';
+  if (s.group === 'Alphabet') sub = 'Letter';
+  else if (s.group.startsWith('Number')) sub = 'Number';
+  document.getElementById('frontSub').textContent = sub;
+
+  document.getElementById('backHandshape').textContent = s.handshape;
+  document.getElementById('backLocation').textContent = s.location;
+  document.getElementById('backMovement').textContent = s.movement;
+  document.getElementById('backFacial').textContent = s.facial;
+
+  const pct = filtered.length > 1 ? (idx / (filtered.length - 1)) * 100 : 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('counter').textContent = `${idx + 1} / ${filtered.length}`;
+
+  document.getElementById('prevBtn').disabled = idx === 0;
+  document.getElementById('nextBtn').disabled = idx === filtered.length - 1;
+}
+
+function flipCard() {
+  isFlipped = !isFlipped;
+  document.getElementById('card').classList.toggle('flipped', isFlipped);
+}
+
+function navigate(dir) {
+  idx = Math.max(0, Math.min(filtered.length - 1, idx + dir));
+  isFlipped = false;
+  document.getElementById('card').classList.remove('flipped');
+  render();
+}
+
+function shuffleCards() {
+  for (let i = filtered.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [filtered[i], filtered[j]] = [filtered[j], filtered[i]];
+  }
+  idx = 0;
+  isFlipped = false;
+  document.getElementById('card').classList.remove('flipped');
+  render();
+}
+
+// ─── QUIZ MODE ────────────────────────────────────────────────────────────────
+let quizCurrent = null;
+let quizChoices = [];
+
+function startQuiz() {
+  quizAnswered = false;
+  quizCurrent = filtered[Math.floor(Math.random() * filtered.length)];
+  document.getElementById('quizWord').textContent = quizCurrent.front;
+
+  // Build 4 choices: correct + 3 random wrong
+  const pool = signs.filter(s => s.id !== quizCurrent.id);
+  const wrong = [];
+  while (wrong.length < 3 && pool.length > 0) {
+    const r = Math.floor(Math.random() * pool.length);
+    wrong.push(pool.splice(r, 1)[0]);
+  }
+  quizChoices = [quizCurrent, ...wrong].sort(() => Math.random() - 0.5);
+
+  const el = document.getElementById('quizOptions');
+  el.innerHTML = '';
+  quizChoices.forEach(s => {
+    const d = document.createElement('div');
+    d.className = 'quiz-opt';
+    d.textContent = s.handshape;
+    d.onclick = () => answerQuiz(s, d);
+    el.appendChild(d);
+  });
+
+  updateQuizScore();
+}
+
+function answerQuiz(chosen, el) {
+  if (quizAnswered) return;
+  quizAnswered = true;
+  quizTotal++;
+
+  const opts = document.querySelectorAll('.quiz-opt');
+  if (chosen.id === quizCurrent.id) {
+    el.classList.add('correct');
+    quizCorrect++;
+  } else {
+    el.classList.add('wrong');
+    // Highlight correct
+    opts.forEach(o => {
+      if (o.textContent === quizCurrent.handshape) o.classList.add('correct');
+    });
+  }
+  updateQuizScore();
+}
+
+function nextQuiz() {
+  startQuiz();
+}
+
+function resetQuizScore() {
+  quizCorrect = 0; quizTotal = 0;
+  updateQuizScore();
+  startQuiz();
+}
+
+function updateQuizScore() {
+  const pct = quizTotal > 0 ? Math.round((quizCorrect / quizTotal) * 100) : '—';
+  document.getElementById('quizScore').textContent =
+    `Score: ${quizCorrect} / ${quizTotal}  (${pct}%)`;
+}
+
+// ─── MODE SWITCH ──────────────────────────────────────────────────────────────
+function setMode(m) {
+  mode = m;
+  document.getElementById('modeStudy').classList.toggle('active', m === 'study');
+  document.getElementById('modeQuiz').classList.toggle('active', m === 'quiz');
+
+  document.getElementById('scene').style.display = m === 'study' ? 'block' : 'none';
+  document.getElementById('studyControls').style.display = m === 'study' ? 'flex' : 'none';
+  document.getElementById('studyHints').style.display = m === 'study' ? 'block' : 'none';
+  document.getElementById('quizArea').classList.toggle('active', m === 'quiz');
+  document.getElementById('progressFill').closest('.progress-wrap').style.display = m === 'study' ? 'flex' : 'none';
+
+  if (m === 'quiz') startQuiz();
+}
+
+// ─── KEYBOARD ─────────────────────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (mode !== 'study') return;
+  if (e.key === 'ArrowRight') navigate(1);
+  else if (e.key === 'ArrowLeft') navigate(-1);
+  else if (e.key === ' ') { e.preventDefault(); flipCard(); }
+});
+
+init();
+</script>
+</body>
+</html>
