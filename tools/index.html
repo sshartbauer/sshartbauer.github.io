@@ -24,6 +24,7 @@
       --rule:         rgba(0,175,185,0.15);
       --card:         rgba(255,255,255,0.04);
       --card-hover:   rgba(255,255,255,0.065);
+      --amber:        #D9A441;
     }
 
     body.hc {
@@ -40,6 +41,7 @@
       --rule:         rgba(255,255,255,0.25);
       --card:         rgba(255,255,255,0.06);
       --card-hover:   rgba(255,255,255,0.12);
+      --amber:        #FDFCDC;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -162,6 +164,7 @@
     .tool-tile.peach::before   { background: var(--peach); }
     .tool-tile.lobster::before { background: var(--lobster); }
     .tool-tile.slate::before   { background: #6a93a3; }
+    .tool-tile.amber::before   { background: var(--amber); }
 
     .tool-tile:hover {
       background: var(--card-hover);
@@ -193,6 +196,7 @@
     .tool-tile.peach   .tool-meta { color: var(--peach); }
     .tool-tile.lobster .tool-meta { color: var(--lobster); }
     .tool-tile.slate   .tool-meta { color: #6a93a3; }
+    .tool-tile.amber   .tool-meta { color: var(--amber); }
 
     .tool-title {
       font-family: 'Cormorant Garamond', serif;
@@ -227,6 +231,7 @@
     .tool-tile.peach   .tool-link { color: var(--peach); }
     .tool-tile.lobster .tool-link { color: var(--lobster); }
     .tool-tile.slate   .tool-link { color: #6a93a3; }
+    .tool-tile.amber   .tool-link { color: var(--amber); }
     .tool-tile:hover .tool-link { gap: 10px; }
 
     /* ── Human contributions section ── */
@@ -403,6 +408,20 @@
           <span class="tool-tag">Academic Research</span>
           <span class="tool-tag">First-Gen Students</span>
           <span class="tool-tag">Literature Review</span>
+        </div>
+        <span class="tool-link">Open tool &rarr;</span>
+      </a>
+
+      <a class="tool-tile amber" href="https://sshartbauer.github.io/war-updates/" target="_blank" rel="noopener">
+        <span class="tool-status live">Live</span>
+        <span class="tool-icon">🗞️</span>
+        <div class="tool-meta">Current Events · OSINT</div>
+        <div class="tool-title">Ukraine&ndash;Russia War Updates</div>
+        <div class="tool-desc">A curated dashboard of the sources I trust most for tracking the war, organized by how often they actually update: real-time incident maps, daily assessments, and periodic deep-dive coverage.</div>
+        <div class="tool-tags">
+          <span class="tool-tag">OSINT</span>
+          <span class="tool-tag">Daily Digest</span>
+          <span class="tool-tag">Curated Sources</span>
         </div>
         <span class="tool-link">Open tool &rarr;</span>
       </a>
