@@ -1089,10 +1089,24 @@ function escapeHtml(s){
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
+function cueTargetIndex(cur){
+  // If the cue names a specific word ("brow raise on LEAD, proud"), the
+  // bubble should only appear on that tile. Otherwise it only appears
+  // once, on the first tile of the line, since the expression carries
+  // through the whole phrase.
+  const m = cur.cue.match(/\bon\s+([A-Z][A-Z0-9\-]*)\b/);
+  if (m) {
+    const idx = cur.toks.indexOf(m[1]);
+    if (idx !== -1) return idx;
+  }
+  return 0;
+}
+
 function buildTiles(cur){
   tileGrid.innerHTML = '';
   tileGrid.style.setProperty('--tile-size', tileSize + 'rem');
-  cur.toks.forEach(tok => {
+  const cueIdx = cueTargetIndex(cur);
+  cur.toks.forEach((tok, i) => {
     const info = SIGNS[tok];
     const tile = document.createElement('div');
     tile.className = 'tile';
@@ -1105,7 +1119,7 @@ function buildTiles(cur){
       <div class="tile-inner">
         <div class="tile-face tile-front">
           <div class="tile-word">${escapeHtml(tok)}</div>
-          <div class="tile-cue">${escapeHtml(cur.cue)}</div>
+          ${i === cueIdx ? `<div class="tile-cue">${escapeHtml(cur.cue)}</div>` : ''}
         </div>
         <div class="tile-face tile-back">${back}</div>
       </div>`;
