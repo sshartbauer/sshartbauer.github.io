@@ -931,7 +931,7 @@ const SIGNS = {
     "url": "https://www.handspeak.com/word/4223/"
   },
   "RULES": {
-    "desc": "Both hands form 'X' handshapes, palms facing each other, held apart in neutral space, and alternately move forward and backward twice.",
+    "desc": "Dominant hand forms an 'R' handshape (index and middle fingers crossed) and taps twice on two spots of the flat, palm-up non-dominant hand — the 'guiding principle for conduct' sense of rule (as in workplace rules), not the 'govern/reign over' version (which uses two 'X' handshapes moving forward and back).",
     "url": "https://www.handspeak.com/word/1856/"
   },
   "SCHOOL": {
@@ -1219,13 +1219,23 @@ document.addEventListener('keydown', (e) => {
 });
 
 let touchStartX = null;
-document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
-document.addEventListener('touchend', (e) => {
-  if (touchStartX === null) return;
-  const dx = e.changedTouches[0].clientX - touchStartX;
-  if (Math.abs(dx) > 60) { dx < 0 ? next() : prev(); }
-  touchStartX = null;
+let touchStartY = null;
+document.addEventListener('touchstart', (e) => {
+  if (e.target.closest('.sidebar')) { touchStartX = null; touchStartY = null; return; }
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
 });
+document.addEventListener('touchend', (e) => {
+  if (touchStartX === null || touchStartY === null) return;
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  const dy = e.changedTouches[0].clientY - touchStartY;
+  touchStartX = null;
+  touchStartY = null;
+  // Only treat as a swipe if the gesture is predominantly horizontal;
+  // otherwise a vertical page scroll gets misread as a swipe and flips the line.
+  if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) { dx < 0 ? next() : prev(); }
+});
+document.addEventListener('touchcancel', () => { touchStartX = null; touchStartY = null; });
 
 buildSidebar();
 render();
