@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ASL Midterm — Practice Teleprompter</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --slate:#395C6B; --lobster:#C96460; --peach:#F08667; --teal:#00AFB9; --cream:#FDFCDC;
+  --bg:#080e14; --surf:#0d1b26; --surf2:#132233; --border:#2a4858;
+  --text:#e8e4dc; --muted:#8fa3ba; --dim:#546e87;
+  --good:#2ecc71; --warn:#F08667;
+  --tile-size: 2.7rem;
+}
+html,body{height:100%;height:100dvh}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:'Jost',-apple-system,BlinkMacSystemFont,sans-serif;font-weight:300;
+  display:flex;flex-direction:column;overflow:hidden;
+}
+
+/* -- Topbar -- */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 22px;border-bottom:1px solid var(--border);
+  background:linear-gradient(90deg,#060c12,#0a1520);flex-shrink:0;flex-wrap:wrap;gap:10px;
+}
+.topbar-left{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.topbar h1{
+  font-family:'Cormorant Garamond',serif;font-size:1.35rem;font-weight:600;letter-spacing:.2px;color:var(--teal);
+}
+.topbar-sub{font-size:.68rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--dim)}
+.topbar-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.nav-back-btn{
+  padding:6px 12px;border-radius:6px;border:1px solid var(--border);background:var(--surf2);
+  color:var(--muted);font-size:.72rem;font-weight:500;text-decoration:none;transition:all .15s;
+  white-space:nowrap;display:inline-flex;align-items:center;gap:5px;
+}
+.nav-back-btn:hover{border-color:var(--teal);color:var(--teal)}
+
+/* -- Main layout -- */
+.main{display:flex;flex:1;overflow:hidden}
+
+/* -- Sidebar -- */
+.sidebar{
+  width:230px;flex-shrink:0;
+  background:linear-gradient(180deg,#0a1720 0%,#08131e 100%);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;overflow-y:auto;padding:16px 12px;
+  transition:width .22s ease, padding .22s ease, border-color .22s ease;
+}
+.sidebar.collapsed{
+  width:0;padding:0;border-right-color:transparent;overflow:hidden;
+}
+.sidebar-hdr{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--dim);margin-bottom:10px;padding-left:2px}
+.part-btn{
+  display:flex;flex-direction:column;gap:2px;text-align:left;width:100%;
+  padding:9px 12px;margin-bottom:6px;border-radius:8px;cursor:pointer;
+  background:var(--surf2);border:1.5px solid transparent;border-left:3px solid var(--c);
+  color:var(--muted);transition:all .15s;
+}
+.part-btn:hover{color:var(--text)}
+.part-btn.active{background:color-mix(in srgb,var(--c) 14%,var(--surf2));border-color:var(--c);color:var(--text)}
+.part-btn .pnum{font-size:.62rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--c)}
+.part-btn .ptitle{font-size:.82rem;font-weight:500}
+.part-btn .pcount{font-size:.62rem;color:var(--dim)}
+
+.tip-box{
+  margin-top:auto;padding:12px 13px;border-radius:8px;background:var(--surf2);
+  border:1px solid var(--border);border-left:3px solid var(--lobster);font-size:.7rem;
+  line-height:1.55;color:var(--muted);
+}
+.tip-box b{color:var(--peach)}
+
+/* -- Content -- */
+.content{flex:1;display:flex;flex-direction:column;align-items:center;padding:22px 24px;overflow-y:auto;gap:16px}
+
+.stats-row{width:100%;max-width:1100px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-size:.78rem;color:var(--muted)}
+.stat-chip{display:flex;align-items:center;gap:6px;padding:5px 11px;border-radius:7px;background:var(--surf2);border:1px solid var(--border)}
+.stat-chip b{color:var(--text);font-weight:600}
+.stat-chip.timer.good{border-color:var(--good);color:var(--good)}
+.stat-chip.timer.good b{color:var(--good)}
+.stat-chip.timer.warn{border-color:var(--warn);color:var(--warn)}
+.stat-chip.timer.warn b{color:var(--warn)}
+.prog-wrap{flex:1;min-width:120px;display:flex;align-items:center;gap:8px}
+.prog-bar{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--teal),var(--peach));border-radius:3px;transition:width .25s}
+
+/* -- Line header -- */
+.line-head{width:100%;max-width:1100px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.card-label{font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--teal)}
+.hint-text{width:100%;max-width:1100px;font-size:.7rem;color:var(--dim);text-align:center}
+
+/* -- Tile grid -- */
+.tile-grid{
+  width:100%;max-width:1100px;display:flex;flex-wrap:wrap;justify-content:center;
+  align-items:flex-start;gap:24px 20px;perspective:1200px;
+}
+.tile{
+  width:clamp(192px, 30vw, 336px);height:236px;cursor:pointer;flex-shrink:0;
+}
+.tile-inner{
+  position:relative;width:100%;height:100%;transition:transform .5s cubic-bezier(.4,0,.2,1);
+  transform-style:preserve-3d;
+}
+.tile.flipped .tile-inner{transform:rotateY(180deg)}
+.tile-face{
+  position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;
+  border-radius:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:20px;text-align:center;
+}
+.tile-front{
+  background:var(--cream);color:#16222e;border:2px solid #e8e6c0;
+  box-shadow:0 12px 36px rgba(0,0,0,.35);gap:16px;overflow:hidden;
+}
+.tile-word{font-weight:600;font-size:var(--tile-size);line-height:1.15;letter-spacing:.2px;word-break:break-word}
+.tile-flip-hint{position:absolute;bottom:12px;right:16px;font-size:1.2rem;color:var(--slate);opacity:.7}
+.tile-back{
+  background:linear-gradient(160deg,#0b1c2c 0%,#0d2035 100%);color:var(--text);
+  transform:rotateY(180deg);border:2px solid var(--border);
+  box-shadow:0 12px 36px rgba(0,0,0,.4);overflow-y:auto;align-items:stretch;justify-content:flex-start;gap:6px;
+  padding:16px;
+}
+.tile-back::-webkit-scrollbar{width:6px}
+.tile-back::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+.tile-back-word{font-size:.82rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--teal);flex-shrink:0}
+.tile-back-desc{font-size:.78rem;line-height:1.4;color:var(--text)}
+.tile-back-link{font-size:.7rem;color:var(--peach);text-decoration:none;margin-top:auto;padding-top:6px;flex-shrink:0}
+.tile-back-link:hover{text-decoration:underline}
+.tile-back-none{font-size:.75rem;color:var(--dim);font-style:italic}
+
+/* -- Per-tile facial cue bubble (sits on the card face, under the word) -- */
+.tile-cue{
+  max-width:90%;box-sizing:border-box;text-align:center;
+  font-family:'Jost',sans-serif;font-weight:600;font-size:.8rem;line-height:1.3;
+  color:#3a5a4a;background:rgba(0,175,185,.14);border:1px solid rgba(0,175,185,.4);
+  padding:4px 12px;border-radius:14px;
+}
+
+/* -- Controls -- */
+.controls{width:100%;max-width:1100px;display:flex;flex-direction:column;gap:12px}
+.control-row{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}
+.ctl-btn{
+  padding:10px 18px;border-radius:8px;border:1px solid var(--border);background:var(--surf2);
+  color:var(--text);font-size:.85rem;font-weight:500;cursor:pointer;transition:all .15s;
+  font-family:'Jost',sans-serif;
+}
+.ctl-btn:hover{border-color:var(--teal);color:var(--teal)}
+.ctl-btn.primary{background:var(--teal);color:#080e14;border-color:var(--teal);font-weight:600}
+.ctl-btn.primary:hover{color:#080e14;opacity:.9}
+.ctl-btn:disabled{opacity:.35;cursor:not-allowed}
+.control-row.fine{gap:16px;font-size:.75rem;color:var(--muted)}
+.fine-group{display:flex;align-items:center;gap:6px}
+.fine-group input[type=range]{accent-color:var(--teal)}
+.fs-btn{
+  width:34px;height:34px;border-radius:6px;border:1px solid var(--border);background:var(--surf2);
+  color:var(--muted);cursor:pointer;font-size:1rem;line-height:1;
+}
+.fs-btn:hover{border-color:var(--teal);color:var(--teal)}
+
+footer{
+  padding:14px 22px;border-top:1px solid var(--border);text-align:center;
+  font-size:.68rem;color:var(--dim);flex-shrink:0;
+}
+footer a{color:var(--dim);text-decoration:none}
+footer a:hover{color:var(--teal)}
+
+/* -- Mobile -- */
+@media (max-width:760px){
+  .main{flex-direction:column}
+  .sidebar{
+    width:100%;flex-direction:row;overflow-x:auto;overflow-y:hidden;
+    padding:10px 12px;gap:8px;border-right:none;border-bottom:1px solid var(--border);
+  }
+  .sidebar-hdr{display:none}
+  .part-btn{min-width:110px;margin-bottom:0;flex-shrink:0}
+  .tip-box{display:none}
+  .tile{width:clamp(168px,52vw,240px);height:200px}
+  .content{padding:16px 14px}
+  .sidebar.collapsed{width:100%;height:0;padding:0;border-bottom-color:transparent;overflow:hidden}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <h1>ASL Midterm</h1>
+    <span class="topbar-sub">Practice Teleprompter</span>
+  </div>
+  <div class="topbar-right">
+    <button class="nav-back-btn" id="sidebarToggle">&#9776; Parts</button>
+    <a class="nav-back-btn" href="https://sshartbauer.github.io/tools/">&larr; Tools</a>
+    <a class="nav-back-btn" href="https://sshartbauer.github.io/">Home</a>
+  </div>
+</div>
+
+<div class="main">
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-hdr">Parts</div>
+    <div id="partList"></div>
+    <div class="tip-box">
+      <b>Grading lever:</b> Communication (10 pts) rewards facial cues, not just handshapes. Drill the wh-q on "WHY DOCTOR," the softer face on the deaf family line, and the resolve on "GIVE-UP? NO!"
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="stats-row">
+      <div class="stat-chip">Line <b id="lineCount">1 / 30</b></div>
+      <div class="prog-wrap">
+        <div class="prog-bar"><div class="prog-fill" id="progFill"></div></div>
+      </div>
+      <div class="stat-chip timer" id="timerChip">Time <b id="timerText">0:00</b></div>
+    </div>
+
+    <div class="line-head">
+      <div class="card-label" id="partLabel">Part 1 &middot; The Job</div>
+    </div>
+
+    <div class="hint-text">Click a tile to flip it and see how that sign is formed (from HandSpeak.com)</div>
+
+    <div class="tile-grid" id="tileGrid"></div>
+
+    <div class="controls">
+      <div class="control-row">
+        <button class="ctl-btn" id="prevBtn">&larr; Prev</button>
+        <button class="ctl-btn primary" id="playBtn">&#9654; Auto</button>
+        <button class="ctl-btn" id="nextBtn">Next &rarr;</button>
+        <button class="ctl-btn" id="resetBtn">Reset</button>
+      </div>
+      <div class="control-row fine">
+        <div class="fine-group">
+          <span>Pace</span>
+          <input type="range" id="paceSlider" min="3" max="12" step="0.5" value="6">
+          <span id="paceLabel">6s/line</span>
+        </div>
+        <div class="fine-group">
+          <span>Tile text</span>
+          <button class="fs-btn" id="fsDown">&minus;</button>
+          <button class="fs-btn" id="fsUp">&plus;</button>
+        </div>
+        <div class="fine-group" style="color:var(--dim)">Space/&rarr; next line &middot; &larr; back &middot; P play</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Built for ASL 101 midterm &mdash; College/Job story, ~148&ndash;155 signs, target 2&ndash;5 min. Sign descriptions adapted from HandSpeak.com. &middot;
+  <a href="https://sshartbauer.github.io/">S. S. Hartbauer</a>
+</footer>
+
+<script>
+const PARTS = [
+  {
+    "title": "The Job",
+    "lines": [
+      {
+        "toks": [
+          "PAST",
+          "11-YEAR",
+          "ME",
+          "WORK",
+          "SECURITY"
+        ],
+        "cue": "neutral, establish topic"
+      },
+      {
+        "toks": [
+          "COMPANY",
+          "BIG",
+          "PLACE",
+          "SPECIAL",
+          "RULES",
+          "STRICT"
+        ],
+        "cue": "serious"
+      },
+      {
+        "toks": [
+          "ME",
+          "LEAD",
+          "TEAM",
+          "PEOPLE",
+          "30",
+          "ME",
+          "OVERSEE"
+        ],
+        "cue": "brow raise on LEAD, proud"
+      },
+      {
+        "toks": [
+          "JOB",
+          "ME",
+          "RESPONSIBLE",
+          "MANY",
+          "THING"
+        ],
+        "cue": "nod"
+      },
+      {
+        "toks": [
+          "GOOD",
+          "JOB",
+          "BUT",
+          "ME",
+          "HEART",
+          "WANT",
+          "DIFFERENT"
+        ],
+        "cue": "shift face, softer, wistful"
+      }
+    ]
+  },
+  {
+    "title": "The Turn",
+    "lines": [
+      {
+        "toks": [
+          "WHY",
+          "ME",
+          "CHANGE"
+        ],
+        "cue": "wh-q"
+      },
+      {
+        "toks": [
+          "ME",
+          "WANT",
+          "BECOME",
+          "DOCTOR"
+        ],
+        "cue": "determined, brow raise"
+      },
+      {
+        "toks": [
+          "SO",
+          "ME",
+          "DECIDE",
+          "SCHOOL",
+          "START",
+          "AGAIN"
+        ],
+        "cue": "head nod, resolve"
+      }
+    ]
+  },
+  {
+    "title": "Why ASL / Why Doctor",
+    "lines": [
+      {
+        "toks": [
+          "WHY",
+          "DOCTOR",
+          "WHY",
+          "ME"
+        ],
+        "cue": "rhet-q, pause"
+      },
+      {
+        "toks": [
+          "ME",
+          "FAMILY",
+          "ONE",
+          "PERSON",
+          "DEAF"
+        ],
+        "cue": "gentle"
+      },
+      {
+        "toks": [
+          "BEFORE",
+          "THAT",
+          "PERSON",
+          "LIP-READ",
+          "STRUGGLE"
+        ],
+        "cue": "furrowed, empathy"
+      },
+      {
+        "toks": [
+          "ME",
+          "WANT",
+          "COMMUNICATE",
+          "DIRECT",
+          "EASY",
+          "RESPECT"
+        ],
+        "cue": "sincere, warm"
+      },
+      {
+        "toks": [
+          "THAT",
+          "WHY",
+          "ME",
+          "LEARN",
+          "ASL",
+          "YOU-ALL",
+          "CLASS",
+          "HERE"
+        ],
+        "cue": "nod toward camera/class"
+      },
+      {
+        "toks": [
+          "ALSO",
+          "MEDICINE",
+          "ME",
+          "WANT",
+          "HELP",
+          "PATIENT",
+          "EVERY-DAY"
+        ],
+        "cue": "warm, open"
+      }
+    ]
+  },
+  {
+    "title": "College Life",
+    "lines": [
+      {
+        "toks": [
+          "COLLEGE",
+          "NAME",
+          "LMC",
+          "PLACE",
+          "ANTIOCH"
+        ],
+        "cue": "neutral"
+      },
+      {
+        "toks": [
+          "ME",
+          "STUDY",
+          "BIOLOGY",
+          "SCIENCE"
+        ],
+        "cue": "matter-of-fact"
+      },
+      {
+        "toks": [
+          "CLASS",
+          "CHEMISTRY",
+          "PHYSICS",
+          "MATH",
+          "ALL",
+          "HARD"
+        ],
+        "cue": "brow furrow"
+      },
+      {
+        "toks": [
+          "SOMETIMES",
+          "ME",
+          "STRUGGLE",
+          "CONFUSE",
+          "TIRED"
+        ],
+        "cue": "tired face, sigh"
+      },
+      {
+        "toks": [
+          "BUT",
+          "ME",
+          "GIVE-UP",
+          "NO",
+          "ME",
+          "KEEP-GOING"
+        ],
+        "cue": "strong shake head, determined"
+      }
+    ]
+  },
+  {
+    "title": "Balancing Job + School",
+    "lines": [
+      {
+        "toks": [
+          "EVERY-DAY",
+          "ME",
+          "LIFE",
+          "MORNING",
+          "WORK",
+          "AFTERNOON",
+          "CLASS",
+          "NIGHT",
+          "STUDY"
+        ],
+        "cue": "list with space/timeline, matter-of-fact"
+      },
+      {
+        "toks": [
+          "BALANCE",
+          "HARD",
+          "TIME",
+          "LIMITED"
+        ],
+        "cue": "head tilt, exhale"
+      },
+      {
+        "toks": [
+          "FAMILY",
+          "HELP",
+          "ME",
+          "HUSBAND",
+          "TWO",
+          "SON",
+          "SUPPORT"
+        ],
+        "cue": "warm smile"
+      },
+      {
+        "toks": [
+          "THEY",
+          "PROUD",
+          "ME",
+          "SO",
+          "ME",
+          "PROUD",
+          "ME-SELF",
+          "TOO"
+        ],
+        "cue": "smile, chin up"
+      }
+    ]
+  },
+  {
+    "title": "Future Goal",
+    "lines": [
+      {
+        "toks": [
+          "FUTURE",
+          "ME",
+          "PLAN",
+          "FINISH",
+          "LMC",
+          "TRANSFER",
+          "UNIVERSITY"
+        ],
+        "cue": "hopeful"
+      },
+      {
+        "toks": [
+          "FIRST-CHOICE",
+          "BERKELEY",
+          "IF",
+          "NOT",
+          "BACKUP",
+          "DAVIS"
+        ],
+        "cue": "neutral, shrug"
+      },
+      {
+        "toks": [
+          "AFTER",
+          "THAT",
+          "MEDICAL",
+          "SCHOOL",
+          "BECOME",
+          "DOCTOR"
+        ],
+        "cue": "determined, eyes forward"
+      },
+      {
+        "toks": [
+          "ME",
+          "WANT",
+          "WORK",
+          "HOSPITAL",
+          "HELP",
+          "PEOPLE",
+          "EVERY-DAY"
+        ],
+        "cue": "warm, hopeful"
+      }
+    ]
+  },
+  {
+    "title": "Closing",
+    "lines": [
+      {
+        "toks": [
+          "ROAD",
+          "LONG",
+          "HARD",
+          "BUT",
+          "ME",
+          "READY"
+        ],
+        "cue": "strong nod, confident"
+      },
+      {
+        "toks": [
+          "ME",
+          "NEVER",
+          "GIVE-UP"
+        ],
+        "cue": "firm"
+      },
+      {
+        "toks": [
+          "FINISH"
+        ],
+        "cue": "neutral, small nod to close"
+      }
+    ]
+  }
+];
+
+const SIGNS = {
+  "11-YEAR": {
+    "desc": "No HandSpeak dictionary entry for this exact age-incorporation construction. This is a number-incorporated sign: form the numeral handshape for 11 (as used in ASL number system) and combine it with the sign for YEAR/YEAR-OLD by moving the number handshape in the fist-over-fist 'year' movement, per standard ASL age-incorporation rules.",
+    "url": null
+  },
+  "30": {
+    "desc": "No single HandSpeak dictionary entry for this exact number. Number incorporation sign: form the ASL numeral handshape for 30 (a '3' handshape combined with a '0'/O handshape in sequence, or the standard two-digit number formation) held palm facing out at chest level; no dedicated HandSpeak entry for this specific numeral.",
+    "url": null
+  },
+  "AFTER": {
+    "desc": "Hold the non-dominant flat hand in front of you, palm facing your body. Place the dominant flat hand behind it with palm touching the back of the non-dominant hand's fingers, then push the dominant hand forward and away from the stationary non-dominant hand.",
+    "url": "https://www.handspeak.com/word/49/"
+  },
+  "AFTERNOON": {
+    "desc": "Hold your dominant flat/open hand at about a '2 o'clock' angle, resting the elbow of that arm on the back of your non-dominant hand, with the dominant hand pointing forward and slightly upward. Some signers add a small bounce of the arm.",
+    "url": "https://www.handspeak.com/word/50/"
+  },
+  "AGAIN": {
+    "desc": "Dominant hand forms a bent handshape (fingers bent at the knuckles, thumb out) with palm facing up. Move it in a small arc so it lands in/against the palm of the flat, stationary non-dominant hand.",
+    "url": "https://www.handspeak.com/word/51/"
+  },
+  "ALL": {
+    "desc": "Both hands start as flat/open hands with palms facing up. The dominant flat hand moves in a circular motion and lands on top of the stationary non-dominant flat hand.",
+    "url": "https://www.handspeak.com/word/60/"
+  },
+  "ALSO": {
+    "desc": "No clear HandSpeak description retrieved. Commonly signed like SAME/similar signs: two handshapes tap together side to side, or may be fingerspelled A-L-S-O. Confirm with handspeak.com/word/ directly.",
+    "url": null
+  },
+  "ANTIOCH": {
+    "desc": "No HandSpeak dictionary entry. Antioch, CA is a place name and is fingerspelled: A-N-T-I-O-C-H.",
+    "url": null
+  },
+  "ASL": {
+    "desc": "Fingerspell the three letters A-S-L. ASL stands for American Sign Language, the language used by culturally Deaf people in North America.",
+    "url": "https://www.handspeak.com/word/120/"
+  },
+  "BACKUP": {
+    "desc": "Meaning depends on context (data backup, support/back someone up, vehicle backing up); each version uses a different handshape/classifier. Confirm the intended meaning before practicing.",
+    "url": "https://www.handspeak.com/word/3112/"
+  },
+  "BALANCE": {
+    "desc": "Both flat/open hands held out in front, palms up, moving up and down alternately like a scale weighing back and forth.",
+    "url": "https://www.handspeak.com/word/2496/"
+  },
+  "BECOME": {
+    "desc": "Both hands form upright flat/open handshapes, palms facing each other and touching crosswise. Both hands rotate together, swapping positions once, to show a change of state.",
+    "url": "https://www.handspeak.com/word/174/"
+  },
+  "BEFORE": {
+    "desc": "The back of the dominant flat hand touches the back of the stationary non-dominant flat hand, then the dominant hand moves inward/back toward the body.",
+    "url": "https://www.handspeak.com/word/177/"
+  },
+  "BERKELEY": {
+    "desc": "No HandSpeak dictionary entry. Place name, fingerspelled: B-E-R-K-E-L-E-Y.",
+    "url": null
+  },
+  "BIG": {
+    "desc": "Both hands form flat/open handshapes held apart in neutral space, palms facing each other. Briskly move the hands apart to show large size.",
+    "url": "https://www.handspeak.com/word/195/"
+  },
+  "BIOLOGY": {
+    "desc": "Both hands form a 'B' handshape, palms facing away from the body, in front of the torso. Move both hands inward in small alternating circles (same family as SCIENCE/CHEMISTRY, using the 'B' initial).",
+    "url": "https://www.handspeak.com/word/2967/"
+  },
+  "BUT": {
+    "desc": "Both hands make fists with index fingers extended, touch the fingertips together, then pull them apart to opposite sides, showing contrast. Sometimes fingerspelled B-U-T.",
+    "url": "https://www.handspeak.com/word/290/"
+  },
+  "CHANGE": {
+    "desc": "Dominant 'A' handshape (fist, thumb alongside) interlocks at the palm with a non-dominant hooked-finger handshape. Both hands twist at the wrist in opposite directions and meet again.",
+    "url": "https://www.handspeak.com/word/357/"
+  },
+  "CHEMISTRY": {
+    "desc": "Both hands form a 'C' handshape, palms facing down, in front of the torso. Alternate dipping the hands inward toward the center while rotating (same family as SCIENCE/BIOLOGY, using 'C').",
+    "url": "https://www.handspeak.com/word/3538/"
+  },
+  "CLASS": {
+    "desc": "Both hands form 'C' handshapes, palms facing mostly outward. Move them in a horizontal arc so the hands meet again at the edges.",
+    "url": "https://www.handspeak.com/word/398/"
+  },
+  "COLLEGE": {
+    "desc": "Hold the non-dominant open/flat hand palm-up in front of you. Place the dominant open hand flat against it, then lift and sweep it in a circle above the stationary hand.",
+    "url": "https://www.handspeak.com/word/418/"
+  },
+  "COMMUNICATE": {
+    "desc": "No detailed handshape retrievable; related to TALK/LANGUAGE signs. Check handspeak.com/word/435/ for the video before practicing.",
+    "url": "https://www.handspeak.com/word/435/"
+  },
+  "COMPANY": {
+    "desc": "Refers to a business. Signers may use a moving handshape abbreviation, or use the sign for BUSINESS interchangeably for 'company.'",
+    "url": "https://www.handspeak.com/word/440/"
+  },
+  "CONFUSE": {
+    "desc": "A commonly used version crosses bent/claw handshapes in front of the face with a small confused twisting motion. Check handspeak.com/word/463/ to confirm exact handshape.",
+    "url": "https://www.handspeak.com/word/463/"
+  },
+  "DAVIS": {
+    "desc": "No HandSpeak dictionary entry. Place name (UC Davis), fingerspelled: D-A-V-I-S.",
+    "url": null
+  },
+  "DEAF": {
+    "desc": "Index finger of the dominant hand touches near the ear, then moves down to touch near the corner of the mouth (or: thumb of a handshape touches the ear and opens into a spread hand moving back).",
+    "url": "https://www.handspeak.com/word/539/"
+  },
+  "DECIDE": {
+    "desc": "Dominant index finger first points to the side of the head, then both hands form pinched handshapes held apart and move downward together, as if placing something down firmly.",
+    "url": "https://www.handspeak.com/word/546/"
+  },
+  "DIFFERENT": {
+    "desc": "Both hands form '1' handshapes crossed with nails up at roughly a 45-degree angle, then pull apart from each other in a small shaking/twisting motion, as if uncrossing the fingers.",
+    "url": "https://www.handspeak.com/word/574/"
+  },
+  "DIRECT": {
+    "desc": "Dominant hand moves outward in a straight, deliberate path from the signer toward the point being referenced, showing a direct path with no detours. Compare to INDIRECT (wavering path).",
+    "url": "https://www.handspeak.com/word/3265/"
+  },
+  "DOCTOR": {
+    "desc": "Dominant hand forms a bent-flat handshape and taps twice with the fingertips on the palm-up wrist of the non-dominant hand. Same family as NURSE, different handshape.",
+    "url": "https://www.handspeak.com/word/601/"
+  },
+  "EASY": {
+    "desc": "Both hands form bent-flat handshapes, palms facing in; the dominant hand is stacked half-behind/above the non-dominant hand, and the fingertips flick upward twice across the back of the passive hand.",
+    "url": "https://www.handspeak.com/word/644/"
+  },
+  "EVERY-DAY": {
+    "desc": "Sign DAY (dominant index hand sweeping down along the extended non-dominant forearm) with a repeated, cyclical movement to show recurrence, meaning 'happening every day; daily.'",
+    "url": "https://www.handspeak.com/word/696/"
+  },
+  "FAMILY": {
+    "desc": "Both hands form 'F' handshapes with palms facing out, touching at the thumbs/index fingers; circle the hands outward and around until the pinky fingers touch, as if encircling a group of people.",
+    "url": "https://www.handspeak.com/word/740/"
+  },
+  "FINISH": {
+    "desc": "Both hands form open '5' handshapes held out in neutral space, then flick/twist outward to the sides simultaneously at the wrists, as if shaking something off.",
+    "url": "https://www.handspeak.com/word/795/"
+  },
+  "FIRST-CHOICE": {
+    "desc": "Combine FIRST (dominant '1' hand, thumb flicks up from a fist near the other hand's index finger) with CHOICE/CHOOSE (thumb and index finger pinch as if picking an item out of the air).",
+    "url": null
+  },
+  "FUTURE": {
+    "desc": "Dominant open hand (palm facing the body, fingers up) starts near the cheek/jaw and arcs forward and outward away from the signer; arc length/speed can show near vs. distant future.",
+    "url": "https://www.handspeak.com/word/885/"
+  },
+  "GIVE-UP": {
+    "desc": "Both hands start in fists near the chest, then open and flick/toss upward and outward like releasing something into the air, showing surrender or quitting.",
+    "url": "https://www.handspeak.com/word/913/"
+  },
+  "GOOD": {
+    "desc": "Dominant flat hand starts with fingers touching the chin, palm facing in, then moves forward and down into the open palm of the other hand. Don't confuse with THANK-YOU.",
+    "url": "https://www.handspeak.com/word/926/"
+  },
+  "HARD": {
+    "desc": "Both hands form bent 'V' (2-claw) handshapes facing each other; the dominant hand taps down twice on top of the stationary non-dominant hand. Opposite of EASY.",
+    "url": "https://www.handspeak.com/word/983/"
+  },
+  "HEART": {
+    "desc": "Both middle fingers start touching in the center of the chest, then separate outward and curve up and back down to reunite, tracing a heart shape on the chest.",
+    "url": "https://www.handspeak.com/word/1003/"
+  },
+  "HELP": {
+    "desc": "Non-dominant hand forms a flat palm-up base; the dominant hand makes a thumbs-up fist resting on top of that palm, and both hands lift upward together.",
+    "url": "https://www.handspeak.com/word/1017/"
+  },
+  "HERE": {
+    "desc": "Dominant index finger points downward in front of the body, moving in a small motion (often twice) to indicate 'this place, right here.'",
+    "url": "https://www.handspeak.com/word/1023/"
+  },
+  "HOSPITAL": {
+    "desc": "Both hands form 'open-8' handshapes with fingertips touching on the forehead, then the hands separate/diverge outward and to the sides.",
+    "url": "https://www.handspeak.com/word/1059/"
+  },
+  "HUSBAND": {
+    "desc": "Dominant thumbs-up handshape touches the forehead/temple (the MALE location), then moves down and interlocks with the non-dominant relaxed hand, blending MALE and MARRY.",
+    "url": "https://www.handspeak.com/word/1080/"
+  },
+  "IF": {
+    "desc": "Both hands form pinched handshapes held up in front of the body and tip up and down alternately like the pans of a scale weighing options.",
+    "url": "https://www.handspeak.com/word/1096/"
+  },
+  "JOB": {
+    "desc": "Dominant fist handshape, palm down, wrist taps down twice on top of the non-dominant fist handshape. Same base movement as WORK.",
+    "url": "https://www.handspeak.com/word/6439/"
+  },
+  "KEEP-GOING": {
+    "desc": "Both hands form bent handshapes, palms facing, and move forward together in small repeated pushes, showing continuing or persisting forward despite difficulty.",
+    "url": "https://www.handspeak.com/word/5616/"
+  },
+  "LEAD": {
+    "desc": "Non-dominant open hand held forward, palm in, representing the person being led; the dominant hand's thumb and fingers grasp it and pull it forward toward the signer's body, guiding someone along.",
+    "url": "https://www.handspeak.com/word/1242/"
+  },
+  "LEARN": {
+    "desc": "Non-dominant hand is palm-up and flat; the dominant hand starts as a loose, half-open handshape just above it, then closes while moving up to touch the forehead, as if picking up knowledge and putting it into your head.",
+    "url": "https://www.handspeak.com/word/1250/"
+  },
+  "LIFE": {
+    "desc": "Both hands form 'L' handshapes, palms facing the body, and move upward simultaneously along the torso from the waist toward the chest.",
+    "url": "https://www.handspeak.com/word/323/"
+  },
+  "LIMITED": {
+    "desc": "Both hands, palms facing each other (or one hand chopping down near the other), make a short crisp downward or inward motion showing a fixed boundary or cap.",
+    "url": "https://www.handspeak.com/word/1279/"
+  },
+  "LIP-READ": {
+    "desc": "Dominant 'V' handshape, palm facing down toward the mouth, swings back and forth near the lips, representing eyes tracking lip movement to understand speech.",
+    "url": "https://www.handspeak.com/word/1284/"
+  },
+  "LMC": {
+    "desc": "Fingerspell the three letters L-M-C individually. Acronym for a community college name; no HandSpeak dictionary sign.",
+    "url": null
+  },
+  "LONG": {
+    "desc": "Dominant hand, starting near the wrist of the extended non-dominant arm, glides all the way up along the forearm to the shoulder, showing extended length/duration.",
+    "url": "https://www.handspeak.com/word/1299/"
+  },
+  "MANY": {
+    "desc": "Both hands form loose handshapes held in front of the body, palms up, then open into spread hands as they move slightly upward and apart, as if scattering many items into the air.",
+    "url": "https://www.handspeak.com/word/1355/"
+  },
+  "MATH": {
+    "desc": "Both hands form 'M' handshapes and swipe across each other twice, opening slightly as they move left and right.",
+    "url": "https://www.handspeak.com/word/3522/"
+  },
+  "ME": {
+    "desc": "Dominant hand makes a '1' handshape (index finger extended) and points to, or taps, your own chest/sternum.",
+    "url": "https://www.handspeak.com/word/1363/"
+  },
+  "ME-SELF": {
+    "desc": "Dominant thumbs-up handshape, palm facing your own chest, taps once or twice on the chest with the side of the thumb/fist.",
+    "url": "https://www.handspeak.com/word/1446/"
+  },
+  "MEDICAL": {
+    "desc": "Dominant 'M' handshape taps or brushes on the upturned non-dominant wrist/palm area, referencing the medicine location. Check the video for the exact variant vs. MEDICINE.",
+    "url": "https://www.handspeak.com/word/4847/"
+  },
+  "MEDICINE": {
+    "desc": "Dominant hand extends the middle finger, tip touching the upturned non-dominant palm, and twists slightly side to side at the wrist while keeping contact, as if stirring medicine into the palm.",
+    "url": "https://www.handspeak.com/word/1367/"
+  },
+  "MORNING": {
+    "desc": "Non-dominant arm stays horizontal in front of the body (the horizon); dominant flat hand, palm up, rests against the inside of that elbow and rises upward, like the sun coming up over the horizon.",
+    "url": "https://www.handspeak.com/word/1436/"
+  },
+  "NAME": {
+    "desc": "Both hands form horizontal 'H' handshapes (index and middle fingers together, palms facing in); the dominant hand's fingertips tap twice crosswise on top of the passive hand's fingers.",
+    "url": "https://www.handspeak.com/word/1464/"
+  },
+  "NEVER": {
+    "desc": "Dominant hand starts near the shoulder with fingers/hand open and sweeps down and outward in a firm arcing motion, similar to an emphatic 'no' sweep, ending palm down, fingers spread.",
+    "url": "https://www.handspeak.com/word/1488/"
+  },
+  "NIGHT": {
+    "desc": "Non-dominant arm/hand stays flat and palm-down in front of the body (the horizon); dominant bent-flat hand, palm down, comes down to rest on the back of the non-dominant hand, like the sun setting.",
+    "url": "https://www.handspeak.com/word/1492/"
+  },
+  "NO": {
+    "desc": "Dominant hand brings the index and middle fingers together to tap against the thumb once or twice, palm facing outward, a lexicalized fingerspelled 'N-O.'",
+    "url": "https://www.handspeak.com/word/1496/"
+  },
+  "NOT": {
+    "desc": "Dominant thumbs-up handshape, palm facing sideways, thumb tucked under the chin, then thrust forward and away from the chin.",
+    "url": "https://www.handspeak.com/word/1515/"
+  },
+  "ONE": {
+    "desc": "Dominant hand forms a '1' handshape (index finger extended upward), palm facing the signer, held steady in neutral space in front of the body.",
+    "url": "https://www.handspeak.com/word/1554/"
+  },
+  "OVERSEE": {
+    "desc": "Related to MONITOR/SUPERVISE: dominant 'V' handshape (fingers representing the eyes) is directed toward what is being watched, indicating watching over or supervising something.",
+    "url": "https://www.handspeak.com/word/3266/"
+  },
+  "PAST": {
+    "desc": "Dominant flat hand, palm facing the signer, starts near the shoulder and flips backward over the shoulder, as if tossing something behind you into the past.",
+    "url": "https://www.handspeak.com/word/2713/"
+  },
+  "PATIENT": {
+    "desc": "Dominant thumbs-up handshape, thumb tip touches the chin and draws slowly downward, showing calm endurance. Resembles 'endure/tolerate.'",
+    "url": "https://www.handspeak.com/word/1604/"
+  },
+  "PEOPLE": {
+    "desc": "Both hands form 'P' handshapes held apart in neutral space and move in alternating circular motions, representing a group of individuals.",
+    "url": "https://www.handspeak.com/word/1615/"
+  },
+  "PERSON": {
+    "desc": "Both flat hands held apart in front of the body, palms facing each other, move downward together, outlining the shape of a person.",
+    "url": "https://www.handspeak.com/word/1623/"
+  },
+  "PHYSICS": {
+    "desc": "No clear HandSpeak entry found. Commonly described as both hands in bent-V handshapes, palms facing you, knuckles tapping together, separating, and tapping again. May be fingerspelled or an initialized sign; confirm with a teacher.",
+    "url": null
+  },
+  "PLACE": {
+    "desc": "Both hands form 'P' handshapes with middle fingertips touching in neutral space, palms facing each other, then diverge and converge again in a forward arcing motion.",
+    "url": "https://www.handspeak.com/word/1834/"
+  },
+  "PLAN": {
+    "desc": "Both flat hands, palms facing each other, held in front of the body, move sideways together (typically to the right) in one smooth motion.",
+    "url": "https://www.handspeak.com/word/1656/"
+  },
+  "PROUD": {
+    "desc": "Dominant thumbs-up handshape brushes upward from the lower-middle chest/torso toward the upper chest.",
+    "url": "https://www.handspeak.com/word/1717/"
+  },
+  "READY": {
+    "desc": "Both hands form 'R' handshapes, wrists crossed in front of the body, then move apart/outward in opposite directions simultaneously.",
+    "url": "https://www.handspeak.com/word/4205/"
+  },
+  "RESPECT": {
+    "desc": "'R' handshape(s) start at the forehead, palm(s) facing sideways, and move forward/outward away from the forehead in a nodding-style motion.",
+    "url": "https://www.handspeak.com/word/1810/"
+  },
+  "RESPONSIBLE": {
+    "desc": "Both hands form 'R' handshapes and tap twice on the dominant side of the upper chest near the shoulder, as if indicating a weight or burden resting there.",
+    "url": "https://www.handspeak.com/word/1811/"
+  },
+  "ROAD": {
+    "desc": "Both flat hands held apart in front of the body, palms facing each other, move forward together once, tracing the sides of a road stretching ahead.",
+    "url": "https://www.handspeak.com/word/4223/"
+  },
+  "RULES": {
+    "desc": "Both hands form 'X' handshapes, palms facing each other, held apart in neutral space, and alternately move forward and backward twice.",
+    "url": "https://www.handspeak.com/word/1856/"
+  },
+  "SCHOOL": {
+    "desc": "Hold the non-dominant hand palm-up, and tap the dominant flat hand (palm-down) on top of it twice, like clapping in slow motion.",
+    "url": "https://www.handspeak.com/word/1889/"
+  },
+  "SCIENCE": {
+    "desc": "Both hands form an 'A' handshape in front of you, palms facing out. Alternately rotate the wrists inward and dip the hands down and toward each other, as if pouring liquid from two beakers back and forth.",
+    "url": "https://www.handspeak.com/word/1891/"
+  },
+  "SECURITY": {
+    "desc": "With the back of your dominant hand (fist shape) in front of the pinky-side of your non-dominant fist, move the dominant hand in a small circular motion, tapping the non-dominant hand each time it comes around.",
+    "url": "https://www.handspeak.com/word/4072/"
+  },
+  "SO": {
+    "desc": "Form a bent handshape with your dominant hand, palm facing your body, and let it drop or hook downward slightly in front of you, similar to shrugging with your hand, often paired with a questioning face.",
+    "url": null
+  },
+  "SOMETIMES": {
+    "desc": "Hold your non-dominant index finger horizontally in front of you, and tap it once or twice with the tip of your dominant bent index finger, arcing slightly with each tap to show 'once in a while.'",
+    "url": null
+  },
+  "SON": {
+    "desc": "First sign BOY (grasp near the forehead as if tipping an imaginary cap brim), then bring that hand down to rest in the crook of your other arm, palms up, as if cradling a baby.",
+    "url": "https://www.handspeak.com/word/2022/"
+  },
+  "SPECIAL": {
+    "desc": "Pinch the thumb and middle finger of your dominant hand together, then pull upward away from the fingers of your non-dominant flat hand, emphasizing something singled out from the rest.",
+    "url": null
+  },
+  "START": {
+    "desc": "Hold your non-dominant hand in a flat or loose fist. Insert your dominant index finger between the index and middle fingers of the non-dominant hand, then twist the dominant finger forward, like turning a car ignition key.",
+    "url": null
+  },
+  "STRICT": {
+    "desc": "Form a clawed handshape with your dominant hand, palm facing left (for a right-handed signer), and thrust it forward toward your nose/chin with a firm, sharp motion.",
+    "url": "https://www.handspeak.com/word/3743/"
+  },
+  "STRUGGLE": {
+    "desc": "Form '1' handshapes with both hands, index fingers pointing toward each other at chest height. Move both hands back and forth in an alternating, jerky push-pull motion, as if the two fingers are wrestling.",
+    "url": "https://www.handspeak.com/word/2097/"
+  },
+  "STUDY": {
+    "desc": "Hold your non-dominant hand palm-up in front of you. Wiggle the fingers of your dominant open hand (palm facing down) above the non-dominant palm, as if the fingers are absorbing information from a book.",
+    "url": "https://www.handspeak.com/word/2102/"
+  },
+  "SUPPORT": {
+    "desc": "Make fist handshapes with both hands, palms facing you. Place the dominant fist just below the non-dominant fist and push it upward, as if propping the other fist up from underneath.",
+    "url": "https://www.handspeak.com/word/2124/"
+  },
+  "TEAM": {
+    "desc": "Form 'T' handshapes with both hands, palms facing each other. Start with hands together in front of you and arc them apart and then back together, showing a group joined together.",
+    "url": "https://www.handspeak.com/word/2766/"
+  },
+  "THAT": {
+    "desc": "Form a 'Y' handshape with your dominant hand, palm facing down, and bring it down to touch the top of your non-dominant flat hand, which is held palm-up.",
+    "url": "https://www.handspeak.com/word/2782/"
+  },
+  "THEY": {
+    "desc": "Point your dominant index finger outward and sweep it in an arc from one side to the other, indicating a group of people being referred to.",
+    "url": null
+  },
+  "THING": {
+    "desc": "Hold your dominant hand in a loose, open claw shape, palm up, and move it slightly forward in a small arc; can be repeated moving sideways for plural 'things.'",
+    "url": "https://www.handspeak.com/word/2200/"
+  },
+  "TIME": {
+    "desc": "Form a bent/clawed index finger with your dominant hand and tap it once or twice on the top of your non-dominant wrist, as if tapping a wristwatch.",
+    "url": "https://www.handspeak.com/word/2223/"
+  },
+  "TIRED": {
+    "desc": "Form loose, half-bent claw-shaped hands and place the fingertips against the sides of your upper chest/torso. Let both hands drop downward slightly without losing contact with the body.",
+    "url": "https://www.handspeak.com/word/2225/"
+  },
+  "TOO": {
+    "desc": "Hold your dominant hand in a 'T' or index-finger handshape, palm facing your body, and tap or bounce it against your other index finger, similar to the sign for 'also,' indicating an added item.",
+    "url": null
+  },
+  "TRANSFER": {
+    "desc": "Form a clawed handshape with your dominant hand and move it from one side of your signing space to the other in a downward arcing motion, as if moving something from one place to another.",
+    "url": "https://www.handspeak.com/word/2260/"
+  },
+  "TWO": {
+    "desc": "Hold up your dominant hand in a 'V' handshape (index and middle fingers extended, palm facing outward/back), the standard number handshape for two.",
+    "url": "https://www.handspeak.com/learn/22/"
+  },
+  "UNIVERSITY": {
+    "desc": "Form a 'U' handshape with your dominant hand, palm facing out, and touch or circle it against your non-dominant flat palm-in hand, moving in a smooth downward-sideways-upward arc.",
+    "url": "https://www.handspeak.com/word/2296/"
+  },
+  "WANT": {
+    "desc": "Hold both hands out in front of you in loose claw handshapes, palms facing up, and pull them back toward your body while curling the fingers slightly inward, as if drawing something desirable toward yourself.",
+    "url": null
+  },
+  "WHY": {
+    "desc": "Touch your fingertips to your forehead, then pull the hand away and down while changing handshape (bent middle finger), often paired with furrowed brows to ask 'why.'",
+    "url": null
+  },
+  "WORK": {
+    "desc": "Form fist handshapes with both hands, palms facing down. Tap the wrist/heel of the dominant fist on top of the non-dominant fist two times, like tapping with a hammer.",
+    "url": "https://www.handspeak.com/word/2423/"
+  },
+  "YOU-ALL": {
+    "desc": "Point your dominant index finger outward toward the group and sweep it from one side to the other, rather than pointing at a single person, to indicate 'all of you.'",
+    "url": null
+  }
+};
+
+const ACCENTS = ["#00AFB9","#F08667","#C96460","#395C6B","#00AFB9","#F08667","#C96460"];
+
+const SEQ = [];
+PARTS.forEach((part, pi) => {
+  part.lines.forEach((line, li) => {
+    SEQ.push({ pi, li, toks: line.toks, cue: line.cue });
+  });
+});
+const TOTAL = SEQ.length;
+
+let idx = 0;
+let timerSeconds = 0;
+let timerHandle = null;
+let playHandle = null;
+let playing = false;
+let started = false;
+let tileSize = window.innerWidth < 480 ? 1.7 : (window.innerWidth < 760 ? 2.1 : 2.7);
+
+const partListEl = document.getElementById('partList');
+const tileGrid = document.getElementById('tileGrid');
+const partLabel = document.getElementById('partLabel');
+const sidebarEl = document.getElementById('sidebar');
+const sidebarToggle = document.getElementById('sidebarToggle');
+const lineCount = document.getElementById('lineCount');
+const progFill = document.getElementById('progFill');
+const timerText = document.getElementById('timerText');
+const timerChip = document.getElementById('timerChip');
+const playBtn = document.getElementById('playBtn');
+const paceSlider = document.getElementById('paceSlider');
+const paceLabel = document.getElementById('paceLabel');
+
+function buildSidebar(){
+  partListEl.innerHTML = '';
+  PARTS.forEach((part, pi) => {
+    const startIdx = SEQ.findIndex(s => s.pi === pi);
+    const btn = document.createElement('button');
+    btn.className = 'part-btn';
+    btn.style.setProperty('--c', ACCENTS[pi % ACCENTS.length]);
+    btn.innerHTML = `<span class="pnum">Part ${pi+1}</span><span class="ptitle">${part.title}</span><span class="pcount">${part.lines.length} lines</span>`;
+    btn.onclick = () => { goTo(startIdx); };
+    btn.dataset.pi = pi;
+    partListEl.appendChild(btn);
+  });
+}
+
+function escapeHtml(s){
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function buildTiles(cur){
+  tileGrid.innerHTML = '';
+  tileGrid.style.setProperty('--tile-size', tileSize + 'rem');
+  cur.toks.forEach(tok => {
+    const info = SIGNS[tok];
+    const tile = document.createElement('div');
+    tile.className = 'tile';
+    const back = info
+      ? `<div class="tile-back-word">${escapeHtml(tok)}</div>
+         <div class="tile-back-desc">${escapeHtml(info.desc)}</div>
+         ${info.url ? `<a class="tile-back-link" href="${info.url}" target="_blank" rel="noopener">View on HandSpeak.com &#8599;</a>` : ''}`
+      : `<div class="tile-back-word">${escapeHtml(tok)}</div><div class="tile-back-none">No description available.</div>`;
+    tile.innerHTML = `
+      <div class="tile-inner">
+        <div class="tile-face tile-front">
+          <div class="tile-word">${escapeHtml(tok)}</div>
+          <div class="tile-cue">${escapeHtml(cur.cue)}</div>
+        </div>
+        <div class="tile-face tile-back">${back}</div>
+      </div>`;
+    tile.addEventListener('click', (e) => {
+      if (e.target.closest('.tile-back-link')) return;
+      tile.classList.toggle('flipped');
+    });
+    tileGrid.appendChild(tile);
+  });
+}
+
+function render(){
+  const cur = SEQ[idx];
+  const part = PARTS[cur.pi];
+  buildTiles(cur);
+  partLabel.textContent = `Part ${cur.pi+1} \u00b7 ${part.title}`;
+  lineCount.textContent = `${idx+1} / ${TOTAL}`;
+  progFill.style.width = ((idx+1)/TOTAL*100) + '%';
+
+  document.querySelectorAll('.part-btn').forEach(b => {
+    b.classList.toggle('active', Number(b.dataset.pi) === cur.pi);
+  });
+
+  document.getElementById('prevBtn').disabled = idx === 0;
+  document.getElementById('nextBtn').disabled = idx === TOTAL - 1;
+
+  if (idx === TOTAL - 1) stopPlay();
+}
+
+function goTo(i){
+  idx = Math.max(0, Math.min(TOTAL - 1, i));
+  render();
+}
+
+function next(){ startTimer(); goTo(idx + 1); }
+function prev(){ startTimer(); goTo(idx - 1); }
+
+function startTimer(){
+  if (started) return;
+  started = true;
+  timerHandle = setInterval(() => {
+    timerSeconds++;
+    const m = Math.floor(timerSeconds/60);
+    const s = timerSeconds % 60;
+    timerText.textContent = `${m}:${s.toString().padStart(2,'0')}`;
+    timerChip.classList.remove('good','warn');
+    if (timerSeconds >= 120 && timerSeconds <= 300) timerChip.classList.add('good');
+    else if (timerSeconds > 300) timerChip.classList.add('warn');
+  }, 1000);
+}
+
+function stopPlay(){
+  playing = false;
+  playBtn.innerHTML = '&#9654; Auto';
+  if (playHandle) clearInterval(playHandle);
+}
+
+function togglePlay(){
+  if (playing) { stopPlay(); return; }
+  if (idx === TOTAL - 1) return;
+  playing = true;
+  playBtn.innerHTML = '&#10074;&#10074; Pause';
+  startTimer();
+  const tick = () => {
+    if (idx >= TOTAL - 1) { stopPlay(); return; }
+    goTo(idx + 1);
+  };
+  playHandle = setInterval(tick, Number(paceSlider.value) * 1000);
+}
+
+function reset(){
+  stopPlay();
+  if (timerHandle) clearInterval(timerHandle);
+  timerHandle = null; started = false; timerSeconds = 0;
+  timerText.textContent = '0:00';
+  timerChip.classList.remove('good','warn');
+  idx = 0;
+  render();
+}
+
+document.getElementById('prevBtn').onclick = prev;
+document.getElementById('nextBtn').onclick = next;
+document.getElementById('resetBtn').onclick = reset;
+playBtn.onclick = togglePlay;
+
+paceSlider.oninput = () => {
+  paceLabel.textContent = `${paceSlider.value}s/line`;
+  if (playing) { stopPlay(); togglePlay(); }
+};
+
+document.getElementById('fsUp').onclick = () => { tileSize = Math.min(4.4, tileSize + 0.3); render(); };
+document.getElementById('fsDown').onclick = () => { tileSize = Math.max(1.4, tileSize - 0.3); render(); };
+
+function setSidebarCollapsed(collapsed){
+  sidebarEl.classList.toggle('collapsed', collapsed);
+  sidebarToggle.innerHTML = collapsed ? '&#9776; Parts' : '&#10005; Parts';
+  try { localStorage.setItem('asl-sidebar-collapsed', collapsed ? '1' : '0'); } catch(e){}
+}
+sidebarToggle.onclick = () => setSidebarCollapsed(!sidebarEl.classList.contains('collapsed'));
+let savedCollapsed = false;
+try { savedCollapsed = localStorage.getItem('asl-sidebar-collapsed') === '1'; } catch(e){}
+setSidebarCollapsed(savedCollapsed);
+
+document.addEventListener('keydown', (e) => {
+  const tag = (e.target.tagName || '').toLowerCase();
+  if (tag === 'input') return;
+  if (e.code === 'Space') { e.preventDefault(); next(); }
+  else if (e.code === 'ArrowRight') next();
+  else if (e.code === 'ArrowLeft') prev();
+  else if (e.key.toLowerCase() === 'p') togglePlay();
+});
+
+let touchStartX = null;
+document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+document.addEventListener('touchend', (e) => {
+  if (touchStartX === null) return;
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  if (Math.abs(dx) > 60) { dx < 0 ? next() : prev(); }
+  touchStartX = null;
+});
+
+buildSidebar();
+render();
+</script>
+
+</body>
+</html>
