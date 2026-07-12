@@ -6,9 +6,31 @@
   <title>Academic Integrity & AI Use — S. Hartbauer</title>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet"/>
   <style>
+    /* Light theme — default */
     :root {
+      --navy:         #FDFCFA;
+      --navy-mid:     rgba(253,252,250,0.92);
+      --navy-light:   #F0EBDD;
+      --slate:        #395C6B;
+      --teal:         #005F66;
+      --teal-dim:     rgba(0,95,102,0.35);
+      --peach:        #A84A25;
+      --lobster:      #8F3330;
+      --cream:        #5F5317;
+      --accent:       #005F66;
+      --accent-muted: rgba(0,95,102,0.4);
+      --text:         #0F1720;
+      --text-muted:   #33404D;
+      --text-dim:     #4A5568;
+      --rule:         rgba(22,32,43,0.15);
+      --card:         rgba(22,32,43,0.035);
+      --card-hover:   rgba(0,95,102,0.08);
+    }
+
+    /* Dark theme — original navy/teal palette */
+    body[data-theme="dark"] {
       --navy:         #111b2e;
-      --navy-mid:     #192338;
+      --navy-mid:     rgba(17,27,46,0.93);
       --navy-light:   #243358;
       --slate:        #395C6B;
       --teal:         #00AFB9;
@@ -26,14 +48,40 @@
       --card-hover:   rgba(0,175,185,0.07);
     }
 
-    body.hc {
+    /* AMOLED theme — same accents as Dark, true-black background */
+    body[data-theme="amoled"] {
       --navy:         #000000;
-      --navy-mid:     #0a0a0a;
+      --navy-mid:     rgba(0,0,0,0.92);
+      --navy-light:   #243358;
+      --slate:        #395C6B;
+      --teal:         #00AFB9;
+      --teal-dim:     rgba(0,175,185,0.55);
+      --peach:        #F08667;
+      --lobster:      #C96460;
+      --cream:        #FDFCDC;
+      --accent:       #00AFB9;
+      --accent-muted: rgba(0,175,185,0.45);
+      --text:         #e8e4dc;
+      --text-muted:   #8fa3ba;
+      --text-dim:     #546e87;
+      --rule:         rgba(0,175,185,0.15);
+      --card:         rgba(255,255,255,0.04);
+      --card-hover:   rgba(0,175,185,0.07);
+    }
+
+    /* High Contrast theme — unchanged from prior .hc implementation */
+    body[data-theme="hc"] {
+      --navy:         #000000;
+      --navy-mid:     rgba(0,0,0,0.97);
       --navy-light:   #111111;
+      --slate:        #395C6B;
       --accent:       #FDFCDC;
       --accent-muted: rgba(253,252,220,0.6);
       --teal:         #FDFCDC;
       --teal-dim:     rgba(253,252,220,0.5);
+      --peach:        #F08667;
+      --lobster:      #C96460;
+      --cream:        #FDFCDC;
       --text:         #ffffff;
       --text-muted:   #cccccc;
       --text-dim:     #999999;
@@ -65,14 +113,14 @@
       opacity: 0.5;
     }
 
-    body.hc::before { opacity: 0; }
+    body[data-theme="hc"]::before { opacity: 0; }
 
     /* ── Nav ── */
     nav {
       position: fixed;
       top: 0; left: 0; right: 0;
       z-index: 100;
-      background: rgba(17,27,46,0.93);
+      background: var(--navy-mid);
       backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--rule);
       padding: 0 40px;
@@ -83,8 +131,6 @@
       gap: 16px;
       transition: background 0.3s;
     }
-
-    body.hc nav { background: rgba(0,0,0,0.97); }
 
     .nav-name {
       font-family: 'Cormorant Garamond', serif;
@@ -122,25 +168,73 @@
     .nav-links a:hover { color: var(--accent); }
     .nav-links a.active { color: var(--teal); }
 
-    .hc-toggle {
+    .theme-select-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .theme-select {
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
       background: none;
       border: 1px solid var(--rule);
       border-radius: 3px;
       color: var(--text-muted);
       font-family: 'Jost', sans-serif;
       font-size: 10px;
-      font-weight: 400;
+      font-weight: 500;
       letter-spacing: 1.5px;
       text-transform: uppercase;
-      padding: 5px 10px;
+      padding: 5px 24px 5px 10px;
       cursor: pointer;
       white-space: nowrap;
-      flex-shrink: 0;
       transition: color 0.2s, border-color 0.2s, background 0.2s;
     }
 
-    .hc-toggle:hover { color: var(--accent); border-color: var(--accent-muted); }
-    body.hc .hc-toggle { color: var(--cream); border-color: rgba(253,252,220,0.5); background: rgba(253,252,220,0.08); }
+    .theme-select option {
+      background: var(--navy);
+      color: var(--text);
+      font-weight: 400;
+      text-transform: none;
+    }
+
+    .theme-select:hover,
+    .theme-select:focus {
+      color: var(--accent);
+      border-color: var(--accent-muted);
+      outline: none;
+    }
+
+    .theme-select-wrap::after {
+      content: '';
+      position: absolute;
+      right: 11px;
+      top: 50%;
+      width: 6px;
+      height: 6px;
+      border-right: 1px solid var(--text-dim);
+      border-bottom: 1px solid var(--text-dim);
+      transform: translateY(-70%) rotate(45deg);
+      pointer-events: none;
+      transition: border-color 0.2s;
+    }
+
+    .theme-select-wrap:hover::after {
+      border-color: var(--accent);
+    }
+
+    body[data-theme="hc"] .theme-select {
+      color: var(--cream);
+      border-color: rgba(253,252,220,0.5);
+      background: rgba(253,252,220,0.08);
+    }
+
+    body[data-theme="hc"] .theme-select-wrap::after {
+      border-color: var(--cream);
+    }
 
     /* ── Page layout ── */
     .page-hero {
@@ -344,7 +438,7 @@
       footer p, footer a { font-size: 12px; }
 
       .nav-name { min-height: 44px; display: inline-flex; align-items: center; }
-      .hc-toggle { min-height: 44px; min-width: 44px; padding: 10px 14px; font-size: 11px; }
+      .theme-select { min-height: 44px; padding: 8px 26px 8px 12px; }
       footer a { display: inline-flex; align-items: center; min-height: 44px; }
 
       .page-hero h1 { font-size: clamp(32px, 9vw, 44px); }
@@ -355,6 +449,33 @@
   </style>
 </head>
 <body>
+  <script>
+    (function () {
+      var THEMES = ['light', 'dark', 'amoled', 'hc'];
+      var stored = localStorage.getItem('theme');
+      var theme = THEMES.indexOf(stored) !== -1 ? stored : 'light';
+      document.body.setAttribute('data-theme', theme);
+
+      window.setTheme = function (next) {
+        if (THEMES.indexOf(next) === -1) return;
+        var body = document.body;
+        // Force an untransitioned style flush: some browsers don't
+        // re-trigger a transition when only a var()-referenced custom
+        // property changes via attribute/selector switch, which can leave
+        // background/color stuck on the old theme's values.
+        body.style.transition = 'none';
+        body.setAttribute('data-theme', next);
+        void body.offsetHeight;
+        requestAnimationFrame(function () { body.style.transition = ''; });
+        localStorage.setItem('theme', next);
+      };
+
+      document.addEventListener('DOMContentLoaded', function () {
+        var select = document.getElementById('theme-select');
+        if (select) select.value = theme;
+      });
+    })();
+  </script>
 
   <nav>
     <a class="nav-name" href="/">S. S. Hartbauer</a>
@@ -366,7 +487,14 @@
         <li><a href="/integrity/" class="active">AI Policy</a></li>
         <li><a href="/#contact">Contact</a></li>
       </ul>
-      <button class="hc-toggle" onclick="document.body.classList.toggle('hc')" aria-label="Toggle high contrast">High Contrast</button>
+      <div class="theme-select-wrap">
+        <select class="theme-select" id="theme-select" onchange="setTheme(this.value)" aria-label="Choose color theme">
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+          <option value="amoled">AMOLED</option>
+          <option value="hc">High Contrast</option>
+        </select>
+      </div>
     </div>
   </nav>
 
@@ -449,13 +577,6 @@
     <a href="https://github.com/sshartbauer" target="_blank">github.com/sshartbauer</a>
   </footer>
 
-  <script>
-    if (sessionStorage.getItem('hc') === '1') document.body.classList.add('hc');
-    document.querySelector('.hc-toggle').addEventListener('click', () => {
-      const on = document.body.classList.contains('hc');
-      sessionStorage.setItem('hc', on ? '1' : '0');
-    });
-  </script>
 
 </body>
 </html>

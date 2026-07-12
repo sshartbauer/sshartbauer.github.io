@@ -36,7 +36,42 @@
     --sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   }
 
-  body.high-contrast {
+  /* Dark theme — mirrors main site's navy/teal dark palette */
+  body[data-theme="dark"] {
+    --paper: #132030;
+    --paper-alt: rgba(255,255,255,0.04);
+    --ink: #e8e4dc;
+    --ink-soft: #8fa3ba;
+    --border: rgba(0,175,185,0.15);
+    --accent: #00AFB9;
+    --accent-soft: rgba(0,175,185,0.12);
+    --tier-live: #F08667;
+    --tier-live-bg: rgba(240,134,103,0.12);
+    --tier-daily: #00AFB9;
+    --tier-daily-bg: rgba(0,175,185,0.12);
+    --tier-periodic: #9cc678;
+    --tier-periodic-bg: rgba(156,198,120,0.12);
+  }
+
+  /* AMOLED theme — same accents as Dark, true-black background */
+  body[data-theme="amoled"] {
+    --paper: #000000;
+    --paper-alt: rgba(255,255,255,0.04);
+    --ink: #e8e4dc;
+    --ink-soft: #8fa3ba;
+    --border: rgba(0,175,185,0.15);
+    --accent: #00AFB9;
+    --accent-soft: rgba(0,175,185,0.12);
+    --tier-live: #F08667;
+    --tier-live-bg: rgba(240,134,103,0.12);
+    --tier-daily: #00AFB9;
+    --tier-daily-bg: rgba(0,175,185,0.12);
+    --tier-periodic: #9cc678;
+    --tier-periodic-bg: rgba(156,198,120,0.12);
+  }
+
+  /* High Contrast theme — values unchanged from the prior class-toggle implementation */
+  body[data-theme="hc"] {
     --paper: #ffffff;
     --paper-alt: #f0f0f0;
     --ink: #000000;
@@ -104,17 +139,70 @@
   }
   nav.links a:hover { color: var(--accent); }
   nav.links a.current { color: var(--ink); border-bottom: 2px solid var(--accent); padding-bottom: 3px; }
-  .hc-toggle {
+  .theme-select-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .theme-select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
     font-size: 0.8rem;
     font-weight: 600;
+    font-family: var(--sans);
     border: 1px solid var(--border);
     background: var(--paper-alt);
-    padding: 6px 12px;
+    padding: 6px 26px 6px 12px;
     border-radius: 20px;
     cursor: pointer;
     color: var(--ink-soft);
+    white-space: nowrap;
+    transition: color 0.2s, border-color 0.2s, background 0.2s;
   }
-  .hc-toggle:hover { color: var(--ink); }
+
+  .theme-select option {
+    background: var(--paper);
+    color: var(--ink);
+    font-weight: 400;
+  }
+
+  .theme-select:hover,
+  .theme-select:focus {
+    color: var(--ink);
+    border-color: var(--accent);
+    outline: none;
+  }
+
+  .theme-select-wrap::after {
+    content: '';
+    position: absolute;
+    right: 11px;
+    top: 50%;
+    width: 6px;
+    height: 6px;
+    border-right: 1px solid var(--ink-soft);
+    border-bottom: 1px solid var(--ink-soft);
+    transform: translateY(-70%) rotate(45deg);
+    pointer-events: none;
+    transition: border-color 0.2s;
+  }
+
+  .theme-select-wrap:hover::after {
+    border-color: var(--accent);
+  }
+
+  body[data-theme="hc"] .theme-select {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+
+  body[data-theme="hc"] .theme-select-wrap::after {
+    border-color: var(--accent);
+  }
 
   .breadcrumb {
     font-size: 0.82rem;
@@ -407,7 +495,7 @@
     nav.links a { min-height: 44px; display: inline-flex; align-items: center; padding: 0 4px; }
     nav.links a.current { padding-bottom: 0; border-bottom: none; text-decoration: underline; text-decoration-color: var(--accent); text-decoration-thickness: 2px; text-underline-offset: 5px; }
     .site-name { min-height: 44px; display: inline-flex; align-items: center; }
-    .hc-toggle { min-height: 44px; padding: 10px 16px; font-size: 0.85rem; }
+    .theme-select { min-height: 44px; padding: 10px 30px 10px 16px; font-size: 0.85rem; }
     .breadcrumb a { display: inline-flex; align-items: center; min-height: 44px; }
     .card a.open { display: inline-flex; align-items: center; min-height: 44px; font-size: 0.9rem; }
     footer.site-footer a { display: inline-flex; align-items: center; min-height: 44px; }
@@ -423,6 +511,33 @@
 </style>
 </head>
 <body>
+  <script>
+    (function () {
+      var THEMES = ['light', 'dark', 'amoled', 'hc'];
+      var stored = localStorage.getItem('theme');
+      var theme = THEMES.indexOf(stored) !== -1 ? stored : 'light';
+      document.body.setAttribute('data-theme', theme);
+
+      window.setTheme = function (next) {
+        if (THEMES.indexOf(next) === -1) return;
+        var body = document.body;
+        // Force an untransitioned style flush: some browsers don't
+        // re-trigger a transition when only a var()-referenced custom
+        // property changes via attribute/selector switch, which can leave
+        // background/color stuck on the old theme's values.
+        body.style.transition = 'none';
+        body.setAttribute('data-theme', next);
+        void body.offsetHeight;
+        requestAnimationFrame(function () { body.style.transition = ''; });
+        localStorage.setItem('theme', next);
+      };
+
+      document.addEventListener('DOMContentLoaded', function () {
+        var select = document.getElementById('theme-select');
+        if (select) select.value = theme;
+      });
+    })();
+  </script>
 
 <div class="dev-banner">PROTOTYPE: layout final, backend wiring in progress. <strong>See SETUP.md</strong> for the one-time setup that turns on live data.</div>
 
@@ -436,7 +551,14 @@
         <a href="https://sshartbauer.github.io/tools/" class="current">Tools</a>
         <a href="https://sshartbauer.github.io/integrity/">AI Policy</a>
         <a href="https://sshartbauer.github.io/#contact">Contact</a>
-        <button class="hc-toggle" onclick="document.body.classList.toggle('high-contrast')">High Contrast</button>
+        <div class="theme-select-wrap">
+          <select id="theme-select" class="theme-select" onchange="setTheme(this.value)" aria-label="Choose color theme">
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+            <option value="amoled">AMOLED</option>
+            <option value="hc">High Contrast</option>
+          </select>
+        </div>
       </nav>
     </div>
     <div class="breadcrumb"><a href="https://sshartbauer.github.io/tools/">Tools</a> / Ukraine–Russia War Updates</div>

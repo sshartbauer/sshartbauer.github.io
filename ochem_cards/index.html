@@ -7,23 +7,43 @@
 <script src="https://cdn.jsdelivr.net/npm/smiles-drawer@1.0.10/dist/smiles-drawer.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+/* Light theme (default) */
 :root{
+  --slate:#24505F; --pink:#8F3330; --peach:#A84A25; --teal:#005F66; --yellow:#FDFCDC;
+  --bg:#FDFCFA; --surf:rgba(22,32,43,.035); --surf2:rgba(22,32,43,.06); --border:rgba(22,32,43,.15); --text:#0F1720; --muted:#33404D;
+  --known:#1E8449; --unknown:#C0392B; --code:#1E7D32; --on-accent:#FDFCFA;
+}
+/* Dark theme — original palette */
+body[data-theme="dark"]{
   --slate:#395C6B; --pink:#C96460; --peach:#F08667; --teal:#00AFB9; --yellow:#FDFCDC;
   --bg:#080e14; --surf:#0d1b26; --surf2:#132233; --border:#2a4858; --text:#FDFCDC; --muted:#6fa0af;
-  --known:#2ecc71; --unknown:#e74c3c;
+  --known:#2ecc71; --unknown:#e74c3c; --code:#56d364; --on-accent:#080e14;
+}
+/* AMOLED theme — Dark accents, true-black surfaces */
+body[data-theme="amoled"]{
+  --slate:#395C6B; --pink:#C96460; --peach:#F08667; --teal:#00AFB9; --yellow:#FDFCDC;
+  --bg:#000000; --surf:#0a0a0a; --surf2:#0f0f0f; --border:#2a4858; --text:#FDFCDC; --muted:#6fa0af;
+  --known:#2ecc71; --unknown:#e74c3c; --code:#56d364; --on-accent:#080e14;
+}
+/* High Contrast theme */
+body[data-theme="hc"]{
+  --slate:#FDFCDC; --pink:#FDFCDC; --peach:#FDFCDC; --teal:#FDFCDC; --yellow:#FDFCDC;
+  --bg:#000000; --surf:#0a0a0a; --surf2:#0f0f0f; --border:rgba(255,255,255,.25); --text:#ffffff; --muted:#cccccc;
+  --known:#00ff66; --unknown:#ff3b30; --code:#FDFCDC; --on-accent:#000000;
 }
 html,body{height:100%;overflow:hidden}
 body{
   background:var(--bg);color:var(--text);
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
   display:flex;flex-direction:column;
+  transition:background .25s,color .25s;
 }
 
 /* ── Top bar ── */
 .topbar{
   display:flex;align-items:center;justify-content:space-between;
   padding:12px 20px;border-bottom:1px solid var(--border);
-  background:linear-gradient(90deg,#060c12,#0a1520);flex-shrink:0;
+  background:linear-gradient(90deg,var(--bg),var(--surf));flex-shrink:0;
 }
 .topbar-left{display:flex;align-items:center;gap:8px}
 .topbar h1{
@@ -40,12 +60,29 @@ body{
   padding:5px 14px;font-size:.75rem;font-weight:600;cursor:pointer;
   border:none;background:var(--surf2);color:var(--muted);transition:all .15s;
 }
-.mode-btn.active{background:var(--teal);color:#080e14}
+.mode-btn.active{background:var(--teal);color:var(--on-accent)}
 .reset-btn{
   padding:5px 12px;border-radius:7px;border:1px solid var(--border);
   background:var(--surf2);color:var(--muted);font-size:.73rem;cursor:pointer;transition:all .15s;
 }
 .reset-btn:hover{border-color:var(--pink);color:var(--pink)}
+
+/* ── Theme select ── */
+.theme-select-wrap{position:relative;display:inline-flex;align-items:center;flex-shrink:0}
+.theme-select{
+  appearance:none;-webkit-appearance:none;-moz-appearance:none;
+  padding:4px 22px 4px 10px;border-radius:6px;border:1px solid var(--border);
+  background:var(--surf2);color:var(--muted);font-size:.7rem;font-weight:500;
+  font-family:inherit;cursor:pointer;white-space:nowrap;transition:all .15s;
+}
+.theme-select option{background:var(--surf2);color:var(--text)}
+.theme-select:hover,.theme-select:focus{border-color:var(--teal);color:var(--teal);outline:none}
+.theme-select-wrap::after{
+  content:'';position:absolute;right:9px;top:50%;width:5px;height:5px;
+  border-right:1px solid var(--muted);border-bottom:1px solid var(--muted);
+  transform:translateY(-65%) rotate(45deg);pointer-events:none;transition:border-color .15s;
+}
+.theme-select-wrap:hover::after{border-color:var(--teal)}
 
 /* ── Main layout ── */
 .main{display:flex;flex:1;overflow:hidden}
@@ -53,7 +90,7 @@ body{
 /* ── LEFT SIDEBAR ── */
 .sidebar{
   width:240px;flex-shrink:0;
-  background:linear-gradient(180deg,#0a1720 0%,#08131e 100%);
+  background:linear-gradient(180deg,var(--surf) 0%,var(--bg) 100%);
   border-right:1px solid var(--border);
   display:flex;flex-direction:column;overflow:hidden;
 }
@@ -100,7 +137,7 @@ body{
 /* ── PROGRESS PANEL in sidebar ── */
 .prog-panel{
   flex-shrink:0;border-top:1px solid var(--border);padding:12px 14px;
-  background:#06101a;
+  background:var(--bg);
 }
 .prog-panel-title{font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:8px}
 .prog-stats{display:flex;gap:8px;margin-bottom:8px}
@@ -129,7 +166,7 @@ body{
 .empty{
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:14px;width:100%;max-width:540px;min-height:380px;
-  background:linear-gradient(160deg,#0d1b26,#0a1620);
+  background:linear-gradient(160deg,var(--surf),var(--bg));
   border:2px dashed var(--border);border-radius:18px;color:var(--muted);
   margin:auto;
 }
@@ -187,7 +224,7 @@ body{
 
 /* Back */
 .back{
-  background:linear-gradient(160deg,#0b1c2c 0%,#0d2035 100%);
+  background:linear-gradient(160deg,var(--surf2) 0%,var(--surf) 100%);
   color:var(--text);
   transform:rotateY(180deg);flex-direction:row;align-items:stretch;
   padding:18px;border:1px solid var(--border);
@@ -206,13 +243,13 @@ body{
 .struct-canvas{background:#fff;border-radius:9px;display:block;box-shadow:0 2px 10px rgba(0,0,0,.35)}
 .smiles{
   font-family:'SF Mono','Fira Code',monospace;font-size:.62rem;
-  color:#56d364;word-break:break-all;text-align:center;
-  background:#06101a;padding:4px 7px;border-radius:5px;
+  color:var(--code);word-break:break-all;text-align:center;
+  background:var(--bg);padding:4px 7px;border-radius:5px;
   border:1px solid var(--border);max-width:188px;
 }
 .dl{display:flex;flex-direction:column;gap:2px}
 .dl-label{font-size:.58rem;font-weight:800;text-transform:uppercase;letter-spacing:.09em;color:var(--teal)}
-.dl-text{font-size:.76rem;color:#c9dae0;line-height:1.4}
+.dl-text{font-size:.76rem;color:var(--text);line-height:1.4}
 .chips{display:flex;flex-wrap:wrap;gap:3px}
 .chip{
   padding:2px 7px;border-radius:9px;font-size:.64rem;color:var(--peach);
@@ -277,6 +314,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--border);border-r
   .nav-back-btn{padding:10px 14px;font-size:.85rem;border-radius:8px;min-height:44px}
   .mode-btn{padding:12px 18px;font-size:.9rem;min-height:44px}
   .reset-btn{padding:12px 14px;font-size:.85rem;min-height:44px}
+  .theme-select{min-height:44px;padding:10px 26px 10px 12px;font-size:.85rem}
 
   .sidebar{width:100%;border-right:none;border-bottom:1px solid var(--border)}
   .sidebar-body{max-height:250px}
@@ -319,6 +357,29 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--border);border-r
 </style>
 </head>
 <body>
+<script>
+(function () {
+  var THEMES = ['light', 'dark', 'amoled', 'hc'];
+  var stored = localStorage.getItem('theme');
+  var theme = THEMES.indexOf(stored) !== -1 ? stored : 'light';
+  document.body.setAttribute('data-theme', theme);
+
+  window.setTheme = function (next) {
+    if (THEMES.indexOf(next) === -1) return;
+    var body = document.body;
+    body.style.transition = 'none';
+    body.setAttribute('data-theme', next);
+    void body.offsetHeight;
+    requestAnimationFrame(function () { body.style.transition = ''; });
+    localStorage.setItem('theme', next);
+  };
+
+  document.addEventListener('DOMContentLoaded', function () {
+    var select = document.getElementById('theme-select');
+    if (select) select.value = theme;
+  });
+})();
+</script>
 
 <!-- TOP BAR -->
 <div class="topbar">
@@ -334,6 +395,14 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--border);border-r
       <button class="mode-btn" id="modeQuiz" onclick="setMode('quiz')">Quiz</button>
     </div>
     <button class="reset-btn" onclick="resetProgress()" title="Reset all known/unknown">↺ Reset progress</button>
+    <div class="theme-select-wrap">
+      <select id="theme-select" class="theme-select" onchange="setTheme(this.value)" aria-label="Choose color theme">
+        <option value="light">Light</option>
+        <option value="dark">Dark</option>
+        <option value="amoled">AMOLED</option>
+        <option value="hc">High Contrast</option>
+      </select>
+    </div>
   </div>
 </div>
 

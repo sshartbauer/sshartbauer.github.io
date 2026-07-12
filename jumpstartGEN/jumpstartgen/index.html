@@ -9,7 +9,29 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <style>
     /* ── Variables ── */
+    /* Light theme — default */
     :root {
+      --blue-slate:    #24505F;
+      --lobster-pink:  #8F3330;
+      --burnt-peach:   #A84A25;
+      --teal:          #005F66;
+      --cream:         #5F5317;
+      --bg:            #FDFCFA;
+      --bg-card:       #F5F2EC;
+      --bg-card2:      #EFEAE0;
+      --bg-input:      #FFFFFF;
+      --nav-bg:        rgba(253,252,250,0.92);
+      --border:        rgba(22,32,43,0.15);
+      --border-light:  rgba(22,32,43,0.28);
+      --text:          #0F1720;
+      --text-muted:    #33404D;
+      --text-dim:      #4A5568;
+      --radius:        10px;
+      --shadow:        0 4px 24px rgba(22,32,43,0.12);
+    }
+
+    /* Dark theme — original navy/teal palette */
+    body[data-theme="dark"] {
       --blue-slate:    #395C6B;
       --lobster-pink:  #C96460;
       --burnt-peach:   #F08667;
@@ -19,24 +41,48 @@
       --bg-card:       #192236;
       --bg-card2:      #1e2b42;
       --bg-input:      #0e1627;
+      --nav-bg:        rgba(17,27,46,0.96);
       --border:        #2a3b55;
       --border-light:  #334966;
       --text:          #dde6f0;
       --text-muted:    #7a95b0;
       --text-dim:      #4a6580;
-      --radius:        10px;
       --shadow:        0 4px 24px rgba(0,0,0,0.4);
     }
-    body.high-contrast {
+
+    /* AMOLED theme — same accents as Dark, true-black background */
+    body[data-theme="amoled"] {
+      --blue-slate:    #395C6B;
+      --lobster-pink:  #C96460;
+      --burnt-peach:   #F08667;
+      --teal:          #00AFB9;
+      --cream:         #FDFCDC;
+      --bg:            #000000;
+      --bg-card:       #192236;
+      --bg-card2:      #1e2b42;
+      --bg-input:      #0e1627;
+      --nav-bg:        rgba(0,0,0,0.92);
+      --border:        #2a3b55;
+      --border-light:  #334966;
+      --text:          #dde6f0;
+      --text-muted:    #7a95b0;
+      --text-dim:      #4a6580;
+      --shadow:        0 4px 24px rgba(0,0,0,0.4);
+    }
+
+    /* High Contrast theme — unchanged from prior .high-contrast implementation */
+    body[data-theme="hc"] {
       --bg:       #000;
       --bg-card:  #111;
       --bg-card2: #1a1a1a;
       --bg-input: #000;
+      --nav-bg:   rgba(0,0,0,0.97);
       --border:   #555;
       --border-light: #666;
       --text:     #fff;
       --text-muted: #ccc;
       --text-dim:   #aaa;
+      --shadow:   0 4px 24px rgba(0,0,0,0.4);
     }
 
     /* ── Reset / Base ── */
@@ -58,7 +104,7 @@
 
     /* ── Nav ── */
     nav {
-      background: rgba(17,27,46,0.96);
+      background: var(--nav-bg);
       border-bottom: 1px solid var(--border);
       padding: 0.9rem 2rem;
       display: flex;
@@ -81,18 +127,64 @@
     .nav-right { display: flex; gap: 0.75rem; align-items: center; }
     .btn-nav-back { background: transparent; border: 1px solid var(--border-light); color: var(--text-muted); padding: 0.3rem 0.75rem; border-radius: 5px; font-size: 0.78rem; font-family: 'Jost', sans-serif; text-decoration: none; transition: all 0.2s; white-space: nowrap; }
     .btn-nav-back:hover { border-color: var(--teal); color: var(--teal); }
-    .btn-hc {
-      background: var(--cream);
-      color: #111b2e;
-      border: 2px solid var(--cream);
-      padding: 0.3rem 0.85rem;
-      border-radius: 5px;
-      font-size: 0.78rem;
-      font-weight: 600;
-      letter-spacing: 0.04em;
-      transition: all 0.2s;
+    .theme-select-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      flex-shrink: 0;
     }
-    body.high-contrast .btn-hc { background: #fff; color: #000; border-color: #fff; }
+    .theme-select {
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      background: none;
+      border: 1px solid var(--border-light);
+      border-radius: 5px;
+      color: var(--text-muted);
+      font-family: 'Jost', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.03em;
+      padding: 0.3rem 1.6rem 0.3rem 0.75rem;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: color 0.2s, border-color 0.2s, background 0.2s;
+    }
+    .theme-select option {
+      background: var(--bg);
+      color: var(--text);
+      font-weight: 400;
+    }
+    .theme-select:hover,
+    .theme-select:focus {
+      color: var(--teal);
+      border-color: var(--teal);
+      outline: none;
+    }
+    .theme-select-wrap::after {
+      content: '';
+      position: absolute;
+      right: 0.7rem;
+      top: 50%;
+      width: 6px;
+      height: 6px;
+      border-right: 1px solid var(--text-dim);
+      border-bottom: 1px solid var(--text-dim);
+      transform: translateY(-70%) rotate(45deg);
+      pointer-events: none;
+      transition: border-color 0.2s;
+    }
+    .theme-select-wrap:hover::after {
+      border-color: var(--teal);
+    }
+    body[data-theme="hc"] .theme-select {
+      color: var(--cream);
+      border-color: rgba(253,252,220,0.5);
+      background: rgba(253,252,220,0.08);
+    }
+    body[data-theme="hc"] .theme-select-wrap::after {
+      border-color: var(--cream);
+    }
     .btn-demo-nav {
       background: rgba(0,175,185,0.12);
       border: 1px solid rgba(0,175,185,0.4);
@@ -1068,13 +1160,14 @@
       .nav-left { gap: 0.5rem; flex-wrap: wrap; }
       .nav-right { gap: 0.5rem; flex-wrap: wrap; justify-content: flex-end; }
       .nav-brand { font-size: 1.25rem; }
-      .btn-nav-back, .btn-hc, .btn-demo-nav, .btn-history {
+      .btn-nav-back, .btn-demo-nav, .btn-history {
         min-height: 44px;
         display: inline-flex;
         align-items: center;
         font-size: 0.85rem;
         padding: 0.4rem 0.8rem;
       }
+      .theme-select { min-height: 44px; padding: 0.4rem 1.8rem 0.4rem 0.8rem; font-size: 0.85rem; }
       .history-dropdown { width: min(320px, calc(100vw - 1.5rem)); right: -0.75rem; }
       .history-item { padding: 0.85rem 1rem; font-size: 0.95rem; min-height: 44px; display: flex; align-items: center; }
 
@@ -1161,6 +1254,33 @@
   </style>
 </head>
 <body>
+  <script>
+    (function () {
+      var THEMES = ['light', 'dark', 'amoled', 'hc'];
+      var stored = localStorage.getItem('theme');
+      var theme = THEMES.indexOf(stored) !== -1 ? stored : 'light';
+      document.body.setAttribute('data-theme', theme);
+
+      window.setTheme = function (next) {
+        if (THEMES.indexOf(next) === -1) return;
+        var body = document.body;
+        // Force an untransitioned style flush: some browsers don't
+        // re-trigger a transition when only a var()-referenced custom
+        // property changes via attribute/selector switch, which can leave
+        // background/color stuck on the old theme's values.
+        body.style.transition = 'none';
+        body.setAttribute('data-theme', next);
+        void body.offsetHeight;
+        requestAnimationFrame(function () { body.style.transition = ''; });
+        localStorage.setItem('theme', next);
+      };
+
+      document.addEventListener('DOMContentLoaded', function () {
+        var select = document.getElementById('theme-select');
+        if (select) select.value = theme;
+      });
+    })();
+  </script>
 
 <!-- ══ NAV ══ -->
 <nav>
@@ -1182,7 +1302,14 @@
         </div>
       </div>
     </div>
-    <button class="btn-hc" onclick="toggleHC()">High Contrast</button>
+    <div class="theme-select-wrap">
+      <select class="theme-select" id="theme-select" onchange="setTheme(this.value)" aria-label="Choose color theme">
+        <option value="light">Light</option>
+        <option value="dark">Dark</option>
+        <option value="amoled">AMOLED</option>
+        <option value="hc">High Contrast</option>
+      </select>
+    </div>
   </div>
 </nav>
 
@@ -1508,9 +1635,6 @@ const state = {
 
 // ── Init ───────────────────────────────────────────────
 (function init() {
-  if (sessionStorage.getItem('jumpstart_hc') === '1') {
-    document.body.classList.add('high-contrast');
-  }
   document.addEventListener('click', (e) => {
     const hw = document.getElementById('btn-history');
     const hd = document.getElementById('history-dropdown');
@@ -1521,11 +1645,6 @@ const state = {
 })();
 
 // ── UI helpers ─────────────────────────────────────────
-function toggleHC() {
-  document.body.classList.toggle('high-contrast');
-  sessionStorage.setItem('jumpstart_hc', document.body.classList.contains('high-contrast') ? '1' : '0');
-}
-
 function toggleTopicPanel() {
   document.getElementById('topic-panel').classList.toggle('open');
 }

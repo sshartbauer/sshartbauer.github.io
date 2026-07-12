@@ -40,6 +40,35 @@ function ResetButton({ onClick, label = '↺ Reset progress' }) {
   return <button className="reset-btn" onClick={onClick}>{label}</button>;
 }
 
+/* ── Theme select (Light / Dark / AMOLED / High Contrast) ───
+   Mirrors the site-wide theme mechanism: localStorage key 'theme',
+   values 'light'|'dark'|'amoled'|'hc', persisted + applied via the
+   window.setTheme() defined in the inline <script> in index.html
+   (which runs before React mounts). */
+function ThemeSelect() {
+  const [value, setValue] = useState(() => (
+    document.documentElement.getAttribute('data-theme') ||
+    localStorage.getItem('theme') ||
+    'light'
+  ));
+  return (
+    <select
+      className="theme-select"
+      value={value}
+      onChange={(e) => {
+        setValue(e.target.value);
+        if (window.setTheme) window.setTheme(e.target.value);
+      }}
+      aria-label="Choose color theme"
+    >
+      <option value="light">Light</option>
+      <option value="dark">Dark</option>
+      <option value="amoled">AMOLED</option>
+      <option value="hc">High Contrast</option>
+    </select>
+  );
+}
+
 /* ── Sidebar shell ─────────────────────────────────────────── */
 function Sidebar({ headerLabel = 'Sections', onSelectAll, onClearAll, children }) {
   return (
@@ -248,7 +277,7 @@ function DeviceNotice({ children = '💾 Progress saves to this browser only —
 }
 
 Object.assign(window, {
-  TopBar, ModeToggle, ResetButton,
+  TopBar, ModeToggle, ResetButton, ThemeSelect,
   Sidebar, SectionPill, SectionList,
   TypeFilter, ProgressPanel,
   FlashcardScene, FlashcardFront, FlashcardBack,

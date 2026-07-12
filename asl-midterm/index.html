@@ -7,11 +7,34 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+/* Light theme (default) */
 :root{
+  --slate:#24505F; --lobster:#8F3330; --peach:#A84A25; --teal:#005F66; --cream:#FDFCDC;
+  --bg:#FDFCFA; --surf:rgba(22,32,43,.035); --surf2:rgba(22,32,43,.06); --border:rgba(22,32,43,.15);
+  --text:#0F1720; --muted:#33404D; --dim:#5b6b78;
+  --good:#1E8449; --warn:#A84A25; --on-accent:#FDFCFA;
+  --tile-size: 2.7rem;
+}
+/* Dark theme — original palette */
+body[data-theme="dark"]{
   --slate:#395C6B; --lobster:#C96460; --peach:#F08667; --teal:#00AFB9; --cream:#FDFCDC;
   --bg:#080e14; --surf:#0d1b26; --surf2:#132233; --border:#2a4858;
   --text:#e8e4dc; --muted:#8fa3ba; --dim:#546e87;
-  --good:#2ecc71; --warn:#F08667;
+  --good:#2ecc71; --warn:#F08667; --on-accent:#080e14;
+}
+/* AMOLED theme — Dark accents, true-black surfaces */
+body[data-theme="amoled"]{
+  --slate:#395C6B; --lobster:#C96460; --peach:#F08667; --teal:#00AFB9; --cream:#FDFCDC;
+  --bg:#000000; --surf:#0a0a0a; --surf2:#0f0f0f; --border:#2a4858;
+  --text:#e8e4dc; --muted:#8fa3ba; --dim:#546e87;
+  --good:#2ecc71; --warn:#F08667; --on-accent:#080e14;
+}
+/* High Contrast theme */
+body[data-theme="hc"]{
+  --slate:#FDFCDC; --lobster:#FDFCDC; --peach:#FDFCDC; --teal:#FDFCDC; --cream:#FDFCDC;
+  --bg:#000000; --surf:#0a0a0a; --surf2:#0f0f0f; --border:rgba(255,255,255,.25);
+  --text:#ffffff; --muted:#cccccc; --dim:#999999;
+  --good:#00ff66; --warn:#ff3b30; --on-accent:#000000;
   --tile-size: 2.7rem;
 }
 html,body{height:100%;height:100dvh}
@@ -19,13 +42,14 @@ body{
   background:var(--bg);color:var(--text);
   font-family:'Jost',-apple-system,BlinkMacSystemFont,sans-serif;font-weight:300;
   display:flex;flex-direction:column;overflow:hidden;
+  transition:background .25s,color .25s;
 }
 
 /* -- Topbar -- */
 .topbar{
   display:flex;align-items:center;justify-content:space-between;
   padding:12px 22px;border-bottom:1px solid var(--border);
-  background:linear-gradient(90deg,#060c12,#0a1520);flex-shrink:0;flex-wrap:wrap;gap:10px;
+  background:linear-gradient(90deg,var(--bg),var(--surf));flex-shrink:0;flex-wrap:wrap;gap:10px;
 }
 .topbar-left{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
 .topbar h1{
@@ -40,13 +64,30 @@ body{
 }
 .nav-back-btn:hover{border-color:var(--teal);color:var(--teal)}
 
+/* -- Theme select -- */
+.theme-select-wrap{position:relative;display:inline-flex;align-items:center;flex-shrink:0}
+.theme-select{
+  appearance:none;-webkit-appearance:none;-moz-appearance:none;
+  padding:6px 24px 6px 12px;border-radius:6px;border:1px solid var(--border);
+  background:var(--surf2);color:var(--muted);font-size:.72rem;font-weight:500;
+  font-family:'Jost',sans-serif;cursor:pointer;white-space:nowrap;transition:all .15s;
+}
+.theme-select option{background:var(--surf2);color:var(--text)}
+.theme-select:hover,.theme-select:focus{border-color:var(--teal);color:var(--teal);outline:none}
+.theme-select-wrap::after{
+  content:'';position:absolute;right:10px;top:50%;width:5px;height:5px;
+  border-right:1px solid var(--dim);border-bottom:1px solid var(--dim);
+  transform:translateY(-65%) rotate(45deg);pointer-events:none;transition:border-color .15s;
+}
+.theme-select-wrap:hover::after{border-color:var(--teal)}
+
 /* -- Main layout -- */
 .main{display:flex;flex:1;overflow:hidden}
 
 /* -- Sidebar -- */
 .sidebar{
   width:230px;flex-shrink:0;
-  background:linear-gradient(180deg,#0a1720 0%,#08131e 100%);
+  background:linear-gradient(180deg,var(--surf) 0%,var(--bg) 100%);
   border-right:1px solid var(--border);
   display:flex;flex-direction:column;overflow-y:auto;padding:16px 12px;
   transition:width .22s ease, padding .22s ease, border-color .22s ease;
@@ -118,7 +159,7 @@ body{
 .tile-word{font-weight:600;font-size:var(--tile-size);line-height:1.15;letter-spacing:.2px;word-break:break-word}
 .tile-flip-hint{position:absolute;bottom:12px;right:16px;font-size:1.2rem;color:var(--slate);opacity:.7}
 .tile-back{
-  background:linear-gradient(160deg,#0b1c2c 0%,#0d2035 100%);color:var(--text);
+  background:linear-gradient(160deg,var(--surf2) 0%,var(--surf) 100%);color:var(--text);
   transform:rotateY(180deg);border:2px solid var(--border);
   box-shadow:0 12px 36px rgba(0,0,0,.4);overflow-y:auto;align-items:stretch;justify-content:flex-start;gap:6px;
   padding:16px;
@@ -148,8 +189,8 @@ body{
   font-family:'Jost',sans-serif;
 }
 .ctl-btn:hover{border-color:var(--teal);color:var(--teal)}
-.ctl-btn.primary{background:var(--teal);color:#080e14;border-color:var(--teal);font-weight:600}
-.ctl-btn.primary:hover{color:#080e14;opacity:.9}
+.ctl-btn.primary{background:var(--teal);color:var(--on-accent);border-color:var(--teal);font-weight:600}
+.ctl-btn.primary:hover{color:var(--on-accent);opacity:.9}
 .ctl-btn:disabled{opacity:.35;cursor:not-allowed}
 .control-row.fine{gap:16px;font-size:.75rem;color:var(--muted)}
 .fine-group{display:flex;align-items:center;gap:6px}
@@ -192,6 +233,7 @@ footer a:hover{color:var(--teal)}
 
   /* Touch-friendly tap targets (>=44px) */
   .nav-back-btn{min-height:44px;padding:8px 14px;font-size:.8rem}
+  .theme-select{min-height:44px;padding:8px 26px 8px 12px;font-size:.85rem}
   .ctl-btn{min-height:44px;font-size:.9rem}
   .fs-btn{width:44px;height:44px;font-size:1.1rem}
   .part-btn{min-height:44px}
@@ -224,6 +266,29 @@ footer a:hover{color:var(--teal)}
 </style>
 </head>
 <body>
+<script>
+(function () {
+  var THEMES = ['light', 'dark', 'amoled', 'hc'];
+  var stored = localStorage.getItem('theme');
+  var theme = THEMES.indexOf(stored) !== -1 ? stored : 'light';
+  document.body.setAttribute('data-theme', theme);
+
+  window.setTheme = function (next) {
+    if (THEMES.indexOf(next) === -1) return;
+    var body = document.body;
+    body.style.transition = 'none';
+    body.setAttribute('data-theme', next);
+    void body.offsetHeight;
+    requestAnimationFrame(function () { body.style.transition = ''; });
+    localStorage.setItem('theme', next);
+  };
+
+  document.addEventListener('DOMContentLoaded', function () {
+    var select = document.getElementById('theme-select');
+    if (select) select.value = theme;
+  });
+})();
+</script>
 
 <div class="topbar">
   <div class="topbar-left">
@@ -234,6 +299,14 @@ footer a:hover{color:var(--teal)}
     <button class="nav-back-btn" id="sidebarToggle">&#9776; Parts</button>
     <a class="nav-back-btn" href="https://sshartbauer.github.io/tools/">&larr; Tools</a>
     <a class="nav-back-btn" href="https://sshartbauer.github.io/">Home</a>
+    <div class="theme-select-wrap">
+      <select id="theme-select" class="theme-select" onchange="setTheme(this.value)" aria-label="Choose color theme">
+        <option value="light">Light</option>
+        <option value="dark">Dark</option>
+        <option value="amoled">AMOLED</option>
+        <option value="hc">High Contrast</option>
+      </select>
+    </div>
   </div>
 </div>
 

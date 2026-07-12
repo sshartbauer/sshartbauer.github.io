@@ -892,6 +892,7 @@ function App() {
         <CurrencyChips streak={streak} level={level} />
         <Wallet electrons={electrons} flash={flashE === 'gain'} spent={flashE === 'spend'} />
         <ResetButton onClick={resetProgress} label={'↺ Reset run'} />
+        <ThemeSelect />
       </TopBar>
 
       <div className="main">

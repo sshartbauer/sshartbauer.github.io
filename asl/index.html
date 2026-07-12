@@ -5,7 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ASL Flashcards</title>
   <style>
+    /* Light theme — default */
     :root {
+      --bg: #FDFCFA;
+      --surface: rgba(22,32,43,0.035);
+      --surface2: rgba(22,32,43,0.06);
+      --border: rgba(22,32,43,0.15);
+      --accent: #5b3fd1;
+      --accent2: #4c2fb0;
+      --accent3: #0e7fb8;
+      --green: #0b8457;
+      --text: #0F1720;
+      --muted: #33404D;
+      --front-bg: #ede9fb;
+      --back-bg: #e7f3f5;
+    }
+
+    /* Dark theme — original palette */
+    body[data-theme="dark"] {
       --bg: #0f0f13;
       --surface: #1a1a24;
       --surface2: #22223a;
@@ -18,6 +35,38 @@
       --muted: #8888aa;
       --front-bg: #1a1a2e;
       --back-bg: #16213e;
+    }
+
+    /* AMOLED theme — same accents as Dark, true-black background */
+    body[data-theme="amoled"] {
+      --bg: #000000;
+      --surface: rgba(255,255,255,0.04);
+      --surface2: rgba(255,255,255,0.07);
+      --border: #2e2e4a;
+      --accent: #7c6af7;
+      --accent2: #a78bfa;
+      --accent3: #38bdf8;
+      --green: #34d399;
+      --text: #e8e8f0;
+      --muted: #8888aa;
+      --front-bg: #1a1a2e;
+      --back-bg: #16213e;
+    }
+
+    /* High Contrast theme */
+    body[data-theme="hc"] {
+      --bg: #000000;
+      --surface: rgba(255,255,255,0.06);
+      --surface2: rgba(255,255,255,0.12);
+      --border: rgba(255,255,255,0.25);
+      --accent: #FDFCDC;
+      --accent2: #FDFCDC;
+      --accent3: #FDFCDC;
+      --green: #FDFCDC;
+      --text: #ffffff;
+      --muted: #cccccc;
+      --front-bg: #FDFCDC;
+      --back-bg: #FDFCDC;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -81,6 +130,68 @@
       background: var(--accent);
       border-color: var(--accent);
       color: #fff;
+    }
+
+    /* Theme picker */
+    .theme-bar {
+      width: 100%;
+      max-width: 580px;
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 10px;
+    }
+
+    .theme-select-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .theme-select {
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      padding: 6px 26px 6px 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .theme-select option {
+      background: var(--bg);
+      color: var(--text);
+      font-weight: 400;
+    }
+
+    .theme-select:hover,
+    .theme-select:focus {
+      border-color: var(--accent);
+      color: var(--accent2);
+      outline: none;
+    }
+
+    .theme-select-wrap::after {
+      content: '';
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      width: 6px;
+      height: 6px;
+      border-right: 1px solid var(--muted);
+      border-bottom: 1px solid var(--muted);
+      transform: translateY(-70%) rotate(45deg);
+      pointer-events: none;
+    }
+
+    .theme-select-wrap:hover::after {
+      border-color: var(--accent);
     }
 
     /* Progress bar */
@@ -155,6 +266,10 @@
       gap: 12px;
     }
 
+    /* Note: the flashcard face is a deliberately fixed dark panel (front/back
+       gradients below are hardcoded, not theme vars) so its accent colors are
+       pinned to the original dark-theme literal values — they stay legible on
+       that panel regardless of which site theme is active. */
     .card-front .group-label {
       position: absolute;
       top: 16px;
@@ -163,14 +278,14 @@
       font-weight: 700;
       letter-spacing: 1px;
       text-transform: uppercase;
-      color: var(--accent);
+      color: #7c6af7;
       opacity: 0.7;
     }
 
     .card-front .hint {
       position: absolute;
       bottom: 16px;
-      color: var(--muted);
+      color: #8888aa;
       font-size: 0.75rem;
     }
 
@@ -179,7 +294,7 @@
       font-weight: 900;
       letter-spacing: -4px;
       line-height: 1;
-      background: linear-gradient(135deg, #fff 30%, var(--accent2));
+      background: linear-gradient(135deg, #fff 30%, #a78bfa);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -188,7 +303,7 @@
 
     .card-front .sub-label {
       font-size: 1rem;
-      color: var(--muted);
+      color: #8888aa;
       letter-spacing: 2px;
       text-transform: uppercase;
       font-weight: 500;
@@ -218,13 +333,13 @@
       font-weight: 700;
       letter-spacing: 1.5px;
       text-transform: uppercase;
-      color: var(--accent);
+      color: #7c6af7;
     }
 
     .back-top .handshape-text {
       font-size: 1rem;
       line-height: 1.5;
-      color: var(--text);
+      color: #e8e8f0;
       font-weight: 500;
     }
 
@@ -256,13 +371,25 @@
       text-transform: uppercase;
     }
 
-    .back-cell.location .cell-label  { color: var(--green); }
-    .back-cell.movement .cell-label  { color: var(--accent3); }
+    .back-cell.location .cell-label  { color: #34d399; }
+    .back-cell.movement .cell-label  { color: #38bdf8; }
     .back-cell.facial .cell-label    { color: #f9a8d4; }
+
+    body[data-theme="hc"] .card-front .group-label,
+    body[data-theme="hc"] .back-top .section-label,
+    body[data-theme="hc"] .back-cell.location .cell-label,
+    body[data-theme="hc"] .back-cell.movement .cell-label,
+    body[data-theme="hc"] .back-cell.facial .cell-label { color: #FDFCDC; }
+
+    body[data-theme="hc"] .card-front .main-word {
+      background: linear-gradient(135deg, #fff, #FDFCDC);
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
 
     .back-cell .cell-text {
       font-size: 0.82rem;
-      color: var(--text);
+      color: #e8e8f0;
       line-height: 1.4;
       opacity: 0.9;
     }
@@ -325,7 +452,7 @@
     .quiz-prompt .q-word {
       font-size: 4rem;
       font-weight: 900;
-      background: linear-gradient(135deg, #fff, var(--accent2));
+      background: linear-gradient(135deg, var(--text), var(--accent2));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -419,6 +546,8 @@
         display: inline-flex;
         align-items: center;
       }
+      .theme-bar { justify-content: center; margin-bottom: 14px; }
+      .theme-select { min-height: 44px; padding: 10px 30px 10px 16px; font-size: 0.85rem; }
       .mode-btn { padding: 11px 12px; min-height: 44px; font-size: 0.9rem; max-width: none; }
       .btn { padding: 12px 18px; min-height: 44px; font-size: 0.95rem; justify-content: center; }
       .controls { width: 100%; justify-content: center; flex-wrap: wrap; }
@@ -449,6 +578,40 @@
   </style>
 </head>
 <body>
+<script>
+  (function () {
+    var THEMES = ['light', 'dark', 'amoled', 'hc'];
+    var stored = localStorage.getItem('theme');
+    var theme = THEMES.indexOf(stored) !== -1 ? stored : 'light';
+    document.body.setAttribute('data-theme', theme);
+
+    window.setTheme = function (next) {
+      if (THEMES.indexOf(next) === -1) return;
+      var body = document.body;
+      body.style.transition = 'none';
+      body.setAttribute('data-theme', next);
+      void body.offsetHeight;
+      requestAnimationFrame(function () { body.style.transition = ''; });
+      localStorage.setItem('theme', next);
+    };
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var select = document.getElementById('theme-select');
+      if (select) select.value = theme;
+    });
+  })();
+</script>
+
+<div class="theme-bar">
+  <div class="theme-select-wrap">
+    <select id="theme-select" class="theme-select" onchange="setTheme(this.value)" aria-label="Choose color theme">
+      <option value="light">Light</option>
+      <option value="dark">Dark</option>
+      <option value="amoled">AMOLED</option>
+      <option value="hc">High Contrast</option>
+    </select>
+  </div>
+</div>
 
 <header>
   <h1>ASL Flashcards</h1>

@@ -1,11 +1,39 @@
 /* Study App UI Kit — dense dark app shell shared by Hospital Spanish
    and OChem. System fonts, deep navy, sidebar + topbar + content. */
 
+/* Light theme — default */
 :root {
+  --slate:#24505F; --pink:#8F3330; --peach:#A84A25; --teal:#005F66; --yellow:#5F5317;
+  --purple:#7A3F96; --red:#C0392B;
+  --bg:#FDFCFA; --surf:#F3F1EC; --surf2:#E8E5DC; --border:rgba(22,32,43,0.15);
+  --text:#0F1720; --muted:#33404D;
+  --known:#1E8449; --unknown:#C0392B;
+}
+
+/* Dark theme — original navy/teal palette */
+html[data-theme="dark"] {
   --slate:#395C6B; --pink:#C96460; --peach:#F08667; --teal:#00AFB9; --yellow:#FDFCDC;
   --purple:#9b59b6; --red:#e74c3c;
   --bg:#080e14; --surf:#0d1b26; --surf2:#132233; --border:#2a4858;
   --text:#FDFCDC; --muted:#6fa0af;
+  --known:#2ecc71; --unknown:#e74c3c;
+}
+
+/* AMOLED theme — same accents as Dark, true-black background */
+html[data-theme="amoled"] {
+  --slate:#395C6B; --pink:#C96460; --peach:#F08667; --teal:#00AFB9; --yellow:#FDFCDC;
+  --purple:#9b59b6; --red:#e74c3c;
+  --bg:#000000; --surf:#0d1b26; --surf2:#132233; --border:#2a4858;
+  --text:#FDFCDC; --muted:#6fa0af;
+  --known:#2ecc71; --unknown:#e74c3c;
+}
+
+/* High Contrast theme — pure black, single bright accent */
+html[data-theme="hc"] {
+  --slate:#FDFCDC; --pink:#FDFCDC; --peach:#FDFCDC; --teal:#FDFCDC; --yellow:#FDFCDC;
+  --purple:#FDFCDC; --red:#e74c3c;
+  --bg:#000000; --surf:#000000; --surf2:rgba(255,255,255,0.06); --border:rgba(255,255,255,0.25);
+  --text:#ffffff; --muted:#cccccc;
   --known:#2ecc71; --unknown:#e74c3c;
 }
 
@@ -21,7 +49,7 @@ body {
 .topbar {
   display: flex; align-items: center; justify-content: space-between;
   padding: 12px 20px; border-bottom: 1px solid var(--border);
-  background: linear-gradient(90deg, #060c12, #0a1520);
+  background: linear-gradient(90deg, var(--surf), var(--surf2));
   flex-shrink: 0;
 }
 .topbar-left { display: flex; align-items: center; gap: 8px; }
@@ -56,13 +84,22 @@ body {
 }
 .reset-btn:hover { border-color: var(--pink); color: var(--pink); }
 
+.theme-select {
+  padding: 5px 10px; border-radius: 7px; border: 1px solid var(--border);
+  background: var(--surf2); color: var(--muted);
+  font-size: 0.73rem; font-weight: 500; cursor: pointer; transition: all 0.15s;
+  font-family: inherit;
+}
+.theme-select:hover, .theme-select:focus { border-color: var(--teal); color: var(--teal); outline: none; }
+.theme-select option { background: var(--surf2); color: var(--text); }
+
 /* ── Main layout ── */
 .main { display: flex; flex: 1; overflow: hidden; }
 
 /* ── Sidebar ── */
 .sidebar {
   width: 240px; flex-shrink: 0;
-  background: linear-gradient(180deg, #0a1720 0%, #08131e 100%);
+  background: linear-gradient(180deg, var(--surf2) 0%, var(--surf) 100%);
   border-right: 1px solid var(--border);
   display: flex; flex-direction: column; overflow: hidden;
 }
@@ -131,7 +168,7 @@ body {
 /* ── Progress panel ── */
 .prog-panel {
   flex-shrink: 0; border-top: 1px solid var(--border);
-  padding: 12px 14px; background: #06101a;
+  padding: 12px 14px; background: var(--surf);
 }
 .prog-panel-title {
   font-size: 0.6rem; font-weight: 800;
@@ -206,7 +243,10 @@ body {
   display: flex; overflow: hidden;
 }
 .front {
-  background: var(--yellow); color: #1a2c3a;
+  /* Flashcard front is a fixed pale "index card" look in every theme —
+     intentionally decoupled from --yellow (which now tracks the theme
+     accent) so the hardcoded dark text below always stays legible. */
+  background: #FDFCDC; color: #1a2c3a;
   flex-direction: column; align-items: center; justify-content: center;
   padding: 32px 28px; gap: 12px;
   border: 1px solid #e8e6c0;
@@ -235,7 +275,7 @@ body {
 }
 
 .back {
-  background: linear-gradient(160deg, #0b1c2c 0%, #0d2035 100%);
+  background: linear-gradient(160deg, var(--surf2) 0%, var(--surf) 100%);
   color: var(--text); transform: rotateY(180deg);
   flex-direction: row; align-items: stretch; padding: 18px;
   border: 1px solid var(--border);
@@ -270,12 +310,12 @@ body {
 .phonetic {
   font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace;
   font-size: 0.85rem; color: var(--peach);
-  background: #06101a; padding: 5px 8px;
+  background: var(--surf); padding: 5px 8px;
   border-radius: 6px; border: 1px solid var(--border);
   line-height: 1.5;
 }
 .notes {
-  font-size: 0.75rem; color: #c9dae0;
+  font-size: 0.75rem; color: var(--muted);
   line-height: 1.5; font-style: italic;
 }
 
@@ -357,7 +397,7 @@ kbd {
   /* Comfortable tap targets */
   button, select, .nav-back-btn { touch-action: manipulation; }
   .btn, .btn-flip, .btn-known, .btn-unknown,
-  .mode-btn, .type-btn, .reset-btn, .btn-xs, .sec-btn, .nav-back-btn {
+  .mode-btn, .type-btn, .reset-btn, .btn-xs, .sec-btn, .nav-back-btn, .theme-select {
     min-height: 44px;
   }
   .nav-back-btn { display: inline-flex; align-items: center; }
