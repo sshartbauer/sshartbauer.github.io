@@ -154,6 +154,12 @@ body{
 .control-row.fine{gap:16px;font-size:.75rem;color:var(--muted)}
 .fine-group{display:flex;align-items:center;gap:6px}
 .fine-group input[type=range]{accent-color:var(--teal)}
+.fine-group input[type=number]{
+  width:56px;padding:5px 6px;border-radius:6px;border:1px solid var(--border);
+  background:var(--surf2);color:var(--text);font-size:.8rem;text-align:center;
+  font-family:'Jost',sans-serif;
+}
+.fine-group input[type=number]:focus{outline:none;border-color:var(--teal)}
 .fs-btn{
   width:34px;height:34px;border-radius:6px;border:1px solid var(--border);background:var(--surf2);
   color:var(--muted);cursor:pointer;font-size:1rem;line-height:1;
@@ -180,6 +186,40 @@ footer a:hover{color:var(--teal)}
   .tile{width:clamp(168px,52vw,240px);height:200px}
   .content{padding:16px 14px}
   .sidebar.collapsed{width:100%;height:0;padding:0;border-bottom-color:transparent;overflow:hidden}
+
+  /* No horizontal scroll from embedded media */
+  img,svg,video,iframe{max-width:100%;height:auto}
+
+  /* Touch-friendly tap targets (>=44px) */
+  .nav-back-btn{min-height:44px;padding:8px 14px;font-size:.8rem}
+  .ctl-btn{min-height:44px;font-size:.9rem}
+  .fs-btn{width:44px;height:44px;font-size:1.1rem}
+  .part-btn{min-height:44px}
+  .fine-group input[type=number]{min-height:44px;width:64px;font-size:.95rem}
+  .fine-group input[type=range]{min-height:44px}
+
+  /* Readable body text on small screens */
+  .tile-back-word{font-size:.9rem}
+  .tile-back-desc{font-size:.95rem;line-height:1.45}
+  .tile-back-link{font-size:.85rem;padding-top:10px}
+  .tile-back-none{font-size:.9rem}
+  .tile-cue{font-size:.85rem}
+  .stats-row{font-size:.85rem}
+  .hint-text{font-size:.78rem}
+  .control-row.fine{font-size:.85rem}
+}
+
+/* -- Phones -- */
+@media (max-width:480px){
+  .topbar{padding:10px 14px}
+  .topbar h1{font-size:1.15rem}
+  .content{padding:14px 12px;gap:14px}
+  /* Stack tiles in a single full-width column */
+  .tile-grid{gap:14px}
+  .tile{width:100%;height:190px}
+  .control-row{gap:8px}
+  .ctl-btn{flex:1 1 auto;min-width:0;padding:10px 8px}
+  footer{padding:12px 14px}
 }
 </style>
 </head>
@@ -233,7 +273,7 @@ footer a:hover{color:var(--teal)}
       <div class="control-row fine">
         <div class="fine-group">
           <span>Pace</span>
-          <input type="range" id="paceSlider" min="3" max="12" step="0.5" value="6">
+          <input type="number" id="paceSlider" min="1" max="30" step="0.5" value="6">
           <span id="paceLabel">6s/line</span>
         </div>
         <div class="fine-group">
@@ -1128,8 +1168,18 @@ playBtn.onclick = togglePlay;
 
 paceSlider.oninput = () => {
   paceLabel.textContent = `${paceSlider.value}s/line`;
+};
+paceSlider.onchange = () => {
+  let v = parseFloat(paceSlider.value);
+  if (isNaN(v)) v = 6;
+  v = Math.min(30, Math.max(1, v));
+  paceSlider.value = v;
+  paceLabel.textContent = `${v}s/line`;
   if (playing) { stopPlay(); togglePlay(); }
 };
+paceSlider.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') paceSlider.blur();
+});
 
 document.getElementById('fsUp').onclick = () => { tileSize = Math.min(4.4, tileSize + 0.3); render(); };
 document.getElementById('fsDown').onclick = () => { tileSize = Math.max(1.4, tileSize - 0.3); render(); };

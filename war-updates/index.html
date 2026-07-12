@@ -379,9 +379,46 @@
   .dev-banner strong { color: #f4bf75; }
 
   @media (max-width: 640px) {
-    h1.page-title { font-size: 1.9rem; }
+    h1.page-title { font-size: clamp(1.7rem, 8vw, 1.9rem); }
     .feed-card { flex-direction: column; gap: 4px; }
     .feed-source { width: auto; }
+
+    /* Mobile-only additions: overflow guards, readable text, tap targets */
+    html, body { overflow-x: hidden; max-width: 100%; }
+    img, svg, video, iframe { max-width: 100%; height: auto; }
+    .wrap { padding: 0 20px; }
+
+    /* Stack card grids to a single column */
+    .card-grid { grid-template-columns: 1fr; }
+
+    /* Body text at least 15px */
+    body { font-size: 15px; }
+    .tier-sub { font-size: 0.95rem; }
+    .card p.desc { font-size: 0.95rem; }
+    .feed-excerpt { font-size: 0.95rem; }
+    .feed-body h4 { font-size: 1rem; }
+    .framing { font-size: 1rem; }
+    .breadcrumb { font-size: 0.88rem; }
+    .placeholder-note, .feed-date { font-size: 0.8rem; }
+    footer.site-footer { font-size: 0.88rem; }
+
+    /* Tap targets at least 44px */
+    nav.links { gap: 6px 14px; }
+    nav.links a { min-height: 44px; display: inline-flex; align-items: center; padding: 0 4px; }
+    nav.links a.current { padding-bottom: 0; border-bottom: none; text-decoration: underline; text-decoration-color: var(--accent); text-decoration-thickness: 2px; text-underline-offset: 5px; }
+    .site-name { min-height: 44px; display: inline-flex; align-items: center; }
+    .hc-toggle { min-height: 44px; padding: 10px 16px; font-size: 0.85rem; }
+    .breadcrumb a { display: inline-flex; align-items: center; min-height: 44px; }
+    .card a.open { display: inline-flex; align-items: center; min-height: 44px; font-size: 0.9rem; }
+    footer.site-footer a { display: inline-flex; align-items: center; min-height: 44px; }
+    .feed-body h4 a { display: inline-block; padding: 4px 0; }
+
+    /* Tighter section chrome so content fits ~360px */
+    .nav-row { padding: 12px 0; }
+    .tier-head { padding: 14px 16px; }
+    .card { padding: 16px; }
+    .feed-card { padding: 14px 16px; }
+    .feed-body h4 a, .card h3, .feed-excerpt { overflow-wrap: anywhere; }
   }
 </style>
 </head>

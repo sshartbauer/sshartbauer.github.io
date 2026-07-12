@@ -6,30 +6,79 @@
   <title>Seanna Hartbauer</title>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet"/>
   <style>
+    /* Light theme — default */
     :root {
-      --navy:         #111b2e;
-      --navy-mid:     #192338;
-      --navy-light:   #243358;
-      --slate:        #395C6B;
-      --teal:         #00AFB9;
-      --teal-dim:     rgba(0,175,185,0.55);
-      --peach:        #F08667;
-      --lobster:      #C96460;
-      --cream:        #FDFCDC;
-      --accent:       #00AFB9;
-      --accent-muted: rgba(0,175,185,0.45);
+      --bg:           #FDFCFA;
+      --nav-bg:       rgba(253,252,250,0.92);
+      --text:         #0F1720;
+      --text-muted:   #33404D;
+      --text-dim:     #4A5568;
+      --rule:         rgba(22,32,43,0.15);
+      --card:         rgba(22,32,43,0.035);
+      --card-hover:   rgba(0,95,102,0.08);
+      --teal:         #005F66;
+      --teal-dim:     rgba(0,95,102,0.35);
+      --peach:        #A84A25;
+      --lobster:      #8F3330;
+      --slate-accent: #24505F;
+      --cream:        #5F5317;
+      --accent:       var(--teal);
+      --accent-muted: rgba(0,95,102,0.4);
+      --noise-opacity: 0;
+      --body-weight:  400;
+      --display-weight: 400;
+    }
+
+    /* Dark theme — original navy/teal palette */
+    body[data-theme="dark"] {
+      --bg:           #132030;
+      --nav-bg:       rgba(19,32,48,0.95);
       --text:         #e8e4dc;
       --text-muted:   #8fa3ba;
       --text-dim:     #546e87;
       --rule:         rgba(0,175,185,0.15);
       --card:         rgba(255,255,255,0.04);
       --card-hover:   rgba(0,175,185,0.07);
+      --teal:         #00AFB9;
+      --teal-dim:     rgba(0,175,185,0.55);
+      --peach:        #F08667;
+      --lobster:      #C96460;
+      --slate-accent: #7bafc2;
+      --cream:        #FDFCDC;
+      --accent:       var(--teal);
+      --accent-muted: rgba(0,175,185,0.45);
+      --noise-opacity: 0.5;
+      --body-weight:  300;
+      --display-weight: 300;
     }
 
-    body.hc {
-      --navy:         #000000;
-      --navy-mid:     #0a0a0a;
-      --navy-light:   #111111;
+    /* AMOLED theme — same accents as Dark, true-black background */
+    body[data-theme="amoled"] {
+      --bg:           #000000;
+      --nav-bg:       rgba(0,0,0,0.92);
+      --text:         #e8e4dc;
+      --text-muted:   #8fa3ba;
+      --text-dim:     #546e87;
+      --rule:         rgba(0,175,185,0.15);
+      --card:         rgba(255,255,255,0.04);
+      --card-hover:   rgba(0,175,185,0.07);
+      --teal:         #00AFB9;
+      --teal-dim:     rgba(0,175,185,0.55);
+      --peach:        #F08667;
+      --lobster:      #C96460;
+      --slate-accent: #7bafc2;
+      --cream:        #FDFCDC;
+      --accent:       var(--teal);
+      --accent-muted: rgba(0,175,185,0.45);
+      --noise-opacity: 0.5;
+      --body-weight:  300;
+      --display-weight: 300;
+    }
+
+    /* High Contrast theme — unchanged from prior .hc implementation */
+    body[data-theme="hc"] {
+      --bg:           #000000;
+      --nav-bg:       rgba(0,0,0,0.97);
       --accent:       #FDFCDC;
       --accent-muted: rgba(253,252,220,0.6);
       --teal:         #FDFCDC;
@@ -40,26 +89,32 @@
       --rule:         rgba(255,255,255,0.25);
       --card:         rgba(255,255,255,0.06);
       --card-hover:   rgba(255,255,255,0.12);
+      --slate-accent: #ffffff;
+      --noise-opacity: 0;
+      --body-weight:  300;
+      --display-weight: 300;
+      background-image: radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px);
+      background-size: 28px 28px;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
 
     body {
-      background: #132030;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 800 800'%3E%3Cg fill='none' stroke='%231B2B49' stroke-width='1'%3E%3Cpath d='M769 229L1037 260.9M927 880L731 737 520 660 309 538 40 599 295 764 126.5 879.5 40 599-197 493 102 382-31 229 126.5 79.5-69-63'/%3E%3Cpath d='M-31 229L237 261 390 382 603 493 308.5 537.5 101.5 381.5M370 905L295 764'/%3E%3Cpath d='M520 660L578 842 731 737 840 599 603 493 520 660 295 764 309 538 390 382 539 269 769 229 577.5 41.5 370 105 295 -36 126.5 79.5 237 261 102 382 40 599 -69 737 127 880'/%3E%3Cpath d='M520-140L578.5 42.5 731-63M603 493L539 269 237 261 370 105M902 382L539 269M390 382L102 382'/%3E%3Cpath d='M-222 42L126.5 79.5 370 105 539 269 577.5 41.5 927 80 769 229 902 382 603 493 731 737M295-36L577.5 41.5M578 842L295 764M40-201L127 80M102 382L-261 269'/%3E%3C/g%3E%3Cg fill='%2300393D'%3E%3Ccircle cx='769' cy='229' r='5'/%3E%3Ccircle cx='539' cy='269' r='5'/%3E%3Ccircle cx='603' cy='493' r='5'/%3E%3Ccircle cx='731' cy='737' r='5'/%3E%3Ccircle cx='520' cy='660' r='5'/%3E%3Ccircle cx='309' cy='538' r='5'/%3E%3Ccircle cx='295' cy='764' r='5'/%3E%3Ccircle cx='40' cy='599' r='5'/%3E%3Ccircle cx='102' cy='382' r='5'/%3E%3Ccircle cx='127' cy='80' r='5'/%3E%3Ccircle cx='370' cy='105' r='5'/%3E%3Ccircle cx='578' cy='42' r='5'/%3E%3Ccircle cx='237' cy='261' r='5'/%3E%3Ccircle cx='390' cy='382' r='5'/%3E%3C/g%3E%3C/svg%3E");
-      background-size: 200px 200px;
+      background: var(--bg);
       color: var(--text);
       font-family: 'Jost', sans-serif;
-      font-weight: 300;
+      font-weight: var(--body-weight);
       line-height: 1.7;
       min-height: 100vh;
       transition: background 0.3s, color 0.3s;
     }
 
-    body.hc {
-      background-image: radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px);
-      background-size: 28px 28px;
+    /* Decorative constellation texture — Dark/AMOLED only */
+    body[data-theme="dark"],
+    body[data-theme="amoled"] {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 800 800'%3E%3Cg fill='none' stroke='%231B2B49' stroke-width='1'%3E%3Cpath d='M769 229L1037 260.9M927 880L731 737 520 660 309 538 40 599 295 764 126.5 879.5 40 599-197 493 102 382-31 229 126.5 79.5-69-63'/%3E%3Cpath d='M-31 229L237 261 390 382 603 493 308.5 537.5 101.5 381.5M370 905L295 764'/%3E%3Cpath d='M520 660L578 842 731 737 840 599 603 493 520 660 295 764 309 538 390 382 539 269 769 229 577.5 41.5 370 105 295 -36 126.5 79.5 237 261 102 382 40 599 -69 737 127 880'/%3E%3Cpath d='M520-140L578.5 42.5 731-63M603 493L539 269 237 261 370 105M902 382L539 269M390 382L102 382'/%3E%3Cpath d='M-222 42L126.5 79.5 370 105 539 269 577.5 41.5 927 80 769 229 902 382 603 493 731 737M295-36L577.5 41.5M578 842L295 764M40-201L127 80M102 382L-261 269'/%3E%3C/g%3E%3Cg fill='%2300393D'%3E%3Ccircle cx='769' cy='229' r='5'/%3E%3Ccircle cx='539' cy='269' r='5'/%3E%3Ccircle cx='603' cy='493' r='5'/%3E%3Ccircle cx='731' cy='737' r='5'/%3E%3Ccircle cx='520' cy='660' r='5'/%3E%3Ccircle cx='309' cy='538' r='5'/%3E%3Ccircle cx='295' cy='764' r='5'/%3E%3Ccircle cx='40' cy='599' r='5'/%3E%3Ccircle cx='102' cy='382' r='5'/%3E%3Ccircle cx='127' cy='80' r='5'/%3E%3Ccircle cx='370' cy='105' r='5'/%3E%3Ccircle cx='578' cy='42' r='5'/%3E%3Ccircle cx='237' cy='261' r='5'/%3E%3Ccircle cx='390' cy='382' r='5'/%3E%3C/g%3E%3C/svg%3E");
+      background-size: 200px 200px;
     }
 
     body::before {
@@ -69,17 +124,16 @@
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
       pointer-events: none;
       z-index: 0;
-      opacity: 0.5;
+      opacity: var(--noise-opacity);
+      transition: opacity 0.3s;
     }
-
-    body.hc::before { opacity: 0; }
 
     /* ── Nav ── */
     nav {
       position: fixed;
       top: 0; left: 0; right: 0;
       z-index: 100;
-      background: rgba(19,32,48,0.95);
+      background: var(--nav-bg);
       backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--rule);
       padding: 0 40px;
@@ -90,8 +144,6 @@
       gap: 16px;
       transition: background 0.3s;
     }
-
-    body.hc nav { background: rgba(0,0,0,0.97); }
 
     .nav-name {
       font-family: 'Cormorant Garamond', serif;
@@ -128,32 +180,72 @@
 
     .nav-links a:hover { color: var(--accent); }
 
-    .hc-toggle {
+    .theme-select-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .theme-select {
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
       background: none;
       border: 1px solid var(--rule);
       border-radius: 3px;
       color: var(--text-muted);
       font-family: 'Jost', sans-serif;
       font-size: 10px;
-      font-weight: 400;
+      font-weight: 500;
       letter-spacing: 1.5px;
       text-transform: uppercase;
-      padding: 5px 10px;
+      padding: 5px 24px 5px 10px;
       cursor: pointer;
       white-space: nowrap;
-      flex-shrink: 0;
       transition: color 0.2s, border-color 0.2s, background 0.2s;
     }
 
-    .hc-toggle:hover {
-      color: var(--accent);
-      border-color: var(--accent-muted);
+    .theme-select option {
+      background: var(--bg);
+      color: var(--text);
+      font-weight: 400;
+      text-transform: none;
     }
 
-    body.hc .hc-toggle {
+    .theme-select:hover,
+    .theme-select:focus {
+      color: var(--accent);
+      border-color: var(--accent-muted);
+      outline: none;
+    }
+
+    .theme-select-wrap::after {
+      content: '';
+      position: absolute;
+      right: 11px;
+      top: 50%;
+      width: 6px;
+      height: 6px;
+      border-right: 1px solid var(--text-dim);
+      border-bottom: 1px solid var(--text-dim);
+      transform: translateY(-70%) rotate(45deg);
+      pointer-events: none;
+      transition: border-color 0.2s;
+    }
+
+    .theme-select-wrap:hover::after {
+      border-color: var(--accent);
+    }
+
+    body[data-theme="hc"] .theme-select {
       color: var(--cream);
       border-color: rgba(253,252,220,0.5);
       background: rgba(253,252,220,0.08);
+    }
+
+    body[data-theme="hc"] .theme-select-wrap::after {
+      border-color: var(--cream);
     }
 
     /* ── Hero ── */
@@ -184,7 +276,7 @@
     .hero h1 {
       font-family: 'Cormorant Garamond', serif;
       font-size: clamp(48px, 8vw, 82px);
-      font-weight: 300;
+      font-weight: var(--display-weight);
       line-height: 1.08;
       letter-spacing: -0.5px;
       color: var(--text);
@@ -228,9 +320,9 @@
     .tag.teal    { border-color: rgba(0,175,185,0.35);   color: var(--teal); }
     .tag.peach   { border-color: rgba(240,134,103,0.35); color: var(--peach); }
     .tag.lobster { border-color: rgba(201,100,96,0.35);  color: var(--lobster); }
-    .tag.slate   { border-color: rgba(57,92,107,0.55);   color: #7bafc2; }
+    .tag.slate   { border-color: rgba(57,92,107,0.55);   color: var(--slate-accent); }
 
-    body.hc .tag { color: #fff; border-color: rgba(255,255,255,0.35); }
+    body[data-theme="hc"] .tag { color: #fff; border-color: rgba(255,255,255,0.35); }
 
     .hero-rule {
       position: absolute;
@@ -269,7 +361,7 @@
     .section-label {
       font-family: 'Cormorant Garamond', serif;
       font-size: 36px;
-      font-weight: 300;
+      font-weight: var(--display-weight);
       letter-spacing: 0.5px;
       color: var(--teal);
       margin-bottom: 40px;
@@ -288,7 +380,7 @@
     .section-intro {
       font-family: 'Cormorant Garamond', serif;
       font-size: 28px;
-      font-weight: 300;
+      font-weight: var(--display-weight);
       line-height: 1.4;
       color: var(--text);
       margin-bottom: 48px;
@@ -314,7 +406,7 @@
     .card.accent-teal    { border-left-color: var(--teal); }
     .card.accent-peach   { border-left-color: var(--peach); }
     .card.accent-lobster { border-left-color: var(--lobster); }
-    .card.accent-slate   { border-left-color: #7bafc2; }
+    .card.accent-slate   { border-left-color: var(--slate-accent); }
     .card.accent-cream   { border-left-color: rgba(253,252,220,0.45); }
 
     .card-meta {
@@ -359,7 +451,7 @@
       border-color: rgba(0,175,185,0.35);
     }
 
-    body.hc .card-status.active {
+    body[data-theme="hc"] .card-status.active {
       background: rgba(253,252,220,0.1);
       color: var(--cream);
       border-color: rgba(253,252,220,0.4);
@@ -409,7 +501,7 @@
     }
 
     .contact-email:hover { border-color: var(--teal); }
-    body.hc .contact-email { color: var(--cream); border-color: rgba(253,252,220,0.4); }
+    body[data-theme="hc"] .contact-email { color: var(--cream); border-color: rgba(253,252,220,0.4); }
 
     /* ── Footer ── */
     footer {
@@ -447,19 +539,80 @@
     /* ── Molecule stripe ── */
     /* ── Mobile ── */
     @media (max-width: 640px) {
-      nav { padding: 0 18px; height: 54px; }
-      .nav-links { display: none; }
-      .nav-right { gap: 12px; }
-      .hero { padding: 100px 20px 90px; min-height: 100svh; }
+      html, body { overflow-x: hidden; }
+      img, svg, video { max-width: 100%; height: auto; }
+
+      /* Nav: static + wrapping rows so all links stay reachable, 44px tap targets */
+      nav {
+        position: static;
+        height: auto;
+        padding: 8px 16px 6px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      .nav-name { padding: 10px 0; }
+      .nav-right {
+        width: 100%;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+        gap: 4px 10px;
+      }
+      .nav-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0 2px;
+        margin-left: -8px;
+      }
+      .nav-links a {
+        display: inline-block;
+        padding: 13px 8px;
+        font-size: 12px;
+        letter-spacing: 1.5px;
+      }
+      .theme-select { min-height: 44px; padding: 8px 26px 8px 12px; }
+
+      .hero { padding: 56px 20px 90px; min-height: 100svh; }
+      .hero h1 { font-size: clamp(40px, 12vw, 48px); }
       .hero-rule { left: 20px; bottom: 36px; }
       section { padding: 60px 20px; }
       .section-intro { font-size: 22px; }
       .card { padding: 20px 18px; }
-      footer { padding: 24px 20px; flex-direction: column; align-items: flex-start; }
+      .card-desc { font-size: 15px; }
+      .clinical-sub { font-size: 15px; }
+      .contact-email { display: inline-block; font-size: 15px; padding: 12px 0; }
+      footer { padding: 20px; flex-direction: column; align-items: flex-start; }
+      footer a { display: inline-block; padding: 12px 0; }
     }
   </style>
 </head>
 <body>
+  <script>
+    (function () {
+      var THEMES = ['light', 'dark', 'amoled', 'hc'];
+      var stored = localStorage.getItem('theme');
+      var theme = THEMES.indexOf(stored) !== -1 ? stored : 'light';
+      document.body.setAttribute('data-theme', theme);
+
+      window.setTheme = function (next) {
+        if (THEMES.indexOf(next) === -1) return;
+        var body = document.body;
+        // Force an untransitioned style flush: some browsers don't
+        // re-trigger a transition when only a var()-referenced custom
+        // property changes via attribute/selector switch, which can leave
+        // background/color stuck on the old theme's values.
+        body.style.transition = 'none';
+        body.setAttribute('data-theme', next);
+        void body.offsetHeight;
+        requestAnimationFrame(function () { body.style.transition = ''; });
+        localStorage.setItem('theme', next);
+      };
+
+      document.addEventListener('DOMContentLoaded', function () {
+        var select = document.getElementById('theme-select');
+        if (select) select.value = theme;
+      });
+    })();
+  </script>
 
   <nav>
     <a class="nav-name" href="#">S. S. Hartbauer</a>
@@ -471,9 +624,14 @@
         <li><a href="/integrity/">AI Policy</a></li>
         <li><a href="#contact">Contact</a></li>
       </ul>
-      <button class="hc-toggle" onclick="document.body.classList.toggle('hc')" aria-label="Toggle high contrast mode">
-        High Contrast
-      </button>
+      <div class="theme-select-wrap">
+        <select class="theme-select" id="theme-select" onchange="setTheme(this.value)" aria-label="Choose color theme">
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+          <option value="amoled">AMOLED</option>
+          <option value="hc">High Contrast</option>
+        </select>
+      </div>
     </div>
   </nav>
 
@@ -495,7 +653,7 @@
   <section id="research">
     <div class="section-label">Research &amp; Analysis</div>
     <p class="section-intro">Papers I'm currently working on or that I have planned in an attempt to learn R</p>
-    <p style="font-family: 'Jost', sans-serif; font-size: 16px; font-weight: 300; color: var(--text-muted); line-height: 1.8; margin-top: 8px;">Currently trying to figure out a way to get my AI (Claude) to automatically track progress for these. First two are underway.</p>
+    <p style="font-family: 'Jost', sans-serif; font-size: 16px; color: var(--text-muted); line-height: 1.8; margin-top: 8px;">Currently trying to figure out a way to get my AI (Claude) to automatically track progress for these. First two are underway.</p>
     <div class="card-grid">
 
       <div class="card accent-teal">
@@ -604,4 +762,3 @@
 
 </body>
 </html>
-           

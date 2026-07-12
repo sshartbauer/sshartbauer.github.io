@@ -402,6 +402,50 @@
       font-family: inherit;
       font-size: 0.72rem;
     }
+
+    /* ── Mobile (additive only — desktop unchanged) ─────────────────────── */
+    @media (max-width: 640px) {
+      img, svg, video, iframe { max-width: 100%; height: auto; }
+
+      body { padding: 16px 12px 40px; }
+      header { margin-bottom: 20px; }
+      header h1 { font-size: clamp(1.5rem, 6.5vw, 2rem); }
+
+      /* Touch-friendly tap targets (>=44px) */
+      .tab {
+        padding: 10px 16px;
+        font-size: 0.85rem;
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+      }
+      .mode-btn { padding: 11px 12px; min-height: 44px; font-size: 0.9rem; max-width: none; }
+      .btn { padding: 12px 18px; min-height: 44px; font-size: 0.95rem; justify-content: center; }
+      .controls { width: 100%; justify-content: center; flex-wrap: wrap; }
+      .mode-row { width: 100%; max-width: 320px; }
+
+      /* Card: taller to fit stacked back cells; scale huge letter down */
+      .scene { height: 460px; }
+      .card-front .main-word { font-size: clamp(3.5rem, 22vw, 5rem); letter-spacing: -2px; }
+      .card-front .sub-label { font-size: 0.9rem; }
+      .card-back { overflow-y: auto; }
+      .back-top { padding: 18px 16px 14px; }
+      .back-top .handshape-text { font-size: 0.95rem; }
+
+      /* Stack the 3-column back grid into a single column */
+      .back-bottom { grid-template-columns: 1fr; height: auto; }
+      .back-cell { padding: 12px 16px; }
+      .back-cell + .back-cell { border-left: none; border-top: 1px solid var(--border); }
+      .back-cell .cell-text { font-size: 0.95rem; }
+
+      /* Quiz: single-column options, readable text, big tap areas */
+      .quiz-prompt { padding: 16px 18px; }
+      .quiz-prompt .q-word { font-size: clamp(2.4rem, 13vw, 3.2rem); }
+      .quiz-options { grid-template-columns: 1fr; }
+      .quiz-opt { font-size: 0.95rem; padding: 14px 16px; min-height: 44px; }
+      .quiz-score { font-size: 0.95rem; }
+      .counter { font-size: 0.85rem; }
+    }
   </style>
 </head>
 <body>

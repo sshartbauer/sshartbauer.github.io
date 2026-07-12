@@ -235,10 +235,33 @@
     .page-footer a { color: var(--text-muted); }
 
     @media (max-width: 640px) {
+      body { overflow-x: hidden; }
+      img, svg { max-width: 100%; height: auto; }
+
+      /* Nav: allow wrapping so it never overflows at 360px */
+      nav { padding: 0.6rem 0.75rem; flex-wrap: wrap; gap: 0.4rem 0.6rem; }
+      .nav-left { flex-wrap: wrap; gap: 0.5rem; }
+      .nav-right { flex-wrap: wrap; gap: 0.5rem; justify-content: flex-end; }
+      .nav-brand { font-size: 1.3rem; }
+      .btn-nav-back, .btn-hc {
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        font-size: 0.85rem;
+        padding: 0.4rem 0.8rem;
+      }
+
       .page-wrap { padding: 2rem 1rem 4rem; }
       .page-hero h1 { font-size: 2rem; }
+      .page-hero p { font-size: 1rem; }
       .do-dont { grid-template-columns: 1fr; }
       .policy-section { padding: 1.25rem 1.1rem; }
+      .policy-section h2 { font-size: 1.35rem; }
+      .policy-section h3 { font-size: 1.1rem; }
+      .do-box li, .dont-box li { font-size: 0.95rem; }
+      .citation-example { font-size: 0.95rem; overflow-wrap: anywhere; }
+      .callout { font-size: 0.95rem; }
+      .page-footer { font-size: 0.9rem; }
     }
   </style>
 </head>

@@ -1060,17 +1060,103 @@
 
     /* ── Responsive ── */
     @media (max-width: 640px) {
-      nav { padding: 0.8rem 1rem; }
+      body { overflow-x: hidden; }
+      img, svg { max-width: 100%; height: auto; }
+
+      /* Nav: allow wrapping so it never overflows at 360px */
+      nav { padding: 0.6rem 0.75rem; flex-wrap: wrap; gap: 0.4rem 0.6rem; }
+      .nav-left { gap: 0.5rem; flex-wrap: wrap; }
+      .nav-right { gap: 0.5rem; flex-wrap: wrap; justify-content: flex-end; }
       .nav-brand { font-size: 1.25rem; }
+      .btn-nav-back, .btn-hc, .btn-demo-nav, .btn-history {
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        font-size: 0.85rem;
+        padding: 0.4rem 0.8rem;
+      }
+      .history-dropdown { width: min(320px, calc(100vw - 1.5rem)); right: -0.75rem; }
+      .history-item { padding: 0.85rem 1rem; font-size: 0.95rem; min-height: 44px; display: flex; align-items: center; }
+
+      /* Hero */
       .hero { padding: 2.5rem 1rem 1.5rem; }
-      .input-card { padding: 1.25rem; }
-      .section-body { padding: 1rem; }
-      .section-header { padding: 0.85rem 1rem; }
-      .vars-grid { grid-template-columns: 1fr; }
-      .export-row { flex-direction: column; }
-      .history-dropdown { width: calc(100vw - 2rem); right: -1rem; }
+      .hero-sub { font-size: 1rem; }
+
+      main { padding: 0 1rem 3rem; }
+
+      /* Input card / forms: full-width, 16px inputs to prevent iOS zoom */
+      .input-card { padding: 1.25rem 1rem; }
+      .input-explainer { font-size: 0.95rem; }
+      textarea#question { font-size: 1rem; }
+      .input-actions { flex-direction: column; align-items: stretch; }
+      .topic-link { min-height: 44px; font-size: 0.95rem; }
+      .btn-primary { width: 100%; justify-content: center; min-height: 48px; font-size: 1rem; }
+
+      /* Topic suggester */
+      .topic-panel { padding: 1.25rem 1rem; }
+      .topic-input-row { flex-direction: column; }
+      input#topic-input { min-width: 0; width: 100%; font-size: 1rem; }
+      .btn-secondary { width: 100%; min-height: 48px; font-size: 1rem; }
+      .scope-card-text { font-size: 0.95rem; }
+      .scope-tooltip { width: min(200px, 70vw); }
+
+      /* Preview grid → single column */
       .preview-grid { grid-template-columns: 1fr; }
+      .preview-card-desc, .preview-bullets li { font-size: 0.95rem; }
+
+      /* Section cards */
+      .section-body { padding: 1rem; }
+      .section-header { padding: 0.85rem 1rem; flex-wrap: wrap; gap: 0.6rem; }
+      .section-header h2 { font-size: 1.35rem; }
+      .section-direction { font-size: 0.95rem; }
+      .active-q-banner { padding: 1rem; }
+      .active-q-text { overflow-wrap: anywhere; }
+      .btn-ghost-sm { min-height: 44px; display: inline-flex; align-items: center; font-size: 0.85rem; }
+      .collapsible-trigger { min-height: 44px; }
+
+      /* Query optimizer */
+      .mode-btn { min-height: 44px; padding: 0.4rem 1rem; font-size: 0.95rem; }
+      .synonyms-row { font-size: 0.95rem; }
+      .search-string-item { flex-direction: column; align-items: stretch; font-size: 0.95rem; }
+      .btn-copy { min-height: 44px; font-size: 0.85rem; padding: 0.5rem 0.75rem; }
+
+      /* Source tiers */
+      .tier-text strong { font-size: 0.95rem; }
+      .tier-text span { font-size: 0.95rem; }
+
+      /* Papers */
+      .papers-controls { flex-direction: column; align-items: stretch; }
+      .citable-toggle-wrap { min-height: 44px; font-size: 0.95rem; }
+      .sort-wrap { font-size: 0.95rem; }
+      select.sort-select { font-size: 1rem; min-height: 44px; flex: 1; }
+      .paper-title { font-size: 1rem; overflow-wrap: anywhere; }
+      .paper-meta-table { font-size: 0.88rem; }
+      .meta-label { width: 4.75rem; }
+      .meta-value { overflow-wrap: anywhere; }
+      .paper-abstract, .abstract-expanded { font-size: 0.95rem; }
+      .btn-explain, .btn-pdf, .btn-expand-abstract {
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        font-size: 0.85rem;
+      }
+
+      /* Methodology / variables / datasets / refinements */
+      .method-def, .method-alts, .var-exp, .dataset-desc { font-size: 0.95rem; }
+      .vars-grid { grid-template-columns: 1fr; }
+      .dataset-name { overflow-wrap: anywhere; }
+      .refinement-item { font-size: 0.95rem; padding: 0.85rem 1rem; }
+
+      /* Export */
+      .export-row { flex-direction: column; }
+      .btn-export { width: 100%; justify-content: center; min-height: 48px; font-size: 1rem; }
+      .disclaimer { font-size: 0.85rem; }
+
+      /* Demo wizard */
       #demo-modal { padding: 1.5rem 1.25rem 1.25rem; }
+      #demo-modal-body { font-size: 0.95rem; }
+      .btn-demo-prev, .btn-demo-next { min-height: 44px; }
+      .btn-demo-close { min-height: 44px; }
     }
   </style>
 </head>

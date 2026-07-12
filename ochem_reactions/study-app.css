@@ -330,3 +330,44 @@ kbd {
   background: var(--surf2); font-size: 0.64rem;
   font-family: monospace;
 }
+
+/* ── Mobile (≤640px) — additive overrides only; desktop untouched ── */
+@media (max-width: 640px) {
+  /* Let the page scroll as a normal document instead of a fixed shell */
+  html, body { height: auto; min-height: 100%; overflow: auto; }
+  body { min-height: 100dvh; overflow-x: hidden; }
+
+  /* Topbar wraps instead of overflowing */
+  .topbar { flex-wrap: wrap; gap: 8px; padding: 10px 12px; }
+  .topbar h1 { font-size: 1rem; }
+  .topbar-right { flex-wrap: wrap; gap: 8px; justify-content: flex-start; }
+
+  /* Shell stacks: sidebar on top (own scroll), content below */
+  .main { flex-direction: column; overflow: visible; }
+  .sidebar {
+    width: 100%;
+    max-height: 320px;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+  .content { overflow: visible; padding: 12px 10px 24px; }
+
+  .device-notice { white-space: normal; line-height: 1.4; }
+
+  /* Comfortable tap targets */
+  button, select, .nav-back-btn { touch-action: manipulation; }
+  .btn, .btn-flip, .btn-known, .btn-unknown,
+  .mode-btn, .type-btn, .reset-btn, .btn-xs, .sec-btn, .nav-back-btn {
+    min-height: 44px;
+  }
+  .nav-back-btn { display: inline-flex; align-items: center; }
+  .quiz-btns { width: 100%; }
+
+  /* Flashcard back stacks vertically */
+  .back { flex-direction: column; }
+  .back-l { flex: 0 0 auto; padding: 0 0 10px; }
+  .back-r {
+    border-left: none; border-top: 1px solid var(--border);
+    padding: 12px 0 0;
+  }
+}

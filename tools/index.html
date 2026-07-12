@@ -321,13 +321,47 @@
       .contrib-grid { grid-template-columns: 1fr; }
     }
     @media (max-width: 640px) {
-      nav { padding: 0 18px; height: 54px; }
-      .nav-links { display: none; }
-      .page-hero { padding: 100px 20px 50px; }
+      html, body { overflow-x: hidden; }
+      img, svg, video { max-width: 100%; height: auto; }
+
+      /* Nav: static + wrapping rows so all links stay reachable, 44px tap targets */
+      nav {
+        position: static;
+        height: auto;
+        padding: 8px 16px 6px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      .nav-name { padding: 10px 0; }
+      .nav-right {
+        width: 100%;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+        gap: 4px 10px;
+      }
+      .nav-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0 2px;
+        margin-left: -8px;
+      }
+      .nav-links a {
+        display: inline-block;
+        padding: 13px 8px;
+        font-size: 12px;
+        letter-spacing: 1.5px;
+      }
+      .hc-toggle { min-height: 44px; padding: 8px 12px; }
+
+      .page-hero { padding: 48px 20px 50px; }
       .tools-section { padding: 0 20px 60px; }
       .human-section { padding: 0 20px 70px; }
       .tool-tile { padding: 22px 20px 20px; }
-      footer { padding: 24px 20px; flex-direction: column; align-items: flex-start; }
+      .tool-desc { font-size: 15px; }
+      .human-intro { font-size: 15px; }
+      .contrib-list li { font-size: 15px; }
+      footer { padding: 20px; flex-direction: column; align-items: flex-start; }
+      footer a { display: inline-block; padding: 12px 0; }
     }
   </style>
 </head>

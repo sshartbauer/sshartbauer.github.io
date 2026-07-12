@@ -124,6 +124,57 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 
 .kbd-hint{font-size:.67rem;color:var(--muted);text-align:center;flex-shrink:0}
 kbd{display:inline-block;padding:1px 5px;border:1px solid var(--border);border-radius:4px;background:var(--surf2);font-size:.64rem;font-family:monospace}
+
+/* ── Mobile (additive only — desktop unchanged) ── */
+@media (max-width:640px){
+  html,body{height:auto;min-height:100%;overflow:auto}
+  .main{flex-direction:column;overflow:visible}
+  .content{overflow:visible}
+
+  .topbar{flex-wrap:wrap;gap:8px;padding:10px 12px}
+  .topbar-left{flex-wrap:wrap;row-gap:6px}
+  .topbar h1{font-size:1.05rem;width:100%;order:-1}
+  .topbar-right{width:100%;justify-content:space-between;flex-wrap:wrap;row-gap:8px}
+  .nav-back-btn{padding:10px 14px;font-size:.85rem;border-radius:8px;min-height:44px}
+  .mode-btn{padding:12px 18px;font-size:.9rem;min-height:44px}
+  .reset-btn{padding:12px 14px;font-size:.85rem;min-height:44px}
+
+  .sidebar{width:100%;border-right:none;border-bottom:1px solid var(--border)}
+  .sidebar-body{max-height:220px}
+  .sec-col{flex-direction:row;flex-wrap:wrap;gap:6px}
+  .sec-btn{width:auto;flex:1 1 45%;min-height:44px;font-size:.9rem;padding:8px 12px}
+  .btn-xs{padding:8px 14px;font-size:.85rem;min-height:40px}
+  .type-btn{padding:12px 0;font-size:.9rem;min-height:44px}
+  .prog-stat-lbl{font-size:.7rem}
+
+  .content{padding:14px 12px 28px}
+  .device-notice{white-space:normal;line-height:1.4;font-size:.72rem}
+  .empty{min-height:260px}
+  .empty p{font-size:.95rem}
+  .stats-row{font-size:.85rem}
+
+  .scene{height:420px;height:clamp(380px,62svh,480px)}
+  .phrase-en{font-size:clamp(1.35rem,6.5vw,1.8rem)}
+  .front{padding:26px 18px 34px}
+  .back{flex-direction:column;padding:14px}
+  .back-l{flex:0 0 auto;padding:4px 0 12px;padding-right:0;border-bottom:1px solid var(--border)}
+  .back-r{padding-left:0;padding-top:12px;border-left:none;min-height:0}
+  .es-text{font-size:1.3rem}
+  .es-label,.dl-label{font-size:.68rem}
+  .phonetic{font-size:.95rem}
+  .notes{font-size:.94rem}
+  .flip-hint{font-size:.75rem;bottom:10px}
+
+  .ctrls{flex-wrap:wrap;justify-content:center;gap:10px;width:100%}
+  .btn{min-height:48px;padding:12px 18px;font-size:.95rem;justify-content:center}
+  .btn-flip{flex:1 1 100%;order:-1}
+  #btnPrev,#btnNext{flex:1 1 34%}
+  .quiz-btns{flex-wrap:wrap;justify-content:center;gap:10px;width:100%}
+  .btn-known,.btn-unknown{flex:1 1 44%;max-width:none;min-height:52px;font-size:.95rem;order:-1}
+  #qPrev,#qNext{flex:1 1 40%}
+
+  .kbd-hint{display:none !important}
+}
 </style>
 </head>
 <body>
