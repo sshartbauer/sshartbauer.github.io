@@ -167,7 +167,7 @@
 }
 .rxn-reagent {
   font-size: 0.95rem; font-weight: 700; color: var(--text);
-  font-family: -apple-system, sans-serif;
+  font-family: inherit;
 }
 .rxn-cond {
   font-size: 0.65rem; color: var(--muted);
@@ -648,7 +648,8 @@
 .tut-body::-webkit-scrollbar { width: 5px; }
 .tut-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 .tut-title {
-  font-size: 1.4rem; font-weight: 800; color: var(--text);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.7rem; font-weight: 600; color: var(--text);
   letter-spacing: -0.01em; margin-bottom: 10px;
 }
 .tut-content {

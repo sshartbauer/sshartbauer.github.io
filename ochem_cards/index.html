@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Organic Chemistry Flashcards</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/smiles-drawer@1.0.10/dist/smiles-drawer.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -34,7 +37,7 @@ body[data-theme="hc"]{
 html,body{height:100%;overflow:hidden}
 body{
   background:var(--bg);color:var(--text);
-  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+  font-family:'Jost',sans-serif;
   display:flex;flex-direction:column;
   transition:background .25s,color .25s;
 }
@@ -47,7 +50,7 @@ body{
 }
 .topbar-left{display:flex;align-items:center;gap:8px}
 .topbar h1{
-  font-size:1.15rem;font-weight:800;letter-spacing:-.02em;
+  font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:600;letter-spacing:-.02em;
   color:var(--teal);
 }
 .topbar-right{display:flex;align-items:center;gap:10px}
@@ -217,8 +220,8 @@ body{
   padding:2px 9px;border-radius:10px;font-size:.63rem;
   font-weight:700;letter-spacing:.05em;text-transform:uppercase;
 }
-.mol-name{font-size:clamp(1.6rem,4.5vw,2.4rem);font-weight:800;color:#1a2c3a;text-align:center;line-height:1.05}
-.mol-formula{font-size:1.1rem;font-weight:500;color:var(--slate);font-family:Georgia,serif}
+.mol-name{font-family:'Cormorant Garamond',serif;font-size:clamp(1.8rem,5vw,2.7rem);font-weight:600;color:#1a2c3a;text-align:center;line-height:1.05}
+.mol-formula{font-size:1.1rem;font-weight:500;color:var(--slate);font-family:'Cormorant Garamond',serif}
 .mol-iupac{font-size:.74rem;color:#6a8a9a;font-style:italic;text-align:center}
 .flip-hint{font-size:.68rem;color:#a0b8c0;position:absolute;bottom:14px;display:flex;align-items:center;gap:4px}
 
