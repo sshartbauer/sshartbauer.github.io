@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     /* ── Variables ── */
     /* Light theme — default */
@@ -28,6 +29,10 @@
       --text-dim:      #4A5568;
       --radius:        10px;
       --shadow:        0 4px 24px rgba(22,32,43,0.12);
+      --on-accent:     #FFFFFF;
+      --teal-hover:    #007a83;
+      --blue-slate-tint:        rgba(36,80,95,0.10);
+      --blue-slate-tint-strong: rgba(36,80,95,0.22);
     }
 
     /* Dark theme — original navy/teal palette */
@@ -48,6 +53,10 @@
       --text-muted:    #7a95b0;
       --text-dim:      #4a6580;
       --shadow:        0 4px 24px rgba(0,0,0,0.4);
+      --on-accent:     #0a1520;
+      --teal-hover:    #00c8d4;
+      --blue-slate-tint:        rgba(57,92,107,0.22);
+      --blue-slate-tint-strong: rgba(57,92,107,0.4);
     }
 
     /* AMOLED theme — same accents as Dark, true-black background */
@@ -68,6 +77,10 @@
       --text-muted:    #7a95b0;
       --text-dim:      #4a6580;
       --shadow:        0 4px 24px rgba(0,0,0,0.4);
+      --on-accent:     #0a1520;
+      --teal-hover:    #00c8d4;
+      --blue-slate-tint:        rgba(57,92,107,0.22);
+      --blue-slate-tint-strong: rgba(57,92,107,0.4);
     }
 
     /* High Contrast theme — unchanged from prior .high-contrast implementation */
@@ -83,6 +96,9 @@
       --text-muted: #ccc;
       --text-dim:   #aaa;
       --shadow:   0 4px 24px rgba(0,0,0,0.4);
+      --teal:       #FDFCDC;
+      --on-accent:  #000000;
+      --teal-hover: #e6e1b0;
     }
 
     /* ── Reset / Base ── */
@@ -284,6 +300,59 @@
       font-weight: 300;
     }
 
+    /* ── How it works (3-step) ── */
+    .how-it-works {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.9rem;
+      max-width: 760px;
+      margin: 1.75rem auto 0;
+      text-align: left;
+    }
+    .how-step {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.1rem 1.2rem;
+    }
+    .how-num {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--teal);
+      color: var(--on-accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.82rem;
+      font-weight: 600;
+      margin-bottom: 0.65rem;
+    }
+    .how-text {
+      font-size: 0.87rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+    .mini-analyze {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.08rem 0.65rem;
+      border: 1.5px solid var(--blue-slate);
+      color: var(--blue-slate);
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+    .check-icon {
+      width: 14px;
+      height: 14px;
+      vertical-align: -2px;
+      margin: 0 1px;
+      color: var(--teal);
+    }
+
     /* ── Main layout ── */
     main { max-width: 880px; margin: 0 auto; padding: 0 1.5rem 4rem; }
 
@@ -344,7 +413,7 @@
     .topic-link:hover { text-decoration: underline; }
     .btn-primary {
       background: var(--teal);
-      color: #0a1520;
+      color: var(--on-accent);
       border: none;
       padding: 0.7rem 2rem;
       border-radius: 7px;
@@ -354,7 +423,7 @@
       transition: all 0.2s;
       display: flex; align-items: center; gap: 0.5rem;
     }
-    .btn-primary:hover { background: #00c8d4; transform: translateY(-1px); }
+    .btn-primary:hover { background: var(--teal-hover); transform: translateY(-1px); }
     .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
     /* ── Topic Suggester ── */
@@ -393,7 +462,7 @@
       font-weight: 500;
       transition: all 0.2s;
     }
-    .btn-secondary:hover { background: var(--teal); color: #0a1520; }
+    .btn-secondary:hover { background: var(--teal); color: var(--on-accent); }
     .btn-secondary:disabled { opacity: 0.5; cursor: not-allowed; }
     .topic-results { margin-top: 1.2rem; display: flex; flex-direction: column; gap: 0.6rem; }
     .scope-card {
@@ -564,7 +633,20 @@
       letter-spacing: -0.01em;
     }
     .section-header h2 .icon { font-size: 1.15rem; }
+    .section-header-left { display: flex; align-items: center; gap: 0.9rem; flex-wrap: wrap; }
+    .section-check-wrap {
+      display: flex; align-items: center; gap: 0.35rem;
+      font-size: 0.72rem; font-weight: 500;
+      color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.05em;
+      cursor: pointer; user-select: none;
+    }
     .section-body { padding: 1.25rem 1.5rem; }
+
+    /* ── PDF-inclusion checkboxes ── */
+    .pdf-check-wrap { display: inline-flex; align-items: center; flex-shrink: 0; cursor: pointer; }
+    .pdf-check { width: 16px; height: 16px; accent-color: var(--teal); cursor: pointer; flex-shrink: 0; }
+    .paper-title .pdf-check-wrap, .refinement-item .pdf-check-wrap { margin-top: 0.2rem; }
 
     /* Directional text inside sections */
     .section-direction {
@@ -574,6 +656,13 @@
       padding-left: 0.75rem;
       margin-bottom: 1rem;
       line-height: 1.6;
+    }
+    .flavor-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 1rem;
+      color: var(--text-dim);
+      margin-bottom: 0.85rem;
     }
 
     /* ── Active question banner ── */
@@ -588,6 +677,15 @@
       align-items: flex-start;
       gap: 1rem;
       flex-wrap: wrap;
+    }
+    /* Sticky under the nav on desktop only — mobile keeps normal flow (see responsive block) */
+    @media (min-width: 641px) {
+      .active-q-banner {
+        position: sticky;
+        top: var(--nav-height, 60px);
+        z-index: 90;
+        background: linear-gradient(135deg, rgba(0,175,185,0.12), rgba(57,92,107,0.12)), var(--bg);
+      }
     }
     .active-q-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--teal); font-weight: 600; margin-bottom: 0.3rem; }
     .active-q-text { font-size: 1rem; font-weight: 500; color: var(--text); }
@@ -623,12 +721,43 @@
       transition: all 0.2s;
     }
     .mode-btn.active { background: var(--blue-slate); color: #fff; }
-    .synonyms-row {
-      margin-top: 0.75rem;
-      font-size: 0.83rem;
-      color: var(--text-muted);
+    .synonyms-row { margin-top: 0.9rem; }
+    .synonyms-heading {
+      display: flex; align-items: center; gap: 0.4rem;
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-dim);
+      margin-bottom: 0.55rem;
     }
-    .synonyms-row strong { color: var(--burnt-peach); font-weight: 500; }
+    .synonym-groups { display: flex; flex-direction: column; gap: 0.5rem; }
+    .synonym-group {
+      display: flex;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 0.3rem 0.65rem;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.55rem 0.85rem;
+    }
+    .synonym-group-term {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--burnt-peach);
+      flex-shrink: 0;
+    }
+    .synonym-group-alts { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+    .synonym-chip {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      background: var(--bg-card2);
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      padding: 0.15rem 0.6rem;
+      white-space: nowrap;
+    }
     .search-strings { margin-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
     .search-string-item {
       background: var(--bg-input);
@@ -989,6 +1118,7 @@
       flex-direction: column;
       gap: 0.15rem;
     }
+    .dataset-name-row { display: flex; align-items: center; gap: 0.55rem; }
     .dataset-name { font-size: 0.93rem; font-weight: 500; }
     .dataset-name a { color: var(--teal); }
     .dataset-desc { font-size: 0.82rem; color: var(--text-muted); }
@@ -1001,12 +1131,20 @@
       border-left: 3px solid var(--burnt-peach);
       border-radius: 0 8px 8px 0;
       padding: 0.75rem 1rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+      transition: border-left-color 0.2s;
+    }
+    .refinement-item:hover { border-left-color: var(--teal); }
+    .refinement-body {
+      flex: 1;
       cursor: pointer;
-      transition: all 0.2s;
       font-size: 0.9rem;
       line-height: 1.5;
+      transition: color 0.2s;
     }
-    .refinement-item:hover { border-left-color: var(--teal); color: var(--teal); }
+    .refinement-item:hover .refinement-body { color: var(--teal); }
     .refinement-label {
       font-size: 0.7rem;
       text-transform: uppercase;
@@ -1024,7 +1162,7 @@
       align-items: flex-start;
     }
     .btn-export {
-      background: rgba(57,92,107,0.3);
+      background: var(--blue-slate-tint);
       border: 1.5px solid var(--blue-slate);
       color: var(--text);
       padding: 0.6rem 1.2rem;
@@ -1034,7 +1172,21 @@
       transition: all 0.2s;
       display: flex; align-items: center; gap: 0.4rem;
     }
-    .btn-export:hover { background: var(--blue-slate); }
+    .btn-export:hover { background: var(--blue-slate-tint-strong); }
+    body[data-theme="hc"] .btn-export { background: rgba(255,255,255,0.08); border-color: var(--text); }
+    body[data-theme="hc"] .btn-export:hover { background: rgba(255,255,255,0.16); }
+    .btn-export-pdf {
+      background: var(--teal);
+      color: var(--on-accent);
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 7px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      transition: all 0.2s;
+      display: flex; align-items: center; gap: 0.4rem;
+    }
+    .btn-export-pdf:hover { background: var(--teal-hover); }
 
     /* ── Disclaimer ── */
     .disclaimer {
@@ -1142,7 +1294,7 @@
     .demo-actions { display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; }
     .btn-demo-prev { background: none; border: 1px solid var(--border-light); color: var(--text-muted); padding: 0.45rem 1rem; border-radius: 6px; font-size: 0.84rem; }
     .btn-demo-prev:hover { border-color: var(--text-muted); }
-    .btn-demo-next { background: var(--teal); color: #0a1520; border: none; padding: 0.45rem 1.2rem; border-radius: 6px; font-size: 0.84rem; font-weight: 600; }
+    .btn-demo-next { background: var(--teal); color: var(--on-accent); border: none; padding: 0.45rem 1.2rem; border-radius: 6px; font-size: 0.84rem; font-weight: 600; }
     .btn-demo-next:hover { background: #00c8d4; }
     .btn-demo-close { background: none; border: none; color: var(--text-dim); font-size: 0.8rem; margin-left: auto; text-decoration: underline; }
     .btn-demo-close:hover { color: var(--lobster-pink); }
@@ -1174,6 +1326,7 @@
       /* Hero */
       .hero { padding: 2.5rem 1rem 1.5rem; }
       .hero-sub { font-size: 1rem; }
+      .how-it-works { grid-template-columns: 1fr; margin-top: 1.25rem; }
 
       main { padding: 0 1rem 3rem; }
 
@@ -1202,14 +1355,14 @@
       .section-header { padding: 0.85rem 1rem; flex-wrap: wrap; gap: 0.6rem; }
       .section-header h2 { font-size: 1.35rem; }
       .section-direction { font-size: 0.95rem; }
-      .active-q-banner { padding: 1rem; }
+      .active-q-banner { padding: 1rem; position: static; }
       .active-q-text { overflow-wrap: anywhere; }
       .btn-ghost-sm { min-height: 44px; display: inline-flex; align-items: center; font-size: 0.85rem; }
       .collapsible-trigger { min-height: 44px; }
 
       /* Query optimizer */
       .mode-btn { min-height: 44px; padding: 0.4rem 1rem; font-size: 0.95rem; }
-      .synonyms-row { font-size: 0.95rem; }
+      .synonym-group-term, .synonym-chip { font-size: 0.85rem; }
       .search-string-item { flex-direction: column; align-items: stretch; font-size: 0.95rem; }
       .btn-copy { min-height: 44px; font-size: 0.85rem; padding: 0.5rem 0.75rem; }
 
@@ -1242,7 +1395,7 @@
 
       /* Export */
       .export-row { flex-direction: column; }
-      .btn-export { width: 100%; justify-content: center; min-height: 48px; font-size: 1rem; }
+      .btn-export, .btn-export-pdf { width: 100%; justify-content: center; min-height: 48px; font-size: 1rem; }
       .disclaimer { font-size: 0.85rem; }
 
       /* Demo wizard */
@@ -1316,8 +1469,21 @@
 <!-- ══ HERO ══ -->
 <div class="hero">
   <div class="hero-eyebrow">General Research Tool</div>
-  <h1>Jump<span>start</span> your research</h1>
-  <p class="hero-sub">Enter a research question and get optimized search strings, relevant papers, dataset recommendations, methodology guidance, and an exportable research brief. All in one place.</p>
+  <h1>Research Jump<span>start</span></h1>
+  <div class="how-it-works">
+    <div class="how-step">
+      <div class="how-num">1</div>
+      <div class="how-text">Read below to see what this tool is going to give you. Then, enter your research question (or topic), and click <span class="mini-analyze">Analyze</span>.</div>
+    </div>
+    <div class="how-step">
+      <div class="how-num">2</div>
+      <div class="how-text">Scan your results and check<svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M7.5 12.5l2.8 2.8 6.2-6.2"/></svg> the items you want included on your summary .PDF document.</div>
+    </div>
+    <div class="how-step">
+      <div class="how-num">3</div>
+      <div class="how-text">Export your .PDF and save it to your drive.</div>
+    </div>
+  </div>
 </div>
 
 <!-- ══ MAIN ══ -->
@@ -1463,6 +1629,7 @@
         </div>
       </div>
       <div class="section-body">
+        <p class="flavor-text">An optimized search string and alternatives for more accurate results from <span id="query-flavor-engine">Google</span></p>
         <p class="section-direction">Switch between Google and Google Scholar modes above, then copy any search string directly into your search bar to find sources.</p>
         <div class="synonyms-row" id="synonyms-row"></div>
         <div class="search-strings" id="search-strings"></div>
@@ -1478,6 +1645,7 @@
         </button>
       </div>
       <div class="section-body">
+        <p class="flavor-text">Is this worth spending time even scanning?</p>
         <p class="section-direction">Click "Show guide" above to expand a ranked breakdown of source credibility. Use it to evaluate which sources are strong enough to cite in your paper.</p>
         <div class="collapsible-body" id="tier-body">
           <div class="tier-list">
@@ -1520,6 +1688,7 @@
         <h2><span class="icon">📄</span> Research Papers</h2>
       </div>
       <div class="section-body">
+        <p class="flavor-text">Papers written by people hopefully smarter than both you and myself and what they had to say on this topic</p>
         <p class="section-direction">Browse the papers below. Click <strong>Expand full abstract</strong> to read the full summary, or <strong>Explain in plain English</strong> to get a jargon-free breakdown. Click any paper title to open it.</p>
         <div class="papers-controls">
           <span class="papers-count" id="papers-count"></span>
@@ -1543,9 +1712,16 @@
     <!-- Methodology -->
     <div class="section-card" id="demo-result-method">
       <div class="section-header">
-        <h2><span class="icon">🔬</span> Methodology Suggestion</h2>
+        <div class="section-header-left">
+          <h2><span class="icon">🔬</span> Methodology Suggestion</h2>
+          <label class="section-check-wrap" title="Include in PDF export">
+            <input type="checkbox" class="pdf-check" id="check-methodology" checked onchange="toggleInclude('methodology')" />
+            Include in PDF
+          </label>
+        </div>
       </div>
       <div class="section-body">
+        <p class="flavor-text">How are you going to structure your argument and lay out your results?</p>
         <p class="section-direction">This is the research design best suited to your question, explained in plain English. Use it to frame how you'll approach collecting and analyzing data, and share it with your professor or advisor.</p>
         <div id="methodology-content"></div>
       </div>
@@ -1554,9 +1730,16 @@
     <!-- Suggested Variables -->
     <div class="section-card" id="demo-result-vars">
       <div class="section-header">
-        <h2><span class="icon">📐</span> Suggested Variables</h2>
+        <div class="section-header-left">
+          <h2><span class="icon">📐</span> Suggested Variables</h2>
+          <label class="section-check-wrap" title="Include in PDF export">
+            <input type="checkbox" class="pdf-check" id="check-variables" checked onchange="toggleInclude('variables')" />
+            Include in PDF
+          </label>
+        </div>
       </div>
       <div class="section-body">
+        <p class="flavor-text">What things are we actually examining here?</p>
         <p class="section-direction">These are the key concepts your study measures. Understanding your independent variable (cause), dependent variable (effect), and confounders (things that could skew results) helps you search more precisely and write a stronger paper.</p>
         <div id="variables-content"></div>
       </div>
@@ -1568,6 +1751,7 @@
         <h2><span class="icon">🗄</span> Datasets & Websites</h2>
       </div>
       <div class="section-body">
+        <p class="flavor-text">Oooh, shiny numbers I didn't have to collect myself!</p>
         <p class="section-direction">Click any dataset name below to visit the source directly. These are free, reputable sources relevant to your specific question, good for both background research and data collection.</p>
         <div id="datasets-content"></div>
       </div>
@@ -1579,6 +1763,7 @@
         <h2><span class="icon">🔄</span> Alternative Framings</h2>
       </div>
       <div class="section-body">
+        <p class="flavor-text">Adjust your question to get better, or simply more, data</p>
         <p class="section-direction">Click any framing below to instantly run a fresh analysis on that version of your question. Useful if your original is too broad, too narrow, or you want to try a different angle.</p>
         <div class="refinement-list" id="refinements-content"></div>
       </div>
@@ -1590,8 +1775,10 @@
         <h2><span class="icon">📤</span> Export Your Research Brief</h2>
       </div>
       <div class="section-body">
-        <p class="section-direction">Download a complete .txt file with all your results. Great for bringing to office hours, a library appointment, or sharing with a study group.</p>
+        <p class="flavor-text">Don't forget to save this to a drive that is <em>going with you</em> when you leave if you're in a public place!</p>
+        <p class="section-direction">Export a complete brief with only the results you've checked. Great for bringing to office hours, a library appointment, or sharing with a study group.</p>
         <div class="export-row">
+          <button class="btn-export-pdf" onclick="exportPdf()">⬇ Download .PDF</button>
           <button class="btn-export" onclick="exportBrief()">⬇ Download .txt</button>
         </div>
       </div>
@@ -1630,8 +1817,26 @@ const state = {
   analysisData: null,
   papers: [],
   sessionHistory: [],
-  topicQuestions: []
+  topicQuestions: [],
+  included: { methodology: true, variables: true, google: {}, scholar: {}, papers: {}, datasets: {}, refinements: {} }
 };
+
+// ── PDF-inclusion tracking ─────────────────────────────
+// `idx` omitted → whole-section toggle (methodology/variables).
+// `idx` given   → per-item toggle within a category map.
+function isIncluded(category, idx) {
+  if (idx === undefined || idx === null) return state.included[category] !== false;
+  const map = state.included[category];
+  return !map || map[idx] !== false;
+}
+function toggleInclude(category, idx) {
+  if (idx === undefined || idx === null) {
+    state.included[category] = !isIncluded(category);
+  } else {
+    if (!state.included[category]) state.included[category] = {};
+    state.included[category][idx] = !isIncluded(category, idx);
+  }
+}
 
 // ── Init ───────────────────────────────────────────────
 (function init() {
@@ -1642,6 +1847,18 @@ const state = {
       hd.classList.remove('open');
     }
   });
+})();
+
+// Keep the sticky "Active Research Question" banner (desktop only) flush
+// against the nav's real rendered height, rather than a guessed pixel value.
+(function trackNavHeight() {
+  const nav = document.querySelector('nav');
+  if (!nav) return;
+  function update() {
+    document.documentElement.style.setProperty('--nav-height', nav.offsetHeight + 'px');
+  }
+  update();
+  window.addEventListener('resize', update);
 })();
 
 // ── UI helpers ─────────────────────────────────────────
@@ -1937,6 +2154,9 @@ async function fetchPapers(query) {
 
 // ── Render Results ─────────────────────────────────────
 function renderResults(question, analysis, papers) {
+  state.included = { methodology: true, variables: true, google: {}, scholar: {}, papers: {}, datasets: {}, refinements: {} };
+  document.getElementById('check-methodology').checked = true;
+  document.getElementById('check-variables').checked = true;
   document.getElementById('active-q-text').textContent = question;
   renderQueryOptimizer(analysis);
   renderPapers(papers);
@@ -1952,10 +2172,16 @@ function renderResults(question, analysis, papers) {
 function renderQueryOptimizer(analysis) {
   const synRow = document.getElementById('synonyms-row');
   if (analysis.synonyms && analysis.synonyms.length > 0) {
-    const parts = analysis.synonyms.map(s =>
-      `<strong>"${escHtml(s.term)}"</strong> → also searched: ${s.alternatives.map(a => `"${escHtml(a)}"`).join(', ')}`
-    ).join(' &nbsp;·&nbsp; ');
-    synRow.innerHTML = `<span style="margin-right:0.4rem">🔀</span> ${parts}`;
+    const groups = analysis.synonyms.map(s => `
+      <div class="synonym-group">
+        <span class="synonym-group-term">"${escHtml(s.term)}"</span>
+        <div class="synonym-group-alts">
+          ${s.alternatives.map(a => `<span class="synonym-chip">${escHtml(a)}</span>`).join('')}
+        </div>
+      </div>`).join('');
+    synRow.innerHTML = `
+      <div class="synonyms-heading"><span>🔀</span> Also searched these related terms</div>
+      <div class="synonym-groups">${groups}</div>`;
   } else {
     synRow.innerHTML = '';
   }
@@ -1964,6 +2190,7 @@ function renderQueryOptimizer(analysis) {
   state.currentMode = 'google';
   document.getElementById('mode-google').classList.add('active');
   document.getElementById('mode-scholar').classList.remove('active');
+  document.getElementById('query-flavor-engine').textContent = 'Google';
   renderSearchStrings(state.googleStrings);
 }
 
@@ -1971,13 +2198,18 @@ function switchMode(mode) {
   state.currentMode = mode;
   document.getElementById('mode-google').classList.toggle('active', mode === 'google');
   document.getElementById('mode-scholar').classList.toggle('active', mode === 'scholar');
+  document.getElementById('query-flavor-engine').textContent = mode === 'google' ? 'Google' : 'Google Scholar';
   renderSearchStrings(mode === 'google' ? state.googleStrings : state.scholarStrings);
 }
 
 function renderSearchStrings(strings) {
   const container = document.getElementById('search-strings');
-  container.innerHTML = (strings || []).map((s) => `
+  const mode = state.currentMode;
+  container.innerHTML = (strings || []).map((s, i) => `
     <div class="search-string-item">
+      <label class="pdf-check-wrap" title="Include in PDF export">
+        <input type="checkbox" class="pdf-check" ${isIncluded(mode, i) ? 'checked' : ''} onchange="toggleInclude('${mode}', ${i})" />
+      </label>
       <span class="search-string-text">${escHtml(s)}</span>
       <button class="btn-copy" onclick="copyText(${JSON.stringify(s)}, this)">Copy</button>
     </div>
@@ -2035,6 +2267,7 @@ function renderPapersList(papers) {
     return;
   }
   container.innerHTML = papers.map((p, idx) => {
+    const stableIdx = state.papers.indexOf(p);
     const title     = toTitleCase(p.title || 'Untitled');
     const year      = p.year || 'n.d.';
     const authors   = (p.authors || []).map(a => a.name).join(', ') || 'Unknown authors';
@@ -2071,6 +2304,9 @@ function renderPapersList(papers) {
     return `
     <div class="paper-card" id="paper-${idx}">
       <div class="paper-title">
+        <label class="pdf-check-wrap" title="Include in PDF export">
+          <input type="checkbox" class="pdf-check" ${isIncluded('papers', stableIdx) ? 'checked' : ''} onchange="toggleInclude('papers', ${stableIdx})" />
+        </label>
         <span class="paper-num">${idx + 1}</span>
         <span>${doi ? `<a href="https://doi.org/${doi}" target="_blank" rel="noopener">${escHtml(title)}</a>` : escHtml(title)}</span>
       </div>
@@ -2203,9 +2439,14 @@ function renderDatasets(datasets) {
   }
   document.getElementById('datasets-content').innerHTML = `
     <div class="dataset-list">
-      ${datasets.map(d => `
+      ${datasets.map((d, i) => `
         <div class="dataset-item">
-          <div class="dataset-name"><a href="${escHtml(d.url)}" target="_blank" rel="noopener">${escHtml(d.name)}</a></div>
+          <div class="dataset-name-row">
+            <label class="pdf-check-wrap" title="Include in PDF export">
+              <input type="checkbox" class="pdf-check" ${isIncluded('datasets', i) ? 'checked' : ''} onchange="toggleInclude('datasets', ${i})" />
+            </label>
+            <div class="dataset-name"><a href="${escHtml(d.url)}" target="_blank" rel="noopener">${escHtml(d.name)}</a></div>
+          </div>
           <div class="dataset-desc">${escHtml(d.description)}</div>
         </div>`).join('')}
     </div>`;
@@ -2215,9 +2456,14 @@ function renderDatasets(datasets) {
 function renderRefinements(refinements) {
   if (!refinements || !refinements.length) { document.getElementById('refinements-content').innerHTML = ''; return; }
   document.getElementById('refinements-content').innerHTML = refinements.map((r, i) => `
-    <div class="refinement-item" data-question="${escHtml(r)}" onclick="loadRefinementFromEl(this)">
-      <div class="refinement-label">Alternative ${i + 1}</div>
-      ${escHtml(r)}
+    <div class="refinement-item">
+      <label class="pdf-check-wrap" title="Include in PDF export" onclick="event.stopPropagation()">
+        <input type="checkbox" class="pdf-check" ${isIncluded('refinements', i) ? 'checked' : ''} onchange="toggleInclude('refinements', ${i})" />
+      </label>
+      <div class="refinement-body" data-question="${escHtml(r)}" onclick="loadRefinementFromEl(this)">
+        <div class="refinement-label">Alternative ${i + 1}</div>
+        ${escHtml(r)}
+      </div>
     </div>`).join('');
 }
 
@@ -2284,6 +2530,109 @@ function exportBrief() {
   const a    = document.createElement('a');
   a.href = url; a.download = `jumpstart-brief-${Date.now()}.txt`; a.click();
   URL.revokeObjectURL(url);
+}
+
+// ── PDF export (only checked items) ────────────────────
+function exportPdf() {
+  const q = state.currentQuestion;
+  const a = state.analysisData;
+  const p = state.papers;
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'pt', format: 'letter' });
+  const marginX = 48;
+  const pageW = doc.internal.pageSize.getWidth();
+  const pageH = doc.internal.pageSize.getHeight();
+  const maxW = pageW - marginX * 2;
+  let y = 56;
+
+  function ensureSpace(lines, lineHeight) {
+    if (y + lines * lineHeight > pageH - 48) { doc.addPage(); y = 56; }
+  }
+  function heading(text) {
+    ensureSpace(2, 20);
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(13);
+    doc.text(text, marginX, y); y += 20;
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(10.5);
+  }
+  function para(text, opts) {
+    opts = opts || {};
+    const indent = opts.indent || 0;
+    const lines = doc.splitTextToSize(text, maxW - indent);
+    ensureSpace(lines.length, 14);
+    doc.text(lines, marginX + indent, y);
+    y += lines.length * 14 + (opts.gap != null ? opts.gap : 4);
+  }
+
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(18);
+  doc.text('Jumpstart Research Brief', marginX, y); y += 26;
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(10.5);
+  para(`Research Question: ${q}`, { gap: 12 });
+
+  if (a) {
+    const gStrings = (a.google_strings || []).filter((s, i) => isIncluded('google', i));
+    if (gStrings.length) {
+      heading('Search Strings (Google)');
+      gStrings.forEach((s, i) => para(`${i + 1}. ${s}`));
+      y += 6;
+    }
+    const sStrings = (a.scholar_strings || []).filter((s, i) => isIncluded('scholar', i));
+    if (sStrings.length) {
+      heading('Search Strings (Google Scholar)');
+      sStrings.forEach((s, i) => para(`${i + 1}. ${s}`));
+      y += 6;
+    }
+    if (a.methodology && isIncluded('methodology')) {
+      heading('Methodology Suggestion');
+      para(`Recommended: ${a.methodology.recommended}`, { gap: 2 });
+      para(a.methodology.definition);
+      if (a.methodology.alternatives && a.methodology.alternatives.length) {
+        para(`Also consider: ${a.methodology.alternatives.join(', ')}`);
+      }
+      y += 6;
+    }
+    if (a.variables && isIncluded('variables')) {
+      heading('Suggested Variables');
+      para(`Independent: ${a.variables.independent?.name || ''} — ${a.variables.independent?.explanation || ''}`);
+      para(`Dependent: ${a.variables.dependent?.name || ''} — ${a.variables.dependent?.explanation || ''}`);
+      (a.variables.confounders || []).forEach(c => para(`Confounder: ${c.name} — ${c.explanation}`));
+      y += 6;
+    }
+    const ds = (a.datasets || []).filter((d, i) => isIncluded('datasets', i));
+    if (ds.length) {
+      heading('Datasets & Websites');
+      ds.forEach(d => {
+        para(`${d.name} — ${d.url}`, { gap: 2 });
+        para(d.description, { indent: 10, gap: 8 });
+      });
+    }
+    const refs = (a.refinements || []).filter((r, i) => isIncluded('refinements', i));
+    if (refs.length) {
+      heading('Alternative Framings');
+      refs.forEach((r, i) => para(`${i + 1}. ${r}`));
+      y += 6;
+    }
+  }
+
+  const includedPapers = p.filter((paper) => isIncluded('papers', state.papers.indexOf(paper)));
+  if (includedPapers.length) {
+    heading(`Research Papers (${includedPapers.length})`);
+    includedPapers.forEach((paper, i) => {
+      para(`${i + 1}. ${paper.title}`, { gap: 2 });
+      para(`Authors: ${(paper.authors || []).map(a => a.name).join(', ') || 'Unknown'}`, { indent: 10, gap: 2 });
+      para(`Year: ${paper.year || 'n.d.'}  |  Citations: ${paper.citationCount != null ? paper.citationCount : '—'}`, { indent: 10, gap: 2 });
+      if (paper.journal?.name) para(`Journal: ${paper.journal.name}`, { indent: 10, gap: 2 });
+      if (paper.openAccessPdf?.url) para(`PDF: ${paper.openAccessPdf.url}`, { indent: 10, gap: 2 });
+      if (paper.abstract) {
+        para(`Abstract: ${paper.abstract.substring(0, 300)}${paper.abstract.length > 300 ? '...' : ''}`, { indent: 10, gap: 10 });
+      }
+    });
+  }
+
+  ensureSpace(2, 14);
+  doc.setFontSize(9); doc.setTextColor(120);
+  para('Generated by JumpstartGEN. AI-generated content should be verified. Paper results sourced from Semantic Scholar.');
+
+  doc.save(`jumpstart-brief-${Date.now()}.pdf`);
 }
 
 // ── Keyboard shortcuts ─────────────────────────────────
