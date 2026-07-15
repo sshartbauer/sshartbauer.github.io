@@ -448,6 +448,18 @@
     }
     .btn-primary:hover { background: var(--teal-hover); transform: translateY(-1px); }
     .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .analyze-hint {
+      display: none;
+      font-size: 0.8rem;
+      color: var(--burnt-peach);
+      font-weight: 500;
+      align-self: center;
+    }
+    .btn-primary.attention { animation: analyzePulse 1.4s ease-in-out 3; }
+    @keyframes analyzePulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(0,175,185,0); }
+      50%      { box-shadow: 0 0 0 7px rgba(0,175,185,0.28); }
+    }
 
     /* ── Topic Suggester ── */
     .topic-panel {
@@ -1576,6 +1588,7 @@
       <button class="topic-link" onclick="toggleTopicPanel()">
         ✦ Don't have a question yet? Start with a topic →
       </button>
+      <span class="analyze-hint" id="analyze-hint">Question loaded — click Analyze when ready ↓</span>
       <button class="btn-primary" id="btn-analyze" onclick="runAnalysis()">
         <span id="btn-analyze-text">Analyze Question</span>
       </button>
@@ -2469,12 +2482,16 @@ async function explainAbstract(idx) {
 }
 
 // ── Methodology ────────────────────────────────────────
-function renderMethodology(m) {
-  if (!m) { document.getElementById('methodology-content').innerHTML = '<p style="color:var(--text-muted)">No methodology data.</p>'; return; }
-  // Alternatives may be plain strings (older analysis shape) or {name, definition, why} objects.
-  const alts = (m.alternatives || []).map(alt =>
+// Alternatives may be plain strings (older analysis shape) or {name, definition, why} objects.
+function methodAlts(m) {
+  return (m.alternatives || []).map(alt =>
     typeof alt === 'string' ? { name: alt, definition: '', why: '' } : alt
   );
+}
+
+function renderMethodology(m) {
+  if (!m) { document.getElementById('methodology-content').innerHTML = '<p style="color:var(--text-muted)">No methodology data.</p>'; return; }
+  const alts = methodAlts(m);
   const altCards = alts.map((alt, i) => `
     <div class="method-tier method-tier-alt">
       <div class="method-tier-rank">Alternative ${i + 1}</div>
@@ -2564,7 +2581,10 @@ function loadRefinementFromEl(el) {
 function loadRefinement(question) {
   document.getElementById('question').value = question;
   window.scrollTo({ top: 0, behavior: 'smooth' });
-  setTimeout(() => runAnalysis(), 300);
+  // Don't auto-run: nudge the user toward the Analyze button instead.
+  document.getElementById('analyze-hint').style.display = 'inline';
+  document.getElementById('btn-analyze').classList.add('attention');
+  document.getElementById('question').focus({ preventScroll: true });
 }
 
 // ── Export ─────────────────────────────────────────────
@@ -2581,7 +2601,11 @@ function buildBriefText() {
     if (a.methodology) {
       txt += `\nMETHODOLOGY SUGGESTION\n${'-'.repeat(30)}\n`;
       txt += `Recommended: ${a.methodology.recommended}\n${a.methodology.definition}\n`;
-      if (a.methodology.alternatives?.length) txt += `Also consider: ${a.methodology.alternatives.join(', ')}\n`;
+      if (a.methodology.why) txt += `Why: ${a.methodology.why}\n`;
+      methodAlts(a.methodology).forEach((alt, i) => {
+        txt += `Alternative ${i+1}: ${alt.name}${alt.definition ? ` — ${alt.definition}` : ''}${alt.why ? ` (Why: ${alt.why})` : ''}\n`;
+      });
+      if (a.methodology.why_not) txt += `Why not: ${a.methodology.why_not}\n`;
     }
     if (a.variables) {
       txt += `\nSUGGESTED VARIABLES\n${'-'.repeat(30)}\n`;
@@ -2675,9 +2699,12 @@ function exportPdf() {
       heading('Methodology Suggestion');
       para(`Recommended: ${a.methodology.recommended}`, { gap: 2 });
       para(a.methodology.definition);
-      if (a.methodology.alternatives && a.methodology.alternatives.length) {
-        para(`Also consider: ${a.methodology.alternatives.join(', ')}`);
-      }
+      if (a.methodology.why) para(`Why: ${a.methodology.why}`, { indent: 10 });
+      methodAlts(a.methodology).forEach((alt, i) => {
+        para(`Alternative ${i + 1}: ${alt.name}${alt.definition ? ` — ${alt.definition}` : ''}`, { gap: 2 });
+        if (alt.why) para(`Why: ${alt.why}`, { indent: 10 });
+      });
+      if (a.methodology.why_not) para(`Why not: ${a.methodology.why_not}`);
       y += 6;
     }
     if (a.variables && isIncluded('variables')) {
