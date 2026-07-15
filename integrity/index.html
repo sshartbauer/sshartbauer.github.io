@@ -25,6 +25,8 @@
       --rule:         rgba(22,32,43,0.15);
       --card:         rgba(22,32,43,0.035);
       --card-hover:   rgba(0,95,102,0.08);
+      --body-weight:  400;
+      --display-weight: 400;
     }
 
     /* Dark theme — original navy/teal palette */
@@ -46,6 +48,8 @@
       --rule:         rgba(0,175,185,0.15);
       --card:         rgba(255,255,255,0.04);
       --card-hover:   rgba(0,175,185,0.07);
+      --body-weight:  300;
+      --display-weight: 300;
     }
 
     /* AMOLED theme — same accents as Dark, true-black background */
@@ -67,6 +71,8 @@
       --rule:         rgba(0,175,185,0.15);
       --card:         rgba(255,255,255,0.04);
       --card-hover:   rgba(0,175,185,0.07);
+      --body-weight:  300;
+      --display-weight: 300;
     }
 
     /* High Contrast theme — unchanged from prior .hc implementation */
@@ -88,6 +94,8 @@
       --rule:         rgba(255,255,255,0.25);
       --card:         rgba(255,255,255,0.06);
       --card-hover:   rgba(255,255,255,0.12);
+      --body-weight:  300;
+      --display-weight: 300;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -97,7 +105,7 @@
       background: var(--navy);
       color: var(--text);
       font-family: 'Jost', sans-serif;
-      font-weight: 300;
+      font-weight: var(--body-weight);
       line-height: 1.7;
       min-height: 100vh;
       transition: background 0.3s, color 0.3s;
@@ -256,7 +264,7 @@
     .page-hero h1 {
       font-family: 'Cormorant Garamond', serif;
       font-size: clamp(38px, 6vw, 60px);
-      font-weight: 300;
+      font-weight: var(--display-weight);
       line-height: 1.1;
       color: var(--text);
       margin-bottom: 24px;
@@ -284,7 +292,7 @@
     .section-label {
       font-family: 'Cormorant Garamond', serif;
       font-size: 30px;
-      font-weight: 300;
+      font-weight: var(--display-weight);
       letter-spacing: 0.5px;
       color: var(--teal);
       margin-bottom: 32px;
