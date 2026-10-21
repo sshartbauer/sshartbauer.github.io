@@ -2640,12 +2640,23 @@ function exportBrief() {
 }
 
 // ── PDF export (only checked items) ────────────────────
-function exportPdf() {
+async function loadPdfFont(doc) {
+  try {
+    for (const [file, style] of [['Regular', 'normal'], ['Bold', 'bold'], ['Italic', 'italic']]) {
+      const buf = new Uint8Array(await (await fetch(`fonts/Carlito-${file}.ttf`)).arrayBuffer());
+      let bin = ''; for (let i = 0; i < buf.length; i += 0x8000) bin += String.fromCharCode.apply(null, buf.subarray(i, i + 0x8000));
+      doc.addFileToVFS(`Carlito-${file}.ttf`, btoa(bin)); doc.addFont(`Carlito-${file}.ttf`, 'Carlito', style);
+    }
+    return 'Carlito';
+  } catch (e) { return 'helvetica'; }
+}
+async function exportPdf() {
   const q = state.currentQuestion;
   const a = state.analysisData;
   const p = state.papers;
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ unit: 'pt', format: 'letter' });
+  const FACE = await loadPdfFont(doc);
 
   // Brand palette (site navy and teal on white)
   const C = {
@@ -2668,12 +2679,12 @@ function exportPdf() {
     .replace(/[^\x20-\x7E -ÿ]/g, '')
     .trim();
   const font = (style, size, color, face) => {
-    doc.setFont(face || 'helvetica', style || 'normal');
+    doc.setFont(face || FACE, style || 'normal');
     doc.setFontSize(size);
     doc.setTextColor(color[0], color[1], color[2]);
   };
   const wrap = (text, width, style, size, face) => {
-    doc.setFont(face || 'helvetica', style || 'normal');
+    doc.setFont(face || FACE, style || 'normal');
     doc.setFontSize(size);
     return doc.splitTextToSize(clean(text), width);
   };
@@ -2759,7 +2770,9 @@ function exportPdf() {
   doc.rect(0, 0, pageW, 98, 'F');
   doc.setFillColor(0, 175, 185);
   doc.rect(0, 98, pageW, 4, 'F');
-  font('bold', 25, C.white); doc.text('Jumpstart Research Brief', marginX, 52);
+  font('bold', 25, C.white); doc.text('Jump', marginX, 52);
+  { const w1 = doc.getTextWidth('Jump'); font('bold', 25, [240, 134, 103]); doc.text('start', marginX + w1, 52);
+    const w2 = doc.getTextWidth('start'); font('bold', 25, C.white); doc.text(' Research Brief', marginX + w1 + w2, 52); }
   const dateStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
   font('normal', 10, [190, 210, 225]); doc.text(`Prepared with JumpstartGEN  ·  ${dateStr}`, marginX, 74);
   y = 130;

@@ -1488,17 +1488,28 @@ function exportTxt() {
   download(`jumpstartmed-brief-${stamp()}.txt`, new Blob([parts.join('\n')], { type: 'text/plain' }));
 }
 const ascii = s => String(s == null ? '' : s).replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/[–—]/g, '-').replace(/…/g, '...').replace(/≥/g, '>=').replace(/≤/g, '<=').replace(/×/g, 'x').replace(/•/g, '-').replace(/[^\x09\x0A\x20-\x7E -ÿ]/g, '');
-function exportPDF() {
+async function loadPdfFont(doc) {
+  try {
+    for (const [file, style] of [['Regular', 'normal'], ['Bold', 'bold'], ['Italic', 'italic']]) {
+      const buf = new Uint8Array(await (await fetch(`fonts/Carlito-${file}.ttf`)).arrayBuffer());
+      let bin = ''; for (let i = 0; i < buf.length; i += 0x8000) bin += String.fromCharCode.apply(null, buf.subarray(i, i + 0x8000));
+      doc.addFileToVFS(`Carlito-${file}.ttf`, btoa(bin)); doc.addFont(`Carlito-${file}.ttf`, 'Carlito', style);
+    }
+    return 'Carlito';
+  } catch (e) { return 'helvetica'; }
+}
+async function exportPDF() {
   if (!state.ctx) return;
   if (!window.jspdf) { toast('PDF library did not load. Use the .txt download.'); return; }
   const doc = new window.jspdf.jsPDF({ unit: 'pt', format: 'letter' });
+  const FACE = await loadPdfFont(doc);
   // Same palette as GEN's brief: site navy and teal on white
   const C = { navy: [14, 22, 38], teal: [0, 138, 148], bar: [0, 175, 185], text: [15, 23, 32], muted: [74, 85, 104], card: [238, 243, 248], rule: [205, 214, 224], white: [255, 255, 255] };
   const pageW = doc.internal.pageSize.getWidth(), pageH = doc.internal.pageSize.getHeight();
   const marginX = 54, topY = 64, bottomY = 64, maxW = pageW - marginX * 2;
   let y = topY;
-  const font = (style, size, color) => { doc.setFont('helvetica', style || 'normal'); doc.setFontSize(size); doc.setTextColor(color[0], color[1], color[2]); };
-  const wrap = (text, width, style, size) => { doc.setFont('helvetica', style || 'normal'); doc.setFontSize(size); return doc.splitTextToSize(ascii(text).replace(/\s+/g, ' ').trim() || ' ', width); };
+  const font = (style, size, color) => { doc.setFont(FACE, style || 'normal'); doc.setFontSize(size); doc.setTextColor(color[0], color[1], color[2]); };
+  const wrap = (text, width, style, size) => { doc.setFont(FACE, style || 'normal'); doc.setFontSize(size); return doc.splitTextToSize(ascii(text).replace(/\s+/g, ' ').trim() || ' ', width); };
   const ensure = h => { if (y + h > pageH - bottomY) { doc.addPage(); y = topY; } };
   function para(text, o) {
     o = o || {};
@@ -1538,7 +1549,9 @@ function exportPDF() {
   // Header band
   doc.setFillColor(C.navy[0], C.navy[1], C.navy[2]); doc.rect(0, 0, pageW, 98, 'F');
   doc.setFillColor(C.bar[0], C.bar[1], C.bar[2]); doc.rect(0, 98, pageW, 4, 'F');
-  font('bold', 25, C.white); doc.text('Jumpstart Research Brief', marginX, 52);
+  font('bold', 25, C.white); doc.text('Jump', marginX, 52);
+  { const w1 = doc.getTextWidth('Jump'); font('bold', 25, [240, 134, 103]); doc.text('start', marginX + w1, 52);
+    const w2 = doc.getTextWidth('start'); font('bold', 25, C.white); doc.text(' Research Brief', marginX + w1 + w2, 52); }
   const dateStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
   font('normal', 10, [190, 210, 225]); doc.text(`Prepared with JumpstartMED  ·  ${dateStr}`.replace('·', '|'), marginX, 74);
   y = 130;
