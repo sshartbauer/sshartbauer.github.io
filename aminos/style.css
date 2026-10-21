@@ -41,12 +41,12 @@ html[data-theme="light"] {
 html, body { margin: 0; padding: 0; }
 body {
   background: var(--bg); color: var(--text);
-  font-family: 'Jost', system-ui, sans-serif;
+  font-family: 'Calibri', 'Carlito', sans-serif;
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
 }
 button { font-family: inherit; }
-.titlefont { font-family: 'Cormorant Garamond', Georgia, serif; }
+.titlefont { font-family: 'Calibri', 'Carlito', sans-serif; }
 
 /* accent helper: any element with --c gets tinted bg/border */
 .tint { border-color: var(--c) !important; background: color-mix(in srgb, var(--c) var(--dim), transparent) !important; }
@@ -226,7 +226,7 @@ button { font-family: inherit; }
 }
 .fblock .v { font-size: 18px; font-weight: 500; }
 .fblock .v.none { color: var(--muted2); font-size: 14px; font-weight: 400; font-style: italic; }
-.v-title { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 42px; font-weight: 600; line-height: 1.05; }
+.v-title { font-family: 'Calibri', 'Carlito', sans-serif; font-size: 42px; font-weight: 600; line-height: 1.05; }
 .v-code { font-size: 30px; font-weight: 500; letter-spacing: .04em; }
 .v-formula { font-size: 18px; line-height: 1.5; }
 .v-formula .r { font-size: 14px; color: var(--muted); }
@@ -243,7 +243,7 @@ button { font-family: inherit; }
 }
 .structure-box svg { max-width: 100%; height: auto; display: block; }
 .mol .mol-bonds line { stroke: var(--text); }
-.mol text { fill: var(--text); font-family: 'Jost', system-ui, sans-serif; font-weight: 500; dominant-baseline: central; }
+.mol text { fill: var(--text); font-family: 'Calibri', 'Carlito', sans-serif; font-weight: 500; dominant-baseline: central; }
 
 /* front is bigger than back */
 .back .v-title { font-size: 30px; }
@@ -279,7 +279,7 @@ button { font-family: inherit; }
 .show-btn:hover { border-color: var(--teal); color: var(--teal); }
 
 .empty { text-align: center; max-width: 380px; margin: auto; }
-.empty h2 { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 32px; font-weight: 600; margin: 0 0 8px; color: var(--teal); }
+.empty h2 { font-family: 'Calibri', 'Carlito', sans-serif; font-size: 32px; font-weight: 600; margin: 0 0 8px; color: var(--teal); }
 .empty p { color: var(--muted); font-size: 14px; line-height: 1.5; margin: 0 0 18px; }
 .empty .btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
 

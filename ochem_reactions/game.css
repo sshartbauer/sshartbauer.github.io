@@ -648,7 +648,7 @@
 .tut-body::-webkit-scrollbar { width: 5px; }
 .tut-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 .tut-title {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Calibri', 'Carlito', sans-serif;
   font-size: 1.7rem; font-weight: 600; color: var(--text);
   letter-spacing: -0.01em; margin-bottom: 10px;
 }

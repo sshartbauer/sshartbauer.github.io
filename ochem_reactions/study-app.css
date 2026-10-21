@@ -41,7 +41,7 @@ html[data-theme="hc"] {
 html, body { height: 100%; overflow: hidden; }
 body {
   background: var(--bg); color: var(--text);
-  font-family: 'Jost', sans-serif;
+  font-family: 'Calibri', 'Carlito', sans-serif;
   display: flex; flex-direction: column;
 }
 
@@ -54,7 +54,7 @@ body {
 }
 .topbar-left { display: flex; align-items: center; gap: 8px; }
 .topbar h1 {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Calibri', 'Carlito', sans-serif;
   font-size: 1.4rem; font-weight: 600; letter-spacing: -0.02em;
   color: var(--teal);
 }
