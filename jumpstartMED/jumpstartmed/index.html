@@ -236,11 +236,12 @@
 
     /* ── Layout ── */
     main { max-width:1000px; margin:0 auto; padding:2rem 1.25rem 4rem; }
-    .hero-head { text-align:center; margin-bottom:1.4rem; }
-    .hero-eyebrow { font-size:.78rem; letter-spacing:.14em; text-transform:uppercase; color:var(--teal); font-weight:700; margin-bottom:.6rem; }
-    .med-tool-link { display:inline-block; font-size:.85rem; color:var(--text-muted); margin-bottom:.5rem; }
+    .hero-head { text-align:center; padding-top:2rem; margin-bottom:1.4rem; font-size:1rem; }
+    @media (max-width:640px) { .hero-head { padding-top:0.5rem; } }
+    .hero-eyebrow { font-size:0.78rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--teal); font-weight:500; margin-bottom:0.75rem; }
+    .med-tool-link { display:inline-block; text-decoration:none; font-size:0.82rem; color:var(--text-muted); margin-bottom:0.5rem; transition:color 0.2s; }
     .med-tool-link:hover { color:var(--teal); text-decoration:none; }
-    .hero h1 { font-size:clamp(2.4rem,5vw,3.6rem); font-weight:700; line-height:1.1; margin-bottom:.5rem; }
+    .hero h1 { font-size:clamp(2.4rem,5vw,3.6rem); font-weight:600; margin-bottom:0.75rem; line-height:1.1; }
     .hero h1 span { color:var(--burnt-peach); }
     .tagline { font-size:clamp(1.15rem,2.4vw,1.4rem); color:var(--text); }
     .tagline em { color:var(--teal); font-style:italic; font-weight:700; }
