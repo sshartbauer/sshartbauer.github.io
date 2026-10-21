@@ -7,7 +7,7 @@
   <meta name="description" content="Turn a clinical idea into a feasible first research project. PICO framing, study design, feasibility check, PubMed search, red flags, and a PI pitch for medical students." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Carlito:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     /* ── Variables (shared palette with JumpstartGEN) ── */
@@ -47,17 +47,18 @@
     /* ── Base ── */
     *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
     html { scroll-behavior:smooth; }
-    body { font-family:'Jost',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; line-height:1.65; font-size:1rem; transition:background .2s,color .2s; }
-    h1,h2,h3,h4 { font-family:'Cormorant Garamond',serif; line-height:1.2; }
+    body { font-family:'Calibri','Carlito',sans-serif; font-size:1.06rem; background:var(--bg); color:var(--text); min-height:100vh; line-height:1.65; transition:background .2s,color .2s; }
+    h1,h2,h3,h4 { font-family:'Calibri','Carlito',sans-serif; line-height:1.2; }
+    code { font-family:inherit; font-weight:700; }
     a { color:var(--teal); text-decoration:none; } a:hover { text-decoration:underline; }
-    button,select,input,textarea { font-family:'Jost',sans-serif; font-size:1rem; color:var(--text); }
+    button,select,input,textarea { font-family:'Calibri','Carlito',sans-serif; font-size:1rem; color:var(--text); }
     button { cursor:pointer; }
     :focus-visible { outline:3px solid var(--teal); outline-offset:2px; }
     .sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
 
     /* ── Nav ── */
     nav { background:var(--nav-bg); border-bottom:1px solid var(--border); padding:.8rem 2rem; display:flex; align-items:center; justify-content:space-between; gap:1rem; position:sticky; top:0; z-index:50; backdrop-filter:blur(8px); flex-wrap:wrap; }
-    .brand { font-family:'Cormorant Garamond',serif; font-size:1.7rem; font-weight:600; color:var(--text); }
+    .brand { font-family:'Calibri','Carlito',sans-serif; font-size:1.7rem; font-weight:600; color:var(--text); }
     .brand span { color:var(--lobster-pink); }
     .nav-right { display:flex; gap:.6rem; align-items:center; flex-wrap:wrap; }
     .nav-link { font-size:.9rem; color:var(--text-muted); }
@@ -118,7 +119,7 @@
     #results-area { display:none; margin-top:2rem; }
     .active-q { background:var(--blue-slate-tint); border-left:4px solid var(--teal); padding:.8rem 1rem; border-radius:6px; margin-bottom:1.2rem; }
     .active-q small { color:var(--text-muted); display:block; }
-    .active-q div { font-family:'Cormorant Garamond',serif; font-size:1.35rem; }
+    .active-q div { font-family:'Calibri','Carlito',sans-serif; font-size:1.35rem; }
     .section-card { margin-bottom:1.2rem; overflow:hidden; }
     .section-head { display:flex; justify-content:space-between; align-items:flex-start; gap:1rem; padding:1rem 1.25rem .4rem; flex-wrap:wrap; }
     .section-head h2 { font-size:1.55rem; font-weight:600; }
@@ -134,7 +135,7 @@
 
     .pico-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:.7rem; }
     .pico-cell { background:var(--bg-input); border:1px solid var(--border); border-radius:8px; padding:.6rem .8rem; }
-    .pico-cell b { color:var(--teal); font-family:'Cormorant Garamond',serif; font-size:1.2rem; margin-right:.2rem; }
+    .pico-cell b { color:var(--teal); font-family:'Calibri','Carlito',sans-serif; font-size:1.2rem; margin-right:.2rem; }
     .pico-cell small { display:block; color:var(--text-muted); font-size:.78rem; text-transform:uppercase; letter-spacing:.05em; }
     .q-option { display:flex; gap:.6rem; align-items:flex-start; background:var(--bg-input); border:1px solid var(--border); border-radius:8px; padding:.6rem .8rem; margin-top:.5rem; cursor:pointer; }
     .q-option.sel { border-color:var(--teal); background:var(--blue-slate-tint); }
@@ -146,7 +147,7 @@
     .tab small { display:block; font-size:.72rem; opacity:.85; font-weight:400; }
 
     .verdict { display:flex; align-items:center; gap:1rem; flex-wrap:wrap; margin:.6rem 0; }
-    .verdict .big { font-family:'Cormorant Garamond',serif; font-size:1.9rem; font-weight:600; }
+    .verdict .big { font-family:'Calibri','Carlito',sans-serif; font-size:1.9rem; font-weight:600; }
     .verdict.good .big { color:var(--good); } .verdict.ok .big { color:var(--ok); } .verdict.warn .big { color:var(--warn); } .verdict.bad .big { color:var(--bad); }
     .dim { display:grid; grid-template-columns:140px 1fr; gap:.2rem .8rem; align-items:center; margin:.55rem 0; }
     .dim .name { font-weight:500; }
@@ -166,18 +167,18 @@
     table.timeline th { color:var(--text-muted); font-weight:500; font-size:.82rem; text-transform:uppercase; letter-spacing:.04em; }
 
     .query-row { display:flex; gap:.5rem; flex-wrap:wrap; margin:.4rem 0; }
-    .query-row input { flex:1; min-width:220px; background:var(--bg-input); border:1px solid var(--border-light); border-radius:8px; padding:.5rem .7rem; font-family:ui-monospace,Menlo,Consolas,monospace; font-size:.88rem; }
+    .query-row input { flex:1; min-width:220px; background:var(--bg-input); border:1px solid var(--border-light); border-radius:8px; padding:.5rem .7rem; font-size:.95rem; }
     .toolbar { display:flex; gap:.6rem; flex-wrap:wrap; align-items:center; margin:.6rem 0; }
     .toolbar select { background:var(--bg-input); border:1px solid var(--border-light); border-radius:8px; padding:.35rem .5rem; font-size:.92rem; }
     .paper { background:var(--bg-input); border:1px solid var(--border); border-radius:8px; padding:.8rem 1rem; margin:.6rem 0; }
-    .paper h4 { font-family:'Jost',sans-serif; font-size:1rem; font-weight:600; line-height:1.4; }
+    .paper h4 { font-family:'Calibri','Carlito',sans-serif; font-size:1rem; font-weight:600; line-height:1.4; }
     .paper .meta { font-size:.88rem; color:var(--text-muted); margin:.15rem 0 .35rem; }
     .paper .row { display:flex; gap:.5rem; flex-wrap:wrap; align-items:center; margin-top:.4rem; }
     .abstract { white-space:pre-wrap; font-size:.93rem; margin-top:.5rem; display:none; }
     .abstract.open { display:block; }
     .critique { margin-top:.6rem; border-top:1px dashed var(--border-light); padding-top:.5rem; font-size:.93rem; }
     .dataset { background:var(--bg-input); border:1px solid var(--border); border-radius:8px; padding:.7rem .9rem; margin:.55rem 0; }
-    .dataset h4 { font-family:'Jost',sans-serif; font-size:1rem; font-weight:600; }
+    .dataset h4 { font-family:'Calibri','Carlito',sans-serif; font-size:1rem; font-weight:600; }
     details.more { margin-top:.8rem; } details.more summary { cursor:pointer; color:var(--teal); font-weight:500; }
     .mini-list li { margin:.2rem 0; font-size:.93rem; }
 
