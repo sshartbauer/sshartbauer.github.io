@@ -2656,11 +2656,11 @@ function exportPdf() {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ unit: 'pt', format: 'letter' });
 
-  // Brand palette (matches the site's light theme)
+  // Brand palette (site navy and teal on white)
   const C = {
-    slate: [36, 80, 95], teal: [0, 95, 102], peach: [168, 74, 37],
-    text: [15, 23, 32], muted: [74, 85, 104], card: [245, 242, 236],
-    rule: [205, 200, 190], white: [255, 255, 255]
+    slate: [14, 22, 38], teal: [0, 138, 148], peach: [168, 74, 37],
+    text: [15, 23, 32], muted: [74, 85, 104], card: [238, 243, 248],
+    rule: [205, 214, 224], white: [255, 255, 255]
   };
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
@@ -2766,17 +2766,17 @@ function exportPdf() {
   // ── Header band ──
   doc.setFillColor(C.slate[0], C.slate[1], C.slate[2]);
   doc.rect(0, 0, pageW, 98, 'F');
-  doc.setFillColor(C.teal[0], C.teal[1], C.teal[2]);
+  doc.setFillColor(0, 175, 185);
   doc.rect(0, 98, pageW, 4, 'F');
   font('bold', 25, C.white); doc.text('Jumpstart Research Brief', marginX, 52);
   const dateStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-  font('normal', 10, [205, 224, 229]); doc.text(`Prepared with JumpstartGEN  ·  ${dateStr}`, marginX, 74);
+  font('normal', 10, [190, 210, 225]); doc.text(`Prepared with JumpstartGEN  ·  ${dateStr}`, marginX, 74);
   y = 130;
 
   callout([
     { text: 'RESEARCH QUESTION', size: 8, style: 'bold', color: C.teal, gap: 3 },
     { text: q, size: 13, style: 'bold', color: C.slate }
-  ], C.teal);
+  ], [0, 175, 185]);
 
   if (a) {
     const gStrings = (a.google_strings || []).filter((s, i) => isIncluded('google', i));
@@ -2797,7 +2797,7 @@ function exportPdf() {
         { text: a.methodology.definition, gap: a.methodology.why ? 5 : 0 }
       ];
       if (a.methodology.why) items.push({ text: `Why: ${a.methodology.why}`, size: 10, color: C.muted });
-      callout(items, C.teal);
+      callout(items, [0, 175, 185]);
       methodAlts(a.methodology).forEach((alt, i) => {
         ensure(60);
         para(`Alternative ${i + 1}: ${alt.name}`, { style: 'bold', color: C.slate, gap: 1 });

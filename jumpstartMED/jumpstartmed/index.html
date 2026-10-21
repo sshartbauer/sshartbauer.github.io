@@ -1493,13 +1493,83 @@ function exportPDF() {
   if (!state.ctx) return;
   if (!window.jspdf) { toast('PDF library did not load. Use the .txt download.'); return; }
   const doc = new window.jspdf.jsPDF({ unit: 'pt', format: 'letter' });
-  const M = 54, W = 504, H = 792 - 54; let y = M;
-  const need = h => { if (y + h > H) { doc.addPage(); y = M; } };
-  const write = (txt, size, bold) => { doc.setFont('helvetica', bold ? 'bold' : 'normal'); doc.setFontSize(size); const lh = size * 1.35;
-    String(ascii(txt)).split('\n').forEach(par => { const lines = doc.splitTextToSize(par || ' ', W); lines.forEach(l => { need(lh); doc.text(l, M, y); y += lh; }); }); };
-  write('JumpstartMED Research Brief', 20, true); y += 2; write(stamp(), 10, false); y += 10;
-  briefSections().forEach(s => { y += 8; need(40); write(s.title, 13, true); y += 2; s.lines.forEach(l => write(l, 10.5, false)); });
-  y += 14; write(DISCLAIMER, 8.5, false);
+  // Same palette as GEN's brief: site navy and teal on white
+  const C = { navy: [14, 22, 38], teal: [0, 138, 148], bar: [0, 175, 185], text: [15, 23, 32], muted: [74, 85, 104], card: [238, 243, 248], rule: [205, 214, 224], white: [255, 255, 255] };
+  const pageW = doc.internal.pageSize.getWidth(), pageH = doc.internal.pageSize.getHeight();
+  const marginX = 54, topY = 64, bottomY = 64, maxW = pageW - marginX * 2;
+  let y = topY;
+  const font = (style, size, color) => { doc.setFont('helvetica', style || 'normal'); doc.setFontSize(size); doc.setTextColor(color[0], color[1], color[2]); };
+  const wrap = (text, width, style, size) => { doc.setFont('helvetica', style || 'normal'); doc.setFontSize(size); return doc.splitTextToSize(ascii(text).replace(/\s+/g, ' ').trim() || ' ', width); };
+  const ensure = h => { if (y + h > pageH - bottomY) { doc.addPage(); y = topY; } };
+  function para(text, o) {
+    o = o || {};
+    const size = o.size || 10.5, lh = size * 1.5, indent = o.indent || 0;
+    const ls = wrap(text, maxW - indent, o.style, size);
+    font(o.style, size, o.color || C.text);
+    ls.forEach(l => { ensure(lh); doc.text(l, marginX + indent, y); y += lh; });
+    y += o.gap != null ? o.gap : 6;
+  }
+  function bullet(text, o) {
+    o = o || {};
+    const size = 10.5, lh = size * 1.5, ls = wrap(text, maxW - 16, 'normal', size);
+    ensure(lh);
+    font('bold', size, C.teal); doc.text('-', marginX + 2, y);
+    font('normal', size, o.color || C.text);
+    ls.forEach(l => { ensure(lh); doc.text(l, marginX + 16, y); y += lh; });
+    y += 3;
+  }
+  function heading(text) {
+    ensure(80); y += 12;
+    font('bold', 14, C.teal); doc.text(ascii(text), marginX, y); y += 7;
+    doc.setDrawColor(C.rule[0], C.rule[1], C.rule[2]); doc.setLineWidth(0.75);
+    doc.line(marginX, y, pageW - marginX, y); y += 18;
+  }
+  function callout(label, text) {
+    const padX = 16, padY = 12;
+    const ls = wrap(text, maxW - padX * 2, 'bold', 13);
+    const h = padY * 2 - 3 + 8 * 1.5 + 3 + ls.length * 19.5;
+    ensure(h + 8);
+    doc.setFillColor(C.card[0], C.card[1], C.card[2]); doc.roundedRect(marginX, y, maxW, h, 4, 4, 'F');
+    doc.setFillColor(C.bar[0], C.bar[1], C.bar[2]); doc.rect(marginX, y, 4, h, 'F');
+    let cy = y + padY + 8;
+    font('bold', 8, C.teal); doc.text(label, marginX + padX, cy); cy += 8 * 1.5 + 3;
+    font('bold', 13, C.navy); ls.forEach(l => { doc.text(l, marginX + padX, cy); cy += 19.5; });
+    y += h + 12;
+  }
+  // Header band
+  doc.setFillColor(C.navy[0], C.navy[1], C.navy[2]); doc.rect(0, 0, pageW, 98, 'F');
+  doc.setFillColor(C.bar[0], C.bar[1], C.bar[2]); doc.rect(0, 98, pageW, 4, 'F');
+  font('bold', 25, C.white); doc.text('Jumpstart Research Brief', marginX, 52);
+  const dateStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+  font('normal', 10, [190, 210, 225]); doc.text(`Prepared with JumpstartMED  ·  ${dateStr}`.replace('·', '|'), marginX, 74);
+  y = 130;
+  const secs = briefSections();
+  secs.forEach((sec, si) => {
+    if (si === 0) {
+      callout(state.mode === 'research' ? 'RESEARCH QUESTION' : 'CASE (DE-IDENTIFIED)', sec.lines[0]);
+      sec.lines.slice(1).filter(l => l.trim()).forEach(l => para(l, { size: 10, color: C.muted, gap: 2 }));
+      return;
+    }
+    heading(sec.title);
+    sec.lines.forEach(l => {
+      if (!l.trim()) { y += 4; return; }
+      if (/^\s+/.test(l) && !/^\s*[•]/.test(l)) para(l, { indent: 16, size: 9.5, color: C.muted, gap: 3 });
+      else if (l.startsWith('• ')) bullet(l.slice(2));
+      else if (/^[A-Z][A-Za-z /]+:$/.test(l.trim())) para(l, { style: 'bold', color: C.navy, gap: 3 });
+      else para(l, { gap: 4 });
+    });
+  });
+  ensure(40); y += 8;
+  para(DISCLAIMER, { size: 8.5, style: 'italic', color: C.muted });
+  const n = doc.internal.getNumberOfPages();
+  for (let i = 1; i <= n; i++) {
+    doc.setPage(i);
+    doc.setDrawColor(C.rule[0], C.rule[1], C.rule[2]); doc.setLineWidth(0.5);
+    doc.line(marginX, pageH - 42, pageW - marginX, pageH - 42);
+    font('normal', 8, C.muted);
+    doc.text('Jumpstart Research Brief  |  JumpstartMED', marginX, pageH - 28);
+    doc.text(`Page ${i} of ${n}`, pageW - marginX, pageH - 28, { align: 'right' });
+  }
   doc.save(`jumpstartmed-brief-${stamp()}.pdf`);
 }
 
