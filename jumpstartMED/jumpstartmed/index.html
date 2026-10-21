@@ -72,9 +72,15 @@
 
     /* ── Layout ── */
     main { max-width:1000px; margin:0 auto; padding:2rem 1.25rem 4rem; }
-    .hero h1 { font-size:clamp(2rem,5vw,3.1rem); font-weight:600; }
-    .hero h1 em { color:var(--teal); font-style:italic; }
-    .hero p { color:var(--text-muted); max-width:70ch; margin-top:.5rem; }
+    .hero-head { text-align:center; margin-bottom:1.4rem; }
+    .hero-eyebrow { font-size:.78rem; letter-spacing:.14em; text-transform:uppercase; color:var(--teal); font-weight:700; margin-bottom:.6rem; }
+    .med-tool-link { display:inline-block; font-size:.85rem; color:var(--text-muted); margin-bottom:.5rem; }
+    .med-tool-link:hover { color:var(--teal); text-decoration:none; }
+    .hero h1 { font-size:clamp(2.4rem,5vw,3.6rem); font-weight:700; line-height:1.1; margin-bottom:.5rem; }
+    .hero h1 span { color:var(--burnt-peach); }
+    .tagline { font-size:clamp(1.15rem,2.4vw,1.4rem); color:var(--text); }
+    .tagline em { color:var(--teal); font-style:italic; font-weight:700; }
+    .hero p { color:var(--text-muted); margin-top:.5rem; }
     .cross { font-size:.9rem; margin-top:.6rem; color:var(--text-muted); }
 
     .phi-banner { margin-top:1.25rem; border:1px solid var(--burnt-peach); background:var(--blue-slate-tint); border-radius:var(--radius); padding:.8rem 1rem; font-size:.95rem; }
@@ -91,6 +97,10 @@
     .field label, .field-label { display:block; font-size:.85rem; font-weight:500; color:var(--text-muted); margin-bottom:.25rem; }
     .field select, .field input[type=text], textarea { width:100%; background:var(--bg-input); border:1px solid var(--border-light); border-radius:8px; padding:.55rem .7rem; }
     textarea { min-height:110px; resize:vertical; line-height:1.55; }
+    .ta-wrap { background:var(--bg-input); border:1px solid var(--border-light); border-radius:8px; overflow:hidden; }
+    .ta-wrap:focus-within { border-color:var(--teal); }
+    .ta-wrap textarea { border:none; border-radius:0; background:transparent; display:block; outline-offset:-3px; }
+    .ta-note { color:var(--bad); font-weight:700; font-size:.92rem; padding:.2rem .8rem .5rem; }
     .hint { font-size:.85rem; color:var(--text-muted); margin-top:.25rem; }
     .actions { display:flex; gap:.7rem; align-items:center; margin-top:1rem; flex-wrap:wrap; }
     .btn-primary { background:var(--teal); color:var(--on-accent); border:none; border-radius:8px; padding:.7rem 1.4rem; font-weight:600; }
@@ -206,7 +216,6 @@
 <nav>
   <div class="brand">Jumpstart<span>MED</span></div>
   <div class="nav-right">
-    <a class="nav-link" href="https://jumpstartgen.vercel.app/" target="_blank" rel="noopener">General research tool →</a>
     <div class="history-wrap">
       <button class="btn-history" id="btn-history" aria-haspopup="true" aria-expanded="false">History</button>
       <div class="history-dropdown" id="history-dropdown"><div id="history-list"></div></div>
@@ -219,7 +228,12 @@
 
 <main>
   <section class="hero">
-    <h1>Turn a clinical idea into a <em>doable</em> first project</h1>
+    <div class="hero-head">
+      <div class="hero-eyebrow">Medical Research Tool</div>
+      <a class="med-tool-link" href="https://jumpstartgen.vercel.app/" target="_blank" rel="noopener">Looking for the general research tool? →</a>
+      <h1>Research Jump<span>start</span></h1>
+      <div class="tagline">Turn a clinical idea into a <em>doable</em> first project</div>
+    </div>
     <p>Built for MS1 and MS2 students. Frame your question with PICO, pick a study design that fits your time, skills, and mentor access, check what is already published, and walk away with a pitch you can send to a faculty member.</p>
     <p class="cross">Lab or bench research is outside this tool. It covers clinical, public health, review, case report, quality improvement, and education projects.</p>
   </section>
@@ -234,7 +248,7 @@
   <div class="input-card">
     <div id="input-research">
       <label class="field-label" for="question">Your question or idea</label>
-      <textarea id="question" placeholder='e.g. "Does metformin use in type 2 diabetics lower the risk of dementia compared to sulfonylureas?"'></textarea>
+      <div class="ta-wrap"><textarea id="question" placeholder='e.g. "Does metformin use in type 2 diabetics lower the risk of dementia compared to sulfonylureas?"'></textarea><div class="ta-note">Do not enter identifying info.</div></div>
       <div class="hint">Rough is fine. If it is only a topic, use the suggester below.</div>
       <div class="actions" style="margin-top:.5rem">
         <button class="link-btn" id="btn-topic-toggle" type="button" onclick="toggleTopic()">Only have a topic? Get question ideas</button>
@@ -250,7 +264,7 @@
 
     <div id="input-case" style="display:none">
       <label class="field-label" for="case-desc">What made this case notable? (no identifiers)</label>
-      <textarea id="case-desc" placeholder='e.g. "Adult with new-onset seizures and a rash after starting a common antibiotic. Workup initially pointed to infection, final diagnosis was a drug reaction."'></textarea>
+      <div class="ta-wrap"><textarea id="case-desc" placeholder='e.g. "Adult with new-onset seizures and a rash after starting a common antibiotic. Workup initially pointed to infection, final diagnosis was a drug reaction."'></textarea><div class="ta-note">Do not enter identifying info.</div></div>
       <div class="hint">Use age ranges or "adult" instead of exact ages, and no dates, places, or facility names.</div>
     </div>
 
