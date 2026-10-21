@@ -23,7 +23,7 @@
     }
     body[data-theme="dark"] {
       --blue-slate:#395C6B; --lobster-pink:#C96460; --burnt-peach:#F08667; --teal:#00AFB9; --cream:#FDFCDC;
-      --bg:#111b2e; --bg-card:#192236; --bg-card2:#1e2b42; --bg-input:#0e1627; --nav-bg:rgba(17,27,46,0.96);
+      --bg:#132030; --bg-card:#192236; --bg-card2:#1e2b42; --bg-input:#0e1627; --nav-bg:rgba(19,32,48,0.95);
       --border:#2a3b55; --border-light:#334966; --text:#dde6f0; --text-muted:#7a95b0; --text-dim:#4a6580;
       --shadow:0 4px 24px rgba(0,0,0,0.4); --on-accent:#0a1520; --teal-hover:#00c8d4;
       --blue-slate-tint:rgba(57,92,107,0.22); --blue-slate-tint-strong:rgba(57,92,107,0.4);
@@ -57,18 +57,182 @@
     .sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
 
     /* ── Nav ── */
-    nav { background:var(--nav-bg); border-bottom:1px solid var(--border); padding:.8rem 2rem; display:flex; align-items:center; justify-content:space-between; gap:1rem; position:sticky; top:0; z-index:50; backdrop-filter:blur(8px); flex-wrap:wrap; }
-    .brand { font-family:'Calibri','Carlito',sans-serif; font-size:1.7rem; font-weight:600; color:var(--text); }
-    .brand span { color:var(--lobster-pink); }
-    .nav-right { display:flex; gap:.6rem; align-items:center; flex-wrap:wrap; }
-    .nav-link { font-size:.9rem; color:var(--text-muted); }
-    .theme-select, .btn-history { background:var(--bg-input); border:1px solid var(--border-light); border-radius:8px; padding:.35rem .6rem; font-size:.9rem; }
-    .history-wrap { position:relative; }
-    .history-dropdown { display:none; position:absolute; right:0; top:110%; width:min(380px,90vw); background:var(--bg-card); border:1px solid var(--border-light); border-radius:var(--radius); box-shadow:var(--shadow); padding:.5rem; z-index:60; max-height:60vh; overflow:auto; }
-    .history-dropdown.open { display:block; }
-    .history-item { display:block; width:100%; text-align:left; background:none; border:none; border-bottom:1px solid var(--border); padding:.55rem .4rem; font-size:.9rem; }
-    .history-item:hover { background:var(--blue-slate-tint); }
-    .history-item small { display:block; color:var(--text-muted); }
+    nav {
+      background: var(--nav-bg);
+      border-bottom: 1px solid var(--border);
+      padding: 0.9rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      backdrop-filter: blur(10px);
+    }
+    .nav-left { display: flex; align-items: center; gap: 1rem; }
+    .nav-brand {
+      font-family: 'Calibri', 'Carlito', sans-serif;
+      font-size: 1.55rem;
+      font-weight: 600;
+      color: var(--teal);
+      text-decoration: none;
+    }
+    .nav-brand em { color: var(--burnt-peach); font-style: normal; }
+    .nav-right { display: flex; gap: 0.75rem; align-items: center; }
+    .btn-nav-back { background: transparent; border: 1px solid var(--border-light); color: var(--text-muted); padding: 0.3rem 0.75rem; border-radius: 5px; font-size: 0.78rem; font-family: 'Calibri', 'Carlito', sans-serif; text-decoration: none; transition: all 0.2s; white-space: nowrap; }
+    .btn-nav-back:hover { border-color: var(--teal); color: var(--teal); }
+    .theme-select-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .theme-select {
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      background: none;
+      border: 1px solid var(--border-light);
+      border-radius: 5px;
+      color: var(--text-muted);
+      font-family: 'Calibri', 'Carlito', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.03em;
+      padding: 0.3rem 1.6rem 0.3rem 0.75rem;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: color 0.2s, border-color 0.2s, background 0.2s;
+    }
+    .theme-select option {
+      background: var(--bg);
+      color: var(--text);
+      font-weight: 400;
+    }
+    .theme-select:hover,
+    .theme-select:focus {
+      color: var(--teal);
+      border-color: var(--teal);
+      outline: none;
+    }
+    .theme-select-wrap::after {
+      content: '';
+      position: absolute;
+      right: 0.7rem;
+      top: 50%;
+      width: 6px;
+      height: 6px;
+      border-right: 1px solid var(--text-dim);
+      border-bottom: 1px solid var(--text-dim);
+      transform: translateY(-70%) rotate(45deg);
+      pointer-events: none;
+      transition: border-color 0.2s;
+    }
+    .theme-select-wrap:hover::after {
+      border-color: var(--teal);
+    }
+    body[data-theme="hc"] .theme-select {
+      color: var(--cream);
+      border-color: rgba(253,252,220,0.5);
+      background: rgba(253,252,220,0.08);
+    }
+    body[data-theme="hc"] .theme-select-wrap::after {
+      border-color: var(--cream);
+    }
+    .btn-demo-nav {
+      background: rgba(0,175,185,0.12);
+      border: 1px solid rgba(0,175,185,0.4);
+      color: var(--teal);
+      padding: 0.3rem 0.85rem;
+      border-radius: 5px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    .btn-demo-nav:hover { background: rgba(0,175,185,0.25); }
+
+    /* history dropdown in nav */
+    .history-wrap { position: relative; }
+    .btn-history {
+      background: transparent;
+      border: 1px solid var(--border-light);
+      color: var(--text-muted);
+      padding: 0.3rem 0.75rem;
+      border-radius: 5px;
+      font-size: 0.8rem;
+      display: flex; align-items: center; gap: 0.4rem;
+      transition: all 0.2s;
+    }
+    .btn-history:hover { border-color: var(--teal); color: var(--teal); }
+    .btn-history .badge {
+      background: var(--lobster-pink);
+      color: #fff;
+      border-radius: 99px;
+      font-size: 0.65rem;
+      padding: 0 0.4rem;
+      line-height: 1.5;
+    }
+    .history-dropdown {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      width: 320px;
+      background: var(--bg-card2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      display: none;
+      z-index: 300;
+    }
+    .history-dropdown.open { display: block; }
+    .history-dropdown-header {
+      padding: 0.7rem 1rem;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .history-list { max-height: 260px; overflow-y: auto; }
+    .history-item {
+      padding: 0.65rem 1rem;
+      font-size: 0.88rem;
+      cursor: pointer;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.15s;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .history-item:hover { background: var(--bg-card); color: var(--teal); }
+    .history-empty { padding: 1rem; font-size: 0.85rem; color: var(--text-dim); text-align: center; }
+
+    .history-item { display:block; width:100%; text-align:left; background:none; border:none; border-bottom:1px solid var(--border); color:var(--text); white-space:normal; }
+    .history-item small { display:block; color:var(--text-dim); font-size:0.78rem; }
+    .history-item:hover small { color:var(--text-muted); }
+    /* tutorial */
+    #tut-overlay { position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:500; }
+    #tut-overlay.open { display:flex; }
+    #tut-dim { position:absolute; inset:0; background:rgba(0,0,0,0.6); }
+    #tut-modal { position:relative; background:var(--bg-card); border:1px solid var(--border-light); border-radius:var(--radius); box-shadow:var(--shadow); width:min(520px,calc(100vw - 2rem)); padding:1.4rem 1.5rem; }
+    .tut-dots { display:flex; gap:.35rem; margin-bottom:.8rem; }
+    .tut-dots i { width:8px; height:8px; border-radius:50%; background:var(--border-light); }
+    .tut-dots i.on { background:var(--teal); }
+    #tut-step { font-size:.78rem; letter-spacing:.1em; text-transform:uppercase; color:var(--teal); font-weight:700; }
+    #tut-title { font-size:1.5rem; font-weight:700; margin:.2rem 0 .4rem; }
+    #tut-body { color:var(--text-muted); }
+    .tut-actions { display:flex; justify-content:space-between; gap:.6rem; margin-top:1.1rem; }
+
+    @media (max-width: 640px) {
+      nav { padding: 0.6rem 0.75rem; flex-wrap: wrap; gap: 0.4rem 0.6rem; }
+      .nav-left { gap: 0.5rem; flex-wrap: wrap; }
+      .nav-right { gap: 0.5rem; flex-wrap: wrap; justify-content: flex-end; }
+      .nav-brand { font-size: 1.25rem; }
+      .btn-nav-back, .btn-demo-nav, .btn-history { min-height: 44px; display: inline-flex; align-items: center; font-size: 0.85rem; padding: 0.4rem 0.8rem; }
+      .theme-select { min-height: 44px; padding: 0.4rem 1.8rem 0.4rem 0.8rem; font-size: 0.85rem; }
+      .history-dropdown { width: min(320px, calc(100vw - 1.5rem)); right: -0.75rem; }
+    }
 
     /* ── Layout ── */
     main { max-width:1000px; margin:0 auto; padding:2rem 1.25rem 4rem; }
@@ -214,15 +378,25 @@
 </script>
 
 <nav>
-  <div class="brand">Jumpstart<span>MED</span></div>
+  <div class="nav-left">
+    <a class="nav-brand" href="./">Jump<em>start</em><span style="color:var(--text-muted);font-size:1rem;font-weight:300;margin-left:0.3rem;">MED</span></a>
+    <a class="btn-nav-back" href="https://sshartbauer.github.io">← Home</a>
+    <a class="btn-nav-back" href="https://sshartbauer.github.io/#tools">⚙ Tools</a>
+  </div>
   <div class="nav-right">
+    <button class="btn-demo-nav" type="button" onclick="startTutorial()">▶ Quick Tutorial</button>
     <div class="history-wrap">
-      <button class="btn-history" id="btn-history" aria-haspopup="true" aria-expanded="false">History</button>
-      <div class="history-dropdown" id="history-dropdown"><div id="history-list"></div></div>
+      <button class="btn-history" id="btn-history" type="button" aria-haspopup="true" aria-expanded="false">⏱ History <span class="badge" id="history-badge" style="display:none">0</span></button>
+      <div class="history-dropdown" id="history-dropdown">
+        <div class="history-dropdown-header">Recent analyses</div>
+        <div class="history-list" id="history-list"></div>
+      </div>
     </div>
-    <select class="theme-select" id="theme-select" aria-label="Color theme">
-      <option value="light">Light</option><option value="dark">Dark</option><option value="amoled">AMOLED</option><option value="hc">High contrast</option>
-    </select>
+    <div class="theme-select-wrap">
+      <select class="theme-select" id="theme-select" aria-label="Choose color theme">
+        <option value="light">Light</option><option value="dark">Dark</option><option value="amoled">AMOLED</option><option value="hc">High Contrast</option>
+      </select>
+    </div>
   </div>
 </nav>
 
@@ -231,7 +405,7 @@
     <div class="hero-head">
       <div class="hero-eyebrow">Medical Research Tool</div>
       <a class="med-tool-link" href="https://jumpstartgen.vercel.app/" target="_blank" rel="noopener">Looking for the general research tool? →</a>
-      <h1>Research Jump<span>start</span></h1>
+      <h1>Jump<span>start</span> MED</h1>
       <div class="tagline">Turn a clinical idea into a <em>doable</em> first project</div>
     </div>
     <p>Built for MS1 and MS2 students. Frame your question with PICO, pick a study design that fits your time, skills, and mentor access, check what is already published, and walk away with a pitch you can send to a faculty member.</p>
@@ -248,7 +422,7 @@
   <div class="input-card">
     <div id="input-research">
       <label class="field-label" for="question">Your question or idea</label>
-      <div class="ta-wrap"><textarea id="question" placeholder='e.g. "Does metformin use in type 2 diabetics lower the risk of dementia compared to sulfonylureas?"'></textarea><div class="ta-note">Do not enter identifying info.</div></div>
+      <div class="ta-wrap"><textarea id="question" placeholder='e.g. "Does metformin use in type 2 diabetics lower the risk of dementia compared to sulfonylureas?"'></textarea><div class="ta-note">Do not enter information that could be used to identify any person.</div></div>
       <div class="hint">Rough is fine. If it is only a topic, use the suggester below.</div>
       <div class="actions" style="margin-top:.5rem">
         <button class="link-btn" id="btn-topic-toggle" type="button" onclick="toggleTopic()">Only have a topic? Get question ideas</button>
@@ -264,7 +438,7 @@
 
     <div id="input-case" style="display:none">
       <label class="field-label" for="case-desc">What made this case notable? (no identifiers)</label>
-      <div class="ta-wrap"><textarea id="case-desc" placeholder='e.g. "Adult with new-onset seizures and a rash after starting a common antibiotic. Workup initially pointed to infection, final diagnosis was a drug reaction."'></textarea><div class="ta-note">Do not enter identifying info.</div></div>
+      <div class="ta-wrap"><textarea id="case-desc" placeholder='e.g. "Adult with new-onset seizures and a rash after starting a common antibiotic. Workup initially pointed to infection, final diagnosis was a drug reaction."'></textarea><div class="ta-note">Do not enter information that could be used to identify any person.</div></div>
       <div class="hint">Use age ranges or "adult" instead of exact ages, and no dates, places, or facility names.</div>
     </div>
 
@@ -294,6 +468,14 @@
 <footer>
   JumpstartMED is a planning aid. AI output can be wrong, so check every dataset, guideline, and claim against the original source. It does not replace your institution's IRB, a research mentor, or a medical librarian. Paper records come live from PubMed and registered studies from ClinicalTrials.gov. Evidence labels and study design notes are general teaching points, and your IRB decides what counts as human subjects research at your school.
 </footer>
+<div id="tut-overlay" role="dialog" aria-modal="true" aria-labelledby="tut-title">
+  <div id="tut-dim" onclick="endTutorial()"></div>
+  <div id="tut-modal">
+    <div class="tut-dots" id="tut-dots"></div>
+    <div id="tut-step"></div><div id="tut-title"></div><div id="tut-body"></div>
+    <div class="tut-actions"><button class="btn-secondary" type="button" id="tut-prev" onclick="tutStep(-1)">← Back</button><button class="btn-primary" type="button" id="tut-next" onclick="tutStep(1)">Next →</button></div>
+  </div>
+</div>
 <div id="toast" role="status"></div>
 <script>
 'use strict';
@@ -1251,14 +1433,36 @@ function saveHistory() {
   renderHistory();
 }
 function renderHistory() {
-  const h = loadHistory(), list = $('history-list');
-  list.innerHTML = h.length ? h.map((x, i) => `<button class="history-item" type="button" data-i="${i}">${esc(x.text.slice(0, 110))}${x.text.length > 110 ? '…' : ''}<small>${x.mode === 'case' ? 'Case report' : 'Research'} · ${esc(x.ctx.specialty)} · ${new Date(x.t).toLocaleDateString()}</small></button>`).join('') : '<p class="muted" style="padding:.5rem">No history yet. Past questions are stored only in this browser.</p>';
+  const h = loadHistory(), list = $('history-list'), badge = $('history-badge');
+  if (badge) { badge.textContent = h.length; badge.style.display = h.length ? '' : 'none'; }
+  list.innerHTML = h.length ? h.map((x, i) => `<button class="history-item" type="button" data-i="${i}">${esc(x.text.slice(0, 90))}${x.text.length > 90 ? '…' : ''}<small>${x.mode === 'case' ? 'Case report' : 'Research'} · ${esc(x.ctx.specialty)} · ${new Date(x.t).toLocaleDateString()}</small></button>`).join('') : '<div class="history-empty">No analyses yet. Past questions are stored only in this browser.</div>';
   list.querySelectorAll('.history-item').forEach(b => b.onclick = () => {
     const x = h[b.dataset.i]; setMode(x.mode); (x.mode === 'case' ? $('case-desc') : $('question')).value = x.text;
     $('specialty').value = x.ctx.specialty; $('months').value = x.ctx.months; $('hours').value = x.ctx.hours; $('skill').value = x.ctx.skill; $('mentor').value = x.ctx.mentor;
     $('history-dropdown').classList.remove('open'); window.scrollTo({ top: 0, behavior: 'smooth' }); toast('Loaded. Click Analyze to rerun.');
   });
 }
+
+/* ── Quick tutorial ──────────────────────────────────── */
+const TUTORIAL = [
+  { t: 'Pick your project type', b: 'Choose Research question for a PICO-style plan, or Case report if you saw an interesting patient case. Never enter anything that could identify a person.' },
+  { t: 'Describe your idea and your situation', b: 'Rough is fine. Set specialty, time, hours per week, skills, and mentor status honestly, because the feasibility score depends on them.' },
+  { t: 'Click Analyze', b: 'Cards fill in as results arrive: PICO, study design with feasibility, red flags, PubMed papers, data sources, and a timeline.' },
+  { t: 'Compare designs', b: 'Use the design tabs or the compare dropdown. Scores change with the design, so you can see what a smaller scope or a different design does for you.' },
+  { t: 'Read the evidence', b: 'Edit the PubMed search, filter by trials or reviews, and use Explain and critique on any abstract. The ClinicalTrials.gov list shows whether someone is already running your study.' },
+  { t: 'Pitch and export', b: 'Generate a cold email and study outline to bring to a faculty member, tick the cards you want, then download a PDF or text brief.' }
+];
+let tutI = 0;
+function startTutorial() { tutI = 0; $('tut-overlay').classList.add('open'); drawTutorial(); $('tut-next').focus(); }
+function endTutorial() { $('tut-overlay').classList.remove('open'); }
+function tutStep(d) { if (tutI + d >= TUTORIAL.length) { endTutorial(); return; } tutI = Math.max(0, tutI + d); drawTutorial(); }
+function drawTutorial() {
+  const s = TUTORIAL[tutI];
+  $('tut-step').textContent = `Step ${tutI + 1} of ${TUTORIAL.length}`; $('tut-title').textContent = s.t; $('tut-body').textContent = s.b;
+  $('tut-dots').innerHTML = TUTORIAL.map((_, i) => `<i class="${i === tutI ? 'on' : ''}"></i>`).join('');
+  $('tut-prev').style.visibility = tutI ? 'visible' : 'hidden'; $('tut-next').textContent = tutI === TUTORIAL.length - 1 ? 'Done' : 'Next →';
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') endTutorial(); });
 
 /* ── Init ────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', () => {
