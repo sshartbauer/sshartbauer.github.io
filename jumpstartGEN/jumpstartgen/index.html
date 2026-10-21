@@ -715,15 +715,6 @@
       gap: 1rem;
       flex-wrap: wrap;
     }
-    /* Sticky under the nav on desktop only — mobile keeps normal flow (see responsive block) */
-    @media (min-width: 641px) {
-      .active-q-banner {
-        position: sticky;
-        top: var(--nav-height, 60px);
-        z-index: 90;
-        background: linear-gradient(135deg, rgba(0,175,185,0.12), rgba(57,92,107,0.12)), var(--bg);
-      }
-    }
     .active-q-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--teal); font-weight: 600; margin-bottom: 0.3rem; }
     .active-q-text { font-size: 1rem; font-weight: 500; color: var(--text); }
     .btn-ghost-sm {
