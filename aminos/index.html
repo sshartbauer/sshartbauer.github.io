@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Amino Acid Recall — Hartbauer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script>
+  // Apply the saved theme before first paint.
+  (function () {
+    try {
+      var t = localStorage.getItem('recall:theme');
+      if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+    } catch (e) {}
+  })();
+</script>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="home-btn" href="../index.html">&larr; Home</a>
+  <div class="brand">
+    <span class="icon" id="deckIcon">🧬</span>
+    <h1 class="titlefont" id="deckTitle">Amino Acid Recall</h1>
+  </div>
+  <button class="pill-btn danger" id="resetBtn" type="button">Reset progress</button>
+  <select class="theme-select" id="themeSelect" aria-label="Theme">
+    <option value="dark">Dark</option>
+    <option value="light">Light</option>
+  </select>
+</header>
+
+<main class="layout">
+
+  <!-- Front / back field pickers -->
+  <section class="panel fields-panel" aria-label="Card fields">
+    <div class="field-group">
+      <div class="section-label">Presets</div>
+      <div class="preset-row" id="presets"></div>
+    </div>
+    <div class="field-group">
+      <div class="section-label">Front shows
+        <span><button class="mini-link" data-side="front" data-all="1">All</button><button class="mini-link" data-side="front" data-all="0">None</button></span>
+      </div>
+      <div id="frontFields"></div>
+    </div>
+    <div class="field-group">
+      <div class="section-label">Back shows
+        <span><button class="mini-link" data-side="back" data-all="1">All</button><button class="mini-link" data-side="back" data-all="0">None</button></span>
+      </div>
+      <div id="backFields"></div>
+    </div>
+  </section>
+
+  <!-- Classification key + progress -->
+  <section class="panel side-panel" aria-label="Key and progress">
+    <div class="section-label">Classification key</div>
+    <div id="keyList"></div>
+
+    <div class="section-label stats-label">Progress</div>
+    <div class="stat-grid">
+      <div class="stat-box"><div class="num" id="statMastered">0</div><div class="lbl">Mastered</div></div>
+      <div class="stat-box"><div class="num" id="statTotal">0</div><div class="lbl">In deck</div></div>
+      <div class="stat-box"><div class="num sm" id="statLearning">0</div><div class="lbl">Learning</div></div>
+      <div class="stat-box"><div class="num sm" id="statNew">0</div><div class="lbl">New</div></div>
+    </div>
+    <div class="mastery-track"><div class="mastery-fill" id="masteryFill"></div></div>
+    <p class="fine-print" id="masteryNote"></p>
+  </section>
+
+  <!-- Card column -->
+  <section class="main-col" aria-label="Study">
+    <div class="key-strip" id="keyStrip"></div>
+
+    <div class="progress-bar">
+      <span id="sessionPos">—</span>
+      <div class="dots" id="dots"></div>
+      <div class="spacer"></div>
+      <div class="seg" role="group" aria-label="Session scope">
+        <button type="button" data-scope="due">Due</button>
+        <button type="button" data-scope="all">All cards</button>
+      </div>
+      <button class="nav-btn" id="prevBtn" type="button" title="Previous (←)">&larr; Prev</button>
+      <button class="nav-btn" id="skipBtn" type="button" title="Skip (→)">Skip &rarr;</button>
+    </div>
+
+    <div class="autoplay-panel">
+      <button class="play-btn" id="playBtn" type="button" title="Play / pause (P)" aria-label="Play">&#9654;</button>
+      <label class="interval-field">Interval
+        <input type="text" id="intervalInput" inputmode="numeric" autocomplete="off" aria-label="Interval in milliseconds">
+        ms
+      </label>
+      <label class="toggle"><input type="checkbox" id="loopToggle"><span class="switch"></span>Loop</label>
+      <label class="toggle"><input type="checkbox" id="shuffleToggle"><span class="switch"></span>Shuffle</label>
+      <div class="spacer"></div>
+      <span class="kbd-hint">Space flip · 1–4 rate · P play</span>
+    </div>
+
+    <div class="card-panel" id="card"></div>
+  </section>
+
+</main>
+
+<script src="js/structures.js"></script>
+<script src="js/srs.js"></script>
+<script src="decks/amino-acids.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

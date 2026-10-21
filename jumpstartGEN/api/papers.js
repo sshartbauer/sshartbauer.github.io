@@ -27,24 +27,49 @@ export default async function handler(req) {
 
   const url = `${SS_BASE}?query=${encodeURIComponent(query)}&fields=${FIELDS}&limit=12`;
 
-  try {
-    const ssKey = process.env.SEMANTIC_SCHOLAR_API_KEY;
-    const res = await fetch(url, {
-      headers: {
-        'Accept': 'application/json',
-        ...(ssKey ? { 'x-api-key': ssKey } : {}),
-      },
-    });
-    if (!res.ok) {
+  const ssKey = process.env.SEMANTIC_SCHOLAR_API_KEY;
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+  // Try with the key first. If the key is rejected (401/403), retry once without it.
+  // Retry 429/5xx with short backoff (Edge functions have limited time, keep it tight).
+  let useKey = !!ssKey;
+  let lastStatus = 0;
+  let lastMsg = '';
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      const res = await fetch(url, {
+        headers: {
+          'Accept': 'application/json',
+          ...(useKey ? { 'x-api-key': ssKey } : {}),
+        },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        return new Response(JSON.stringify(data), {
+          status: 200,
+          headers: { ...CORS, 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=300' },
+        });
+      }
+      lastStatus = res.status;
       const body = await res.json().catch(() => ({}));
-      return jsonError(body?.message || `Semantic Scholar error ${res.status}`, res.status);
+      lastMsg = body?.message || body?.error || '';
+      console.error('S2 error', res.status, lastMsg, 'key:', useKey);
+
+      if ((res.status === 401 || res.status === 403) && useKey) {
+        useKey = false; // bad/expired key, fall back to unauthenticated
+        continue;
+      }
+      if (res.status === 429 || res.status >= 500) {
+        await sleep(600 * (attempt + 1));
+        continue;
+      }
+      break; // other 4xx, retrying will not help
+    } catch (err) {
+      console.error('S2 fetch failed', String(err));
+      lastStatus = 502;
+      lastMsg = 'Failed to reach Semantic Scholar.';
+      await sleep(400);
     }
-    const data = await res.json();
-    return new Response(JSON.stringify(data), {
-      status: 200,
-      headers: { ...CORS, 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=300' },
-    });
-  } catch (err) {
-    return jsonError('Failed to reach Semantic Scholar.', 502);
   }
+  return jsonError(lastMsg || `Semantic Scholar error ${lastStatus}`, lastStatus || 502);
 }

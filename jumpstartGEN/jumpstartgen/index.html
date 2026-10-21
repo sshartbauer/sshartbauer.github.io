@@ -2163,11 +2163,11 @@ async function runAnalysis() {
     setLoadingStep('Fetching papers from Semantic Scholar…');
     // Papers failing should not block the analysis from rendering
     let papersError = false;
-    const papers = await fetchPapers(analysisData.search_query_plain).catch(() => { papersError = true; return []; });
+    const papers = await fetchPapers(analysisData.search_query_plain).catch(err => { console.error('Papers fetch failed:', err.message); papersError = true; state.papersErrorCode = err.message; return []; });
     state.papers = papers;
     if (papersError || papers.length === 0) {
       document.getElementById('papers-error').textContent = papersError
-        ? 'Semantic Scholar is temporarily unavailable. Try again in a moment, or paste a search string from the Query Optimizer into Google Scholar directly.'
+        ? 'Semantic Scholar is temporarily unavailable (' + (state.papersErrorCode || 'unknown error') + '). Try again in a moment, or paste a search string from the Query Optimizer into Google Scholar directly.'
         : 'No papers found for this query. Try a different search string from the Query Optimizer above.';
       document.getElementById('papers-error').style.display = 'block';
     } else {
