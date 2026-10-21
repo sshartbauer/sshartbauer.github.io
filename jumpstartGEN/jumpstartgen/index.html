@@ -2653,80 +2653,184 @@ function exportPdf() {
   const p = state.papers;
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ unit: 'pt', format: 'letter' });
-  const marginX = 48;
+
+  // Brand palette (matches the site's light theme)
+  const C = {
+    slate: [36, 80, 95], teal: [0, 95, 102], peach: [168, 74, 37],
+    text: [15, 23, 32], muted: [74, 85, 104], card: [245, 242, 236],
+    rule: [205, 200, 190], white: [255, 255, 255]
+  };
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
+  const marginX = 54, topY = 64, bottomY = 64;
   const maxW = pageW - marginX * 2;
-  let y = 56;
+  let y = topY;
 
-  function ensureSpace(lines, lineHeight) {
-    if (y + lines * lineHeight > pageH - 48) { doc.addPage(); y = 56; }
+  // jsPDF's built-in fonts only cover Latin-1, so normalize punctuation and drop other glyphs
+  const clean = t => String(t == null ? '' : t)
+    .replace(/[‘’]/g, "'").replace(/[“”]/g, '"')
+    .replace(/—/g, ' - ').replace(/[–−]/g, '-')
+    .replace(/…/g, '...')
+    .replace(/\s+/g, ' ')
+    .replace(/[^\x20-\x7E -ÿ]/g, '')
+    .trim();
+  const font = (style, size, color, face) => {
+    doc.setFont(face || 'helvetica', style || 'normal');
+    doc.setFontSize(size);
+    doc.setTextColor(color[0], color[1], color[2]);
+  };
+  const wrap = (text, width, style, size, face) => {
+    doc.setFont(face || 'helvetica', style || 'normal');
+    doc.setFontSize(size);
+    return doc.splitTextToSize(clean(text), width);
+  };
+  const ensure = h => { if (y + h > pageH - bottomY) { doc.addPage(); y = topY; } };
+
+  function para(text, o) {
+    o = o || {};
+    const size = o.size || 10.5, lh = size * 1.5, indent = o.indent || 0;
+    const ls = wrap(text, maxW - indent, o.style, size, o.face);
+    font(o.style, size, o.color || C.text, o.face);
+    ls.forEach(l => { ensure(lh); doc.text(l, marginX + indent, y); y += lh; });
+    y += o.gap != null ? o.gap : 6;
+  }
+  function link(url, o) {
+    o = o || {};
+    const size = 9.5, lh = size * 1.5, indent = o.indent || 0;
+    const ls = wrap(url, maxW - indent, 'normal', size);
+    font('normal', size, C.teal);
+    ls.forEach(l => { ensure(lh); doc.textWithLink(l, marginX + indent, y, { url }); y += lh; });
+    y += o.gap != null ? o.gap : 2;
   }
   function heading(text) {
-    ensureSpace(2, 20);
-    doc.setFont('helvetica', 'bold'); doc.setFontSize(13);
-    doc.text(text, marginX, y); y += 20;
-    doc.setFont('helvetica', 'normal'); doc.setFontSize(10.5);
+    ensure(80);
+    y += 12;
+    font('bold', 14, C.teal); doc.text(clean(text), marginX, y);
+    y += 7;
+    doc.setDrawColor(C.rule[0], C.rule[1], C.rule[2]); doc.setLineWidth(0.75);
+    doc.line(marginX, y, pageW - marginX, y);
+    y += 18;
   }
-  function para(text, opts) {
-    opts = opts || {};
-    const indent = opts.indent || 0;
-    const lines = doc.splitTextToSize(text, maxW - indent);
-    ensureSpace(lines.length, 14);
-    doc.text(lines, marginX + indent, y);
-    y += lines.length * 14 + (opts.gap != null ? opts.gap : 4);
+  // Shaded box with a colored left bar; items = [{text, size, style, color, gap}]
+  function callout(items, bar) {
+    const padX = 16, padY = 12;
+    const prep = items.map(it => {
+      const size = it.size || 10.5;
+      return { it, size, lh: size * 1.5, ls: wrap(it.text, maxW - padX * 2, it.style, size) };
+    });
+    const h = padY * 2 - 3 + prep.reduce((s, x) => s + x.ls.length * x.lh + (x.it.gap || 0), 0);
+    ensure(h + 8);
+    doc.setFillColor(C.card[0], C.card[1], C.card[2]);
+    doc.roundedRect(marginX, y, maxW, h, 4, 4, 'F');
+    doc.setFillColor(bar[0], bar[1], bar[2]);
+    doc.rect(marginX, y, 4, h, 'F');
+    let cy = y + padY + prep[0].size;
+    prep.forEach(x => {
+      font(x.it.style, x.size, x.it.color || C.text);
+      x.ls.forEach(l => { doc.text(l, marginX + padX, cy); cy += x.lh; });
+      cy += x.it.gap || 0;
+    });
+    y += h + 12;
+  }
+  // Numbered monospace box for search strings
+  function codeLine(n, text) {
+    const size = 9.5, lh = 13.5, padX = 10, padY = 8, numW = 22;
+    const ls = wrap(text, maxW - numW - padX * 2, 'normal', size, 'courier');
+    const h = ls.length * lh + padY * 2 - 3;
+    ensure(h + 6);
+    doc.setFillColor(C.card[0], C.card[1], C.card[2]);
+    doc.roundedRect(marginX, y, maxW, h, 4, 4, 'F');
+    font('bold', 9.5, C.teal); doc.text(String(n), marginX + padX, y + padY + 8);
+    font('normal', size, C.text, 'courier');
+    ls.forEach((l, i) => doc.text(l, marginX + numW + padX, y + padY + 8 + i * lh));
+    y += h + 6;
+  }
+  // Colored tag + name + explanation (variables)
+  function tagged(tag, color, name, expl) {
+    const colX = marginX + 92, colW = maxW - 92, lh = 15;
+    const nameL = wrap(name, colW, 'bold', 10.5);
+    const explL = wrap(expl, colW, 'normal', 10.5);
+    ensure((nameL.length + explL.length) * lh + 10);
+    doc.setFillColor(color[0], color[1], color[2]);
+    doc.roundedRect(marginX, y - 11, 80, 16, 3, 3, 'F');
+    font('bold', 7.5, C.white); doc.text(tag.toUpperCase(), marginX + 40, y, { align: 'center' });
+    font('bold', 10.5, C.text);
+    nameL.forEach(l => { doc.text(l, colX, y); y += lh; });
+    font('normal', 10.5, C.muted);
+    explL.forEach(l => { doc.text(l, colX, y); y += lh; });
+    y += 8;
   }
 
-  doc.setFont('helvetica', 'bold'); doc.setFontSize(18);
-  doc.text('Jumpstart Research Brief', marginX, y); y += 26;
-  doc.setFont('helvetica', 'normal'); doc.setFontSize(10.5);
-  para(`Research Question: ${q}`, { gap: 12 });
+  // ── Header band ──
+  doc.setFillColor(C.slate[0], C.slate[1], C.slate[2]);
+  doc.rect(0, 0, pageW, 98, 'F');
+  doc.setFillColor(C.teal[0], C.teal[1], C.teal[2]);
+  doc.rect(0, 98, pageW, 4, 'F');
+  font('bold', 25, C.white); doc.text('Jumpstart Research Brief', marginX, 52);
+  const dateStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+  font('normal', 10, [205, 224, 229]); doc.text(`Prepared with JumpstartGEN  ·  ${dateStr}`, marginX, 74);
+  y = 130;
+
+  callout([
+    { text: 'RESEARCH QUESTION', size: 8, style: 'bold', color: C.teal, gap: 3 },
+    { text: q, size: 13, style: 'bold', color: C.slate }
+  ], C.teal);
 
   if (a) {
     const gStrings = (a.google_strings || []).filter((s, i) => isIncluded('google', i));
     if (gStrings.length) {
-      heading('Search Strings (Google)');
-      gStrings.forEach((s, i) => para(`${i + 1}. ${s}`));
-      y += 6;
+      heading('Search Strings: Google');
+      gStrings.forEach((s, i) => codeLine(i + 1, s));
     }
     const sStrings = (a.scholar_strings || []).filter((s, i) => isIncluded('scholar', i));
     if (sStrings.length) {
-      heading('Search Strings (Google Scholar)');
-      sStrings.forEach((s, i) => para(`${i + 1}. ${s}`));
-      y += 6;
+      heading('Search Strings: Google Scholar');
+      sStrings.forEach((s, i) => codeLine(i + 1, s));
     }
     if (a.methodology && isIncluded('methodology')) {
       heading('Methodology Suggestion');
-      para(`Recommended: ${a.methodology.recommended}`, { gap: 2 });
-      para(a.methodology.definition);
-      if (a.methodology.why) para(`Why: ${a.methodology.why}`, { indent: 10 });
+      const items = [
+        { text: 'RECOMMENDED APPROACH', size: 8, style: 'bold', color: C.teal, gap: 3 },
+        { text: a.methodology.recommended, size: 13, style: 'bold', color: C.slate, gap: 3 },
+        { text: a.methodology.definition, gap: a.methodology.why ? 5 : 0 }
+      ];
+      if (a.methodology.why) items.push({ text: `Why: ${a.methodology.why}`, size: 10, color: C.muted });
+      callout(items, C.teal);
       methodAlts(a.methodology).forEach((alt, i) => {
-        para(`Alternative ${i + 1}: ${alt.name}${alt.definition ? ` — ${alt.definition}` : ''}`, { gap: 2 });
-        if (alt.why) para(`Why: ${alt.why}`, { indent: 10 });
+        ensure(60);
+        para(`Alternative ${i + 1}: ${alt.name}`, { style: 'bold', color: C.slate, gap: 1 });
+        if (alt.definition) para(alt.definition, { gap: 2 });
+        if (alt.why) para(`Why: ${alt.why}`, { indent: 12, size: 10, color: C.muted, gap: 8 });
       });
-      if (a.methodology.why_not) para(`Why not: ${a.methodology.why_not}`);
-      y += 6;
+      if (a.methodology.why_not) para(`Why not: ${a.methodology.why_not}`, { size: 10, color: C.muted });
     }
     if (a.variables && isIncluded('variables')) {
       heading('Suggested Variables');
-      para(`Independent: ${a.variables.independent?.name || ''} — ${a.variables.independent?.explanation || ''}`);
-      para(`Dependent: ${a.variables.dependent?.name || ''} — ${a.variables.dependent?.explanation || ''}`);
-      (a.variables.confounders || []).forEach(c => para(`Confounder: ${c.name} — ${c.explanation}`));
-      y += 6;
+      tagged('Independent', C.teal, a.variables.independent?.name || '', a.variables.independent?.explanation || '');
+      tagged('Dependent', C.slate, a.variables.dependent?.name || '', a.variables.dependent?.explanation || '');
+      (a.variables.confounders || []).forEach(c => tagged('Confounder', C.peach, c.name, c.explanation));
     }
     const ds = (a.datasets || []).filter((d, i) => isIncluded('datasets', i));
     if (ds.length) {
       heading('Datasets & Websites');
       ds.forEach(d => {
-        para(`${d.name} — ${d.url}`, { gap: 2 });
-        para(d.description, { indent: 10, gap: 8 });
+        ensure(70);
+        para(d.name, { style: 'bold', size: 11, gap: 1 });
+        if (d.url) link(d.url);
+        para(d.description, { size: 10, color: C.muted, gap: 12 });
       });
     }
     const refs = (a.refinements || []).filter((r, i) => isIncluded('refinements', i));
     if (refs.length) {
       heading('Alternative Framings');
-      refs.forEach((r, i) => para(`${i + 1}. ${r}`));
-      y += 6;
+      refs.forEach((r, i) => {
+        const ls = wrap(r, maxW - 22, 'normal', 10.5);
+        ensure(ls.length * 15.75 + 8);
+        font('bold', 10.5, C.teal); doc.text(`${i + 1}.`, marginX, y);
+        font('normal', 10.5, C.text);
+        ls.forEach(l => { doc.text(l, marginX + 22, y); y += 15.75; });
+        y += 6;
+      });
     }
   }
 
@@ -2734,20 +2838,44 @@ function exportPdf() {
   if (includedPapers.length) {
     heading(`Research Papers (${includedPapers.length})`);
     includedPapers.forEach((paper, i) => {
-      para(`${i + 1}. ${paper.title}`, { gap: 2 });
-      para(`Authors: ${(paper.authors || []).map(a => a.name).join(', ') || 'Unknown'}`, { indent: 10, gap: 2 });
-      para(`Year: ${paper.year || 'n.d.'}  |  Citations: ${paper.citationCount != null ? paper.citationCount : '—'}`, { indent: 10, gap: 2 });
-      if (paper.journal?.name) para(`Journal: ${paper.journal.name}`, { indent: 10, gap: 2 });
-      if (paper.openAccessPdf?.url) para(`PDF: ${paper.openAccessPdf.url}`, { indent: 10, gap: 2 });
+      const pgBefore = doc.internal.getNumberOfPages();
+      ensure(150); // keep each paper entry together
+      if (i > 0 && doc.internal.getNumberOfPages() === pgBefore) {
+        doc.setDrawColor(C.rule[0], C.rule[1], C.rule[2]); doc.setLineWidth(0.5);
+        doc.line(marginX, y - 2, pageW - marginX, y - 2);
+        y += 12;
+      }
+      para(`${i + 1}. ${paper.title}`, { style: 'bold', size: 11, gap: 2 });
+      const names = (paper.authors || []).map(x => x.name);
+      const authors = names.length > 6 ? names.slice(0, 6).join(', ') + ', et al.' : names.join(', ');
+      para(authors || 'Unknown authors', { size: 9.5, color: C.muted, gap: 2 });
+      const meta = [
+        paper.year || 'n.d.',
+        paper.citationCount != null ? `${paper.citationCount} citation${paper.citationCount === 1 ? '' : 's'}` : null,
+        paper.journal?.name
+      ].filter(Boolean).join('  ·  ');
+      para(meta, { size: 9.5, style: 'bold', color: C.slate, gap: 2 });
+      if (paper.openAccessPdf?.url) link(paper.openAccessPdf.url, { gap: 3 });
       if (paper.abstract) {
-        para(`Abstract: ${paper.abstract.substring(0, 300)}${paper.abstract.length > 300 ? '...' : ''}`, { indent: 10, gap: 10 });
+        para(`${paper.abstract.substring(0, 300)}${paper.abstract.length > 300 ? '...' : ''}`, { size: 9.5, gap: 6 });
       }
     });
   }
 
-  ensureSpace(2, 14);
-  doc.setFontSize(9); doc.setTextColor(120);
-  para('Generated by JumpstartGEN. AI-generated content should be verified. Paper results sourced from Semantic Scholar.');
+  ensure(40);
+  y += 8;
+  para('AI-generated content should be verified. Paper results sourced from Semantic Scholar.', { size: 8.5, style: 'italic', color: C.muted });
+
+  // ── Footer on every page ──
+  const n = doc.internal.getNumberOfPages();
+  for (let i = 1; i <= n; i++) {
+    doc.setPage(i);
+    doc.setDrawColor(C.rule[0], C.rule[1], C.rule[2]); doc.setLineWidth(0.5);
+    doc.line(marginX, pageH - 42, pageW - marginX, pageH - 42);
+    font('normal', 8, C.muted);
+    doc.text('Jumpstart Research Brief  ·  JumpstartGEN', marginX, pageH - 28);
+    doc.text(`Page ${i} of ${n}`, pageW - marginX, pageH - 28, { align: 'right' });
+  }
 
   doc.save(`jumpstart-brief-${Date.now()}.pdf`);
 }
